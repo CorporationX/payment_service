@@ -4,3 +4,8 @@ server:
 logging:
   level:
     root: info
+
+currency:
+  base_url: https://v6.exchangerate-api.com/v6/
+  key_api: keyapi
+  cron: "0 0 8 * * *"
