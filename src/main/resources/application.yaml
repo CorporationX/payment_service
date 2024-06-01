@@ -8,3 +8,15 @@ spring:
 logging:
   level:
     root: info
+
+controller:
+  payment:
+    url: api/v1/payments
+
+services:
+  openexchangerates:
+    app_id: ca800d6c1f28496a9461bd842d20b919
+
+currencyConverter:
+  commission: 1.01
+
