@@ -3,6 +3,7 @@ package faang.school.paymentservice.service;
 import faang.school.paymentservice.client.ExchangeRatesClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.client.ExchangeRatesResponse;
+import faang.school.paymentservice.validator.CurrencyValidator;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ import java.util.Map;
 @Data
 public class CurrencyConverter {
     private final ExchangeRatesClient exchangeRatesClient;
+    private final CurrencyValidator currencyValidator;
 
     @Value("${services.openexchangerates.app_id}")
     private String appId;
@@ -26,6 +28,8 @@ public class CurrencyConverter {
     public BigDecimal converter(Currency fromCurrency, Currency toCurrency, BigDecimal amount) {
         ExchangeRatesResponse exchangeRatesResponse = exchangeRatesClient.getRates(appId);
         Map<String, Double> rates = exchangeRatesResponse.getRates();
+
+        currencyValidator.checkExistCurrency(fromCurrency, toCurrency, rates);
 
         double fromRate = rates.get(fromCurrency.name());
         double toRate = rates.get(toCurrency.name());

@@ -3,6 +3,7 @@ package faang.school.paymentservice.service;
 import faang.school.paymentservice.client.ExchangeRatesClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.client.ExchangeRatesResponse;
+import faang.school.paymentservice.validator.CurrencyValidator;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,11 +29,16 @@ public class CurrencyConverterTest {
     @Mock
     ExchangeRatesClient exchangeRatesClient;
 
+    @Mock
+    CurrencyValidator currencyValidator;
+
     private BigDecimal commission;
     private double usdRate;
     private double rubRate;
     private BigDecimal amount;
     private String appId;
+    private Currency fromCurrency;
+    private Currency toCurrency;
 
     @BeforeEach
     public void setUp() {
@@ -41,6 +47,8 @@ public class CurrencyConverterTest {
         rubRate = 90.0;
         amount = BigDecimal.valueOf(10);
         appId = "ca800d6c1f28496a9461bd842d20b919";
+        fromCurrency = Currency.USD;
+        toCurrency = Currency.RUB;
     }
 
     @Test
@@ -49,8 +57,8 @@ public class CurrencyConverterTest {
         currencyConverter.setAppId(appId);
 
         Map<String, Double> rates = new HashMap<>();
-        rates.put(Currency.USD.name(), usdRate);
-        rates.put(Currency.RUB.name(), rubRate);
+        rates.put(fromCurrency.name(), usdRate);
+        rates.put(toCurrency.name(), rubRate);
 
         ExchangeRatesResponse exchangeRatesResponse = new ExchangeRatesResponse();
         exchangeRatesResponse.setRates(rates);
@@ -59,6 +67,6 @@ public class CurrencyConverterTest {
 
         BigDecimal expected = BigDecimal.valueOf(rubRate / usdRate).multiply(amount).multiply(commission);
 
-        assertEquals(expected, currencyConverter.converter(Currency.USD, Currency.RUB, amount));
+        assertEquals(expected, currencyConverter.converter(fromCurrency, toCurrency, amount));
     }
 }
