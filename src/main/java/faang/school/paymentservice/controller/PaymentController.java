@@ -15,7 +15,7 @@ import java.text.DecimalFormat;
 import java.util.Random;
 
 @RestController
-@RequestMapping("api/v1/payments")
+@RequestMapping("/payments")
 @RequiredArgsConstructor
 public class PaymentController {
 
