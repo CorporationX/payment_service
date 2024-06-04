@@ -1,17 +1,15 @@
 server:
   port: 9080
-
 spring:
   profiles:
     active: test
-
 logging:
   level:
     root: info
 
-controller:
-  payment:
-    url: api/v1/payments
+site:
+  openexchangerates:
+    url: https://openexchangerates.org/api
 
 services:
   openexchangerates:
@@ -24,3 +22,18 @@ default:
   target:
     currency: USD
 
+scheduler:
+  fetch:
+    currency-rates:
+      cron: "0 0 0 * * *" # every day at 00:00
+
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
+async:
+  currency-rates-fetch:
+    threads-count: 2
+  put-in-map:
+    threads-count: 20
