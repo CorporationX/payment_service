@@ -28,6 +28,9 @@ public class CurrencyService {
     @Value("${currency.key_api}")
     private String key_api;
 
+    @Value("${currency.base_currency}")
+    private String baseCurrency;
+
     private final ObjectMapper mapper = new ObjectMapper();
 
     private final WebClient webClient;
@@ -36,17 +39,14 @@ public class CurrencyService {
     public void fetchCurrency() {
         log.info("Fetch currency rate");
         String json = webClient.get()
-                .uri(currencyBaseUrl + key_api + "/latest/USD")
+                .uri(currencyBaseUrl + key_api + "/latest/" + baseCurrency)
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
-
         try {
             JsonNode baseNode = mapper.readTree(json);
             JsonNode rates = baseNode.get("conversion_rates");
-            rates.fields().forEachRemaining(entry -> {
-                CURRENCIES.put(entry.getKey(), entry.getValue().asDouble());
-            });
+            rates.fields().forEachRemaining(entry -> CURRENCIES.put(entry.getKey(), entry.getValue().asDouble()));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
