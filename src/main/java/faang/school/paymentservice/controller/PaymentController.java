@@ -62,7 +62,7 @@ public class PaymentController {
         }
     }
 
-    @GetMapping("/convert")
+    @PostMapping ("/convert")
     public BigDecimal convert(@RequestBody ConvertDto convertDto) {
         return currencyConverterService.convert(convertDto);
     }
