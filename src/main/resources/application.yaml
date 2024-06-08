@@ -27,10 +27,10 @@ scheduler:
     currency-rates:
       cron: "0 0 0 * * *" # every day at 00:00
 
-  data:
-    redis:
-      port: 6379
-      host: localhost
+data:
+  redis:
+    port: 6379
+    host: localhost
 
 async:
   currency-rates-fetch:
