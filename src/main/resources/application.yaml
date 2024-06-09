@@ -6,12 +6,14 @@ logging:
     root: info
 
 services:
+  currencyRateFetcher:
+    cron: "0 0 0 * * *"
   openexchangerates:
     app_id: ca800d6c1f28496a9461bd842d20b919
 
-
-  currencyRateFetcher:
-    cron: "0 0 0 * * *"
+spring:
+  servlet:
+    mvc: "api/v1"
 
 currencyConverter:
   commission: 1.01
