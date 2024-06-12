@@ -27,10 +27,10 @@ public class CurrencyConverterTest {
     private CurrencyConverter currencyConverter;
 
     @Mock
-    ExchangeRatesClient exchangeRatesClient;
+    private ExchangeRatesClient exchangeRatesClient;
 
     @Mock
-    CurrencyValidator currencyValidator;
+    private CurrencyValidator currencyValidator;
 
     private BigDecimal commission;
     private double usdRate;

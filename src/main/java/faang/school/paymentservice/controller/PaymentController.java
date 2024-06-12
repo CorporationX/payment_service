@@ -15,7 +15,7 @@ import java.text.DecimalFormat;
 import java.util.Random;
 
 @RestController
-@RequestMapping("/payments")
+@RequestMapping("${spring.servlet.mvc}/payments")
 @RequiredArgsConstructor
 public class PaymentController {
 
@@ -37,5 +37,4 @@ public class PaymentController {
                 message)
         );
     }
-
 }
