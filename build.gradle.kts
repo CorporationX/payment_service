@@ -21,6 +21,7 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.5")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
 
     /**
      * Utils & Logging
