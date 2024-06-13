@@ -42,7 +42,6 @@ public class PaymentController {
                 PaymentStatus.SUCCESS,
                 verificationCode,
                 dto.paymentNumber(),
-                //dto.amount(),
                 calculateAmount(dto.amount(), dto.currency()),
                 dto.currency(),
                 message)
@@ -53,6 +52,6 @@ public class PaymentController {
         BigDecimal exchangeRate = openExchangeRatesService.exchange(baseCurrency, paymentCurrency);
         return amount
                 .multiply(exchangeRate)
-                .multiply((BigDecimal.valueOf(exchangeFee)));
+                .multiply(BigDecimal.valueOf(exchangeFee));
     }
 }
