@@ -1,6 +1,7 @@
 package faang.school.paymentservice.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.springframework.stereotype.Service;
 
@@ -19,17 +20,18 @@ public class CurrencyConverterService {
     private final CurrencyConverterClient currencyConverterClient;
     private final CurrencyExchangeConfig exchangeConfig;
     
-    public CurrencyExchangeResponse getCurrentCurrencyExchange() {
-        return currencyConverterClient.getCurrentCurrencyExchange(exchangeConfig.getAppId());
+    public CurrencyExchangeResponse getCurrentCurrencyExchangeRate() {
+        return currencyConverterClient.getCurrentCurrencyExchangeRate(exchangeConfig.getAppId());
     }
     
     public BigDecimal convertWithCommission(PaymentRequest dto, Currency targetCurrency) {
-        BigDecimal newAmount = getAmountInNewCurrency(dto, targetCurrency, getCurrentCurrencyExchange());
+        BigDecimal newAmount = getAmountInNewCurrency(dto, targetCurrency, getCurrentCurrencyExchangeRate());
         return addCommision(newAmount);
     }
     
     private BigDecimal addCommision(BigDecimal amount) {
-        return amount.multiply(new BigDecimal(1).add(new BigDecimal( exchangeConfig.getCommission() / 100.0))).setScale(2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal commission = BigDecimal.valueOf(1).add(BigDecimal.valueOf(exchangeConfig.getCommission() / 100.0));
+        return amount.multiply(commission);
     }
     
     private BigDecimal getAmountInNewCurrency(
@@ -40,6 +42,6 @@ public class CurrencyConverterService {
         BigDecimal amount = dto.amount();
         BigDecimal targetRate = currentCurrencyExchange.getRate(targetCurrency);
         BigDecimal baseRate = currentCurrencyExchange.getRate(dto.currency());
-        return (amount.multiply(targetRate)).divide(baseRate,2, BigDecimal.ROUND_HALF_UP);
+        return (amount.multiply(targetRate)).divide(baseRate,2, RoundingMode.HALF_UP);
     }
 }

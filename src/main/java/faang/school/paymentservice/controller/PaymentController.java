@@ -27,20 +27,27 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentController {
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
+    private static final String CONVERTING_MONEY_MESSAGE = "Dear friend! Thank you for converting money! You converted %s %s to %s %s with commission %f%%";
+    private static final String PAYMENT_MESSAGE = "Dear friend! Thank you for your purchase!. Your payment on %s %s was accepted.";
     
     private final CurrencyConverterService service;
     private final CurrencyExchangeConfig exchangeConfig;
     
+    /**
+     * Получение текущего соотношения валют к доллару из внешнего источника
+     *
+     * @return
+     */
     @GetMapping("currency")
-    public CurrencyExchangeResponse getCurrentCurrency() {
-        return service.getCurrentCurrencyExchange();
+    public CurrencyExchangeResponse getCurrentCurrencyExchangeRate() {
+        return service.getCurrentCurrencyExchangeRate();
     }
 
     @PostMapping("payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
         String message = String.format(
-            "Dear friend! Thank you for your purchase!. Your payment on %s %s was accepted.",
-            formatBigDecimal(dto.amount()),
+            PAYMENT_MESSAGE,
+            DECIMAL_FORMAT.format(dto.amount()),
             dto.currency()
         );
 
@@ -54,16 +61,23 @@ public class PaymentController {
         );
     }
     
+    /**
+     * Конвертация одной валюты в другую
+     *
+     * @param dto Объект для конвертации
+     * @param targetCurrency целевая валюта
+     *
+     * @return Объект результата конвертации
+     */
     @PostMapping("exchange")
     public ResponseEntity<PaymentResponse> exchangeCurrency(@RequestBody @Validated PaymentRequest dto, @RequestParam Currency targetCurrency) {
         BigDecimal newAmount = service.convertWithCommission(dto, targetCurrency);
-        String formattedAmount = formatBigDecimal(newAmount);
         
         String message = String.format(
-            "Dear friend! Thank you for converting money! You converted %s %s to %s %s with commission %%",
-            formatBigDecimal(dto.amount()),
+            CONVERTING_MONEY_MESSAGE,
+            DECIMAL_FORMAT.format(dto.amount()),
             dto.currency(),
-            formattedAmount,
+            DECIMAL_FORMAT.format(newAmount),
             targetCurrency,
             exchangeConfig.getCommission()
         );
@@ -76,10 +90,6 @@ public class PaymentController {
             targetCurrency,
             message)
         );
-    }
-    
-    private String formatBigDecimal(BigDecimal amount) {
-        return DECIMAL_FORMAT.format(amount);
     }
     
     private int getVerificationCode() {

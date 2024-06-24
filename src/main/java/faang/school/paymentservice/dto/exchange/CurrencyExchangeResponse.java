@@ -16,6 +16,6 @@ public class CurrencyExchangeResponse {
     private Map<String, Double> rates;
     
     public BigDecimal getRate(Currency currency) {
-        return new BigDecimal(rates.get(currency.name()));
+        return BigDecimal.valueOf(rates.get(currency.name()));
     }
 }
