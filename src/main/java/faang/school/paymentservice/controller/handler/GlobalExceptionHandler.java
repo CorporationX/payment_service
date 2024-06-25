@@ -1,6 +1,6 @@
 package faang.school.paymentservice.controller.handler;
 
-import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.enums.Currency;
 import faang.school.paymentservice.exception.IdempotencyException;
 import faang.school.paymentservice.exception.IncorrectCurrencyException;
 import faang.school.paymentservice.exception.NotEnoughMoneyOnBalanceException;
