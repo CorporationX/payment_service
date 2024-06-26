@@ -33,6 +33,12 @@ dependencies {
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
 
     /**
+     * Retry
+     */
+    implementation("org.springframework.retry:spring-retry:2.0.6")
+    implementation("org.springframework:spring-aspects:6.1.10")
+
+    /**
      * Tests
      */
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
