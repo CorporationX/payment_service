@@ -19,7 +19,7 @@ import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
-import faang.school.paymentservice.service.CurrencyConverterService;
+import faang.school.paymentservice.service.currency.CurrencyConverterService;
 import lombok.RequiredArgsConstructor;
 
 @RestController

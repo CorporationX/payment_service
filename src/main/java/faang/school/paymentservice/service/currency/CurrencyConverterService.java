@@ -1,4 +1,4 @@
-package faang.school.paymentservice.service;
+package faang.school.paymentservice.service.currency;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -10,22 +10,26 @@ import faang.school.paymentservice.config.currency.CurrencyExchangeConfig;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Data
 public class CurrencyConverterService {
     private final CurrencyConverterClient currencyConverterClient;
     private final CurrencyExchangeConfig exchangeConfig;
+    private CurrencyExchangeResponse currentCurrencyExchange;
     
     public CurrencyExchangeResponse getCurrentCurrencyExchangeRate() {
-        return currencyConverterClient.getCurrentCurrencyExchangeRate(exchangeConfig.getAppId());
+        currentCurrencyExchange = currencyConverterClient.getCurrentCurrencyExchangeRate(exchangeConfig.getAppId());
+        return currentCurrencyExchange;
     }
     
     public BigDecimal convertWithCommission(PaymentRequest dto, Currency targetCurrency) {
-        BigDecimal newAmount = getAmountInNewCurrency(dto, targetCurrency, getCurrentCurrencyExchangeRate());
+        BigDecimal newAmount = getAmountInNewCurrency(dto, targetCurrency, currentCurrencyExchange);
         return addCommision(newAmount);
     }
     
