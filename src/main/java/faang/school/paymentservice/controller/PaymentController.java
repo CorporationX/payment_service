@@ -1,20 +1,20 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.dto.PaymentRequest;
+import faang.school.paymentservice.dto.*;
 import java.text.DecimalFormat;
 import java.util.Random;
-import faang.school.paymentservice.dto.PaymentResponse;
-import faang.school.paymentservice.dto.PaymentStatus;
+import faang.school.paymentservice.service.payment.PaymentService;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api")
 public class PaymentController {
+    private final PaymentService paymentService;
 
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
@@ -33,5 +33,23 @@ public class PaymentController {
                 dto.currency(),
                 message)
         );
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<PaymentDto> createPayment(@RequestBody @Validated InvoiceDto invoiceDto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(paymentService.create(invoiceDto));
+    }
+
+    @PostMapping("/cancel/{id}")
+    public ResponseEntity<PaymentDto> cancelPayment(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(paymentService.cancel(id));
+    }
+
+    @PostMapping("/clear/{id}")
+    public ResponseEntity<PaymentDto> clearPayment(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(paymentService.clear(id));
     }
 }
