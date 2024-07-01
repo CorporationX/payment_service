@@ -18,8 +18,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "payment_operation")
-public class PaymentOperation {
+@Table(name = "payment_request")
+public class PaymentRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,6 +1,6 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.dto.PaymentRequest;
+import faang.school.paymentservice.dto.PaymentRequestDto;
 import java.text.DecimalFormat;
 import java.util.Random;
 import faang.school.paymentservice.dto.PaymentResponse;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentController {
 
     @PostMapping("/payment")
-    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
+    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequestDto dto) {
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         String formattedSum = decimalFormat.format(dto.amount());
         int verificationCode = new Random().nextInt(1000, 10000);
