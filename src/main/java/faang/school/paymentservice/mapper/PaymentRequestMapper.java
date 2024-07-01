@@ -16,10 +16,12 @@ import org.mapstruct.ReportingPolicy;
 public interface PaymentRequestMapper {
     PaymentRequest toModel(PaymentRequestDto dto);
 
+    @Mapping(target = "paymentNumber", source = "id")
     PaymentResponse toPaymentResponse(PaymentRequest pendingRequest);
 
     @Mapping(target = "currency", source = "currency", qualifiedByName = "getCurrencyName")
     @Mapping(target = "type", source = "type", qualifiedByName = "getOperationTypeName")
+    @Mapping(target = "paymentNumber", source = "id")
     PaymentEventDto toPaymentEvent(PaymentRequest pendingRequest);
 
     @Named("getCurrencyName")

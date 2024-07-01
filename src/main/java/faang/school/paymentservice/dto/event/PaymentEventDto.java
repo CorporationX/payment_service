@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class PaymentEventDto extends EventDto implements Serializable {
+    private Long paymentNumber;
     private Long debitAccountId;
     private Long creditAccountId;
     private BigDecimal amount;
