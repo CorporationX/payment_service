@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS payment_operation
+CREATE TABLE IF NOT EXISTS payment_request
 (
     id                 BIGINT PRIMARY KEY,
     debit_account_id   BIGINT      NOT NULL,
