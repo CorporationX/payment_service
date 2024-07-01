@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS payment_request
     id                 BIGINT PRIMARY KEY,
     debit_account_id   BIGINT      NOT NULL,
     credit_account_id  BIGINT      NOT NULL,
-    amount             BIGINT      NOT NULL,
+    amount             DECIMAL      NOT NULL,
     currency           VARCHAR(3)  NOT NULL,
     type               VARCHAR(16) NOT NULL,
     is_cleared         BOOLEAN     NOT NULL,
