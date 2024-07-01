@@ -65,4 +65,8 @@ public class PaymentRequest {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public boolean isClearScheduledAtNow() {
+        return clearScheduledAt.isBefore(LocalDateTime.now());
+    }
 }
