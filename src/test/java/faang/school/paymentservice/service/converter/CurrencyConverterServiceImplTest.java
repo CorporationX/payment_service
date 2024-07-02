@@ -1,6 +1,6 @@
 package faang.school.paymentservice.service.converter;
 
-import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.enums.Currency;
 import faang.school.paymentservice.dto.convert.ConvertDto;
 import faang.school.paymentservice.service.rates.CurrencyFetchService;
 import org.junit.jupiter.api.BeforeEach;

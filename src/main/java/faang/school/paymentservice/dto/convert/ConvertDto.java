@@ -1,6 +1,6 @@
 package faang.school.paymentservice.dto.convert;
 
-import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.enums.Currency;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
