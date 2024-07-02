@@ -1,127 +1,124 @@
 package faang.school.paymentservice.service.payment;
 
-import faang.school.paymentservice.dto.CreatePaymentRequest;
-import faang.school.paymentservice.dto.RedisPaymentDto;
+import faang.school.paymentservice.client.service.AccountServiceClient;
+import faang.school.paymentservice.dto.payment.PaymentDto;
+import faang.school.paymentservice.dto.payment.PaymentDtoToCreate;
 import faang.school.paymentservice.enums.PaymentStatus;
+import faang.school.paymentservice.exception.IdempotencyException;
+import faang.school.paymentservice.exception.NotEnoughMoneyOnBalanceException;
 import faang.school.paymentservice.exception.NotFoundException;
-import faang.school.paymentservice.message.publisher.payment.PaymentRequestPublisher;
+import faang.school.paymentservice.exception.PaymentException;
+import faang.school.paymentservice.mapper.PaymentMapper;
+import faang.school.paymentservice.message.publisher.NewPaymentPublisher;
 import faang.school.paymentservice.model.Balance;
-import faang.school.paymentservice.model.BalanceAudit;
-import faang.school.paymentservice.repository.BalanceAuditRepository;
+import faang.school.paymentservice.model.Payment;
 import faang.school.paymentservice.repository.BalanceRepository;
+import faang.school.paymentservice.repository.PaymentRepository;
+import feign.FeignException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
-    private final PaymentRequestPublisher paymentRequestPublisher;
+
     private final BalanceRepository balanceRepository;
-    private final BalanceAuditRepository balanceAuditRepository;
+    private final PaymentRepository paymentRepository;
+    private final NewPaymentPublisher newPaymentPublisher;
+    private final PaymentMapper paymentMapper;
+    private final AccountServiceClient accountService;
 
     @Override
     @Transactional
-    @Async(value = "paymentPool")
-    public BalanceAudit createRequestForPayment(CreatePaymentRequest createPaymentRequest, long userId) {
-        Balance senderBalance = findBalance(createPaymentRequest.getSenderBalanceNumber());
-        Balance getterBalance = findBalance(createPaymentRequest.getGetterBalanceNumber());
-        BigDecimal deposit = createPaymentRequest.getAmount();
+    public Long createPayment(Long userId, PaymentDtoToCreate dto) {
+        Payment payment;
+        UUID idempotencyKey = dto.getIdempotencyKey();
 
-        BalanceAudit balanceAudit = BalanceAudit.builder()
-                .userId(userId)
-                .senderBalance(senderBalance)
-                .getterBalance(getterBalance)
-                .lockValue(String.valueOf(getterBalance.getId() + senderBalance.getId()))
-                .authorizationAmount(deposit)
-                .actualAmount(BigDecimal.ZERO)
-                .paymentStatus(PaymentStatus.PENDING)
-                .auditTimestamp(LocalDateTime.now())
-                .clearScheduledAt(createPaymentRequest.getClearScheduledAt())
-                .currency(createPaymentRequest.getCurrency())
-                .build();
+        Balance senderBalance = balanceRepository.findBalanceByAccountNumber(payment.getSenderAccountNumber())
+                .orElseThrow(() -> new NotFoundException("Sender balance hasn't been found"));
 
-        balanceAudit = balanceAuditRepository.save(balanceAudit);
+        if (senderBalance.getAuthorizationBalance().compareTo(payment.getAmount()) < 0) {
+            throw new NotEnoughMoneyOnBalanceException("Not enough money");
+        }
 
-        RedisPaymentDto redisPaymentDto = new RedisPaymentDto(userId, senderBalance.getId(), getterBalance.getId(),
-                deposit, createPaymentRequest.getCurrency(), PaymentStatus.PENDING);
+        Optional<Payment> optionalPayment = paymentRepository.findPaymentByIdempotencyKey(idempotencyKey);
+        if (optionalPayment.isPresent()) {
+            payment = optionalPayment.get();
+            boolean isIdempotency = checkPaymentWithSameUUID(dto, payment);
+            if (!isIdempotency) {
+                throw new IdempotencyException("This payment has already been made with other details! Try again!");
+            }
+            log.info("Payment with UUID={} is idempotency and already been processed", idempotencyKey);
+            return payment.getId();
+        }
 
-        paymentRequestPublisher.publish(redisPaymentDto);
+        dto.setPaymentStatus(PaymentStatus.NEW);
+        dto.setScheduledAt(LocalDateTime.now().plusHours(8));
+        payment = paymentRepository.save(paymentMapper.toEntity(dto));
+        log.info("Payment with UUID={} was saved in DB successfully", idempotencyKey);
 
-        return balanceAudit;
+        try {
+            accountService.createPayment(userId, dto);
+            log.info("New payment, UUID={}, has been posted to account-service", dto.getIdempotencyKey());
+        } catch (FeignException e) {
+            throw e;
+        }
+        return payment.getId();
+    }
+
+    @Override
+    public PaymentDto getPayment(Long id) {
+        return paymentMapper.toDto(paymentRepository.findById(id).orElseThrow(() -> new NotFoundException(
+                String.format("Not found payment with id %d", id))));
     }
 
     @Override
     @Transactional
-    @Async(value = "paymentPool")
-    public BalanceAudit cancelRequestForPayment(Long balanceAuditId, long userId) {
-        BalanceAudit balanceAudit = balanceAuditRepository.findById(balanceAuditId)
-                .orElseThrow(() -> new NotFoundException("There is no such request in DB"));
+    public void cancelPayment(Long userId, Long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new NotFoundException("This payment doesn't exist"));
 
-        balanceAudit.setPaymentStatus(PaymentStatus.CANCELED);
-        balanceAudit.setAuditTimestamp(LocalDateTime.now());
+        if (payment.getPaymentStatus() != PaymentStatus.NEW &&
+                payment.getPaymentStatus() != PaymentStatus.READY_TO_CLEAR) {
+            throw new PaymentException("It is impossible to perform this operation with this payment, since it has already been closed");
+        }
 
-        balanceAudit = balanceAuditRepository.save(balanceAudit);
-
-        RedisPaymentDto redisPaymentDto = new RedisPaymentDto(userId, balanceAudit.getSenderBalance().getId(),
-                balanceAudit.getGetterBalance().getId(), balanceAudit.getAuthorizationAmount(),
-                balanceAudit.getCurrency(), PaymentStatus.CANCELED);
-
-        paymentRequestPublisher.publish(redisPaymentDto);
-
-        return balanceAudit;
+        try {
+            accountService.cancelPayment(userId, paymentId);
+            log.info("Payment with UUID={}, has been canceled in account-service", payment.getIdempotencyKey());
+        } catch (FeignException e) {
+            throw e;
+        }
     }
 
-    @Override
     @Transactional
-    @Async(value = "paymentPool")
-    public BalanceAudit forceRequestForPayment(Long balanceAuditId, long userId) {
-        BalanceAudit balanceAudit = balanceAuditRepository.findById(balanceAuditId)
-                .orElseThrow(() -> new NotFoundException("There is no such request in DB"));
+    public void clearPayment(Long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new NotFoundException("This payment doesn't exist"));
 
-        balanceAudit.setPaymentStatus(PaymentStatus.SUCCESS);
-        balanceAudit.setAuditTimestamp(LocalDateTime.now());
+        if (payment.getPaymentStatus() != PaymentStatus.READY_TO_CLEAR){
+            throw new PaymentException("It is impossible to perform this operation with this payment, since it has already been closed");
+        }
 
-        balanceAudit = balanceAuditRepository.save(balanceAudit);
-
-        RedisPaymentDto redisPaymentDto = new RedisPaymentDto(userId, balanceAudit.getSenderBalance().getId(),
-                balanceAudit.getGetterBalance().getId(), balanceAudit.getAuthorizationAmount(),
-                balanceAudit.getCurrency(), PaymentStatus.SUCCESS);
-
-        paymentRequestPublisher.publish(redisPaymentDto);
-
-        return balanceAudit;
+        try {
+            accountService.clearPayment(paymentId);
+            log.info("Payment with UUID={}, has been canceled in account-service", payment.getIdempotencyKey());
+        } catch (FeignException e) {
+            throw e;
+        }
     }
 
-    @Override
-    @Transactional
-    public void approvePendingRequests(Long limit) {
-        List<BalanceAudit> pendingRequests = balanceAuditRepository.findSomeRequests(limit);
-
-        pendingRequests.forEach(balanceAudit -> {
-            balanceAudit.setPaymentStatus(PaymentStatus.SUCCESS);
-            balanceAudit.setAuditTimestamp(LocalDateTime.now());
-
-            balanceAudit = balanceAuditRepository.save(balanceAudit);
-
-            RedisPaymentDto redisPaymentDto = new RedisPaymentDto(balanceAudit.getUserId(),
-                    balanceAudit.getSenderBalance().getId(),
-                    balanceAudit.getGetterBalance().getId(), balanceAudit.getAuthorizationAmount(),
-                    balanceAudit.getCurrency(), PaymentStatus.SUCCESS);
-
-            paymentRequestPublisher.publish(redisPaymentDto);
-        });
-    }
-
-    private Balance findBalance(Long id) {
-        return balanceRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Balance with id " + id + " not found"));
+    private boolean checkPaymentWithSameUUID(PaymentDtoToCreate newPayment, Payment oldPayment) {
+        return newPayment.getSenderAccountNumber().equals(oldPayment.getSenderAccountNumber())
+                && newPayment.getReceiverAccountNumber().equals(oldPayment.getReceiverAccountNumber())
+                && newPayment.getAmount().compareTo(oldPayment.getAmount()) == 0
+                && newPayment.getCurrency() == oldPayment.getCurrency();
     }
 }
-

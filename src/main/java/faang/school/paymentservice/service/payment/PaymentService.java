@@ -1,15 +1,17 @@
 package faang.school.paymentservice.service.payment;
 
-import faang.school.paymentservice.dto.CreatePaymentRequest;
-import faang.school.paymentservice.model.BalanceAudit;
+import faang.school.paymentservice.dto.payment.PaymentDto;
+import faang.school.paymentservice.dto.payment.PaymentDtoToCreate;
 import org.springframework.stereotype.Component;
 
 @Component
 public interface PaymentService {
-    BalanceAudit createRequestForPayment(CreatePaymentRequest dto, long userId);
 
-    BalanceAudit cancelRequestForPayment(Long balanceAuditId, long userId);
+   Long createPayment(Long userId, PaymentDtoToCreate dto);
 
-    BalanceAudit forceRequestForPayment(Long balanceAuditId, long userId);
-    void approvePendingRequests(Long limit);
+    PaymentDto getPayment(Long id);
+
+    void cancelPayment(Long userId, Long paymentId);
+
+    void clearPayment(Long paymentId);
 }

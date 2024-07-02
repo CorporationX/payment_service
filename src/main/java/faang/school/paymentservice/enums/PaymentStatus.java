@@ -1,8 +1,9 @@
 package faang.school.paymentservice.enums;
 
 public enum PaymentStatus {
-    PENDING,
+    NEW,
+    READY_TO_CLEAR,
+    CLEAR,
     CANCELED,
-    SUCCESS,
     FAILURE
 }
