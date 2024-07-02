@@ -5,7 +5,7 @@ import faang.school.paymentservice.dto.CreatePaymentRequest;
 import faang.school.paymentservice.enums.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.PaymentResponse;
-import faang.school.paymentservice.enums.PaymentStatus;
+import faang.school.paymentservice.enums.TransactionStatus;
 import faang.school.paymentservice.dto.convert.ConvertDto;
 import faang.school.paymentservice.exception.PaymentException;
 import faang.school.paymentservice.model.BalanceAudit;
@@ -59,7 +59,7 @@ public class PaymentController {
                     formattedSum, targetCurrency.name());
 
             return ResponseEntity.ok(new PaymentResponse(
-                    PaymentStatus.SUCCESS,
+                    TransactionStatus.SUCCESS,
                     verificationCode,
                     dto.paymentNumber(),
                     convertedAmount,

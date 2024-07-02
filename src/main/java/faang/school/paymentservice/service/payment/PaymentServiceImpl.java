@@ -2,7 +2,7 @@ package faang.school.paymentservice.service.payment;
 
 import faang.school.paymentservice.dto.CreatePaymentRequest;
 import faang.school.paymentservice.dto.RedisPaymentDto;
-import faang.school.paymentservice.enums.PaymentStatus;
+import faang.school.paymentservice.enums.TransactionStatus;
 import faang.school.paymentservice.exception.NotFoundException;
 import faang.school.paymentservice.message.publisher.payment.PaymentRequestPublisher;
 import faang.school.paymentservice.model.Balance;
@@ -10,7 +10,6 @@ import faang.school.paymentservice.model.BalanceAudit;
 import faang.school.paymentservice.repository.BalanceAuditRepository;
 import faang.school.paymentservice.repository.BalanceRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +40,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .lockValue(String.valueOf(getterBalance.getId() + senderBalance.getId()))
                 .authorizationAmount(deposit)
                 .actualAmount(BigDecimal.ZERO)
-                .paymentStatus(PaymentStatus.PENDING)
+                .transactionStatus(TransactionStatus.PENDING)
                 .auditTimestamp(LocalDateTime.now())
                 .clearScheduledAt(createPaymentRequest.getClearScheduledAt())
                 .currency(createPaymentRequest.getCurrency())
@@ -50,7 +49,7 @@ public class PaymentServiceImpl implements PaymentService {
         balanceAudit = balanceAuditRepository.save(balanceAudit);
 
         RedisPaymentDto redisPaymentDto = new RedisPaymentDto(userId, senderBalance.getId(), getterBalance.getId(),
-                deposit, createPaymentRequest.getCurrency(), PaymentStatus.PENDING);
+                deposit, createPaymentRequest.getCurrency(), TransactionStatus.PENDING);
 
         paymentRequestPublisher.publish(redisPaymentDto);
 
@@ -64,14 +63,14 @@ public class PaymentServiceImpl implements PaymentService {
         BalanceAudit balanceAudit = balanceAuditRepository.findById(balanceAuditId)
                 .orElseThrow(() -> new NotFoundException("There is no such request in DB"));
 
-        balanceAudit.setPaymentStatus(PaymentStatus.CANCELED);
+        balanceAudit.setTransactionStatus(TransactionStatus.CANCELED);
         balanceAudit.setAuditTimestamp(LocalDateTime.now());
 
         balanceAudit = balanceAuditRepository.save(balanceAudit);
 
         RedisPaymentDto redisPaymentDto = new RedisPaymentDto(userId, balanceAudit.getSenderBalance().getId(),
                 balanceAudit.getGetterBalance().getId(), balanceAudit.getAuthorizationAmount(),
-                balanceAudit.getCurrency(), PaymentStatus.CANCELED);
+                balanceAudit.getCurrency(), TransactionStatus.CANCELED);
 
         paymentRequestPublisher.publish(redisPaymentDto);
 
@@ -85,14 +84,14 @@ public class PaymentServiceImpl implements PaymentService {
         BalanceAudit balanceAudit = balanceAuditRepository.findById(balanceAuditId)
                 .orElseThrow(() -> new NotFoundException("There is no such request in DB"));
 
-        balanceAudit.setPaymentStatus(PaymentStatus.SUCCESS);
+        balanceAudit.setTransactionStatus(TransactionStatus.SUCCESS);
         balanceAudit.setAuditTimestamp(LocalDateTime.now());
 
         balanceAudit = balanceAuditRepository.save(balanceAudit);
 
         RedisPaymentDto redisPaymentDto = new RedisPaymentDto(userId, balanceAudit.getSenderBalance().getId(),
                 balanceAudit.getGetterBalance().getId(), balanceAudit.getAuthorizationAmount(),
-                balanceAudit.getCurrency(), PaymentStatus.SUCCESS);
+                balanceAudit.getCurrency(), TransactionStatus.SUCCESS);
 
         paymentRequestPublisher.publish(redisPaymentDto);
 
@@ -105,7 +104,7 @@ public class PaymentServiceImpl implements PaymentService {
         List<BalanceAudit> pendingRequests = balanceAuditRepository.findSomeRequests(limit);
 
         pendingRequests.forEach(balanceAudit -> {
-            balanceAudit.setPaymentStatus(PaymentStatus.SUCCESS);
+            balanceAudit.setTransactionStatus(TransactionStatus.SUCCESS);
             balanceAudit.setAuditTimestamp(LocalDateTime.now());
 
             balanceAudit = balanceAuditRepository.save(balanceAudit);
@@ -113,7 +112,7 @@ public class PaymentServiceImpl implements PaymentService {
             RedisPaymentDto redisPaymentDto = new RedisPaymentDto(balanceAudit.getUserId(),
                     balanceAudit.getSenderBalance().getId(),
                     balanceAudit.getGetterBalance().getId(), balanceAudit.getAuthorizationAmount(),
-                    balanceAudit.getCurrency(), PaymentStatus.SUCCESS);
+                    balanceAudit.getCurrency(), TransactionStatus.SUCCESS);
 
             paymentRequestPublisher.publish(redisPaymentDto);
         });

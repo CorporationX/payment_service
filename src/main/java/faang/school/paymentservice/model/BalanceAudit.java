@@ -1,60 +1,79 @@
 package faang.school.paymentservice.model;
 
-import faang.school.paymentservice.enums.Currency;
-import faang.school.paymentservice.enums.PaymentStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Data
+@Getter
+@Setter
+@Entity
+@Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Entity
-@Table(name = "balance_audit")
+@Table(name = "balance_audit", indexes = {
+        @Index(name = "idx_balance_audit_account_id", columnList = "account_id")
+})
 public class BalanceAudit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "user_id")
-    private Long userId;
+    private long id;
 
     @OneToOne
-    @JoinColumn(name = "sender_balance_id", referencedColumnName = "id")
-    private Balance senderBalance;
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
 
-    @OneToOne
-    @JoinColumn(name = "getter_balance_id", referencedColumnName = "id")
-    private Balance getterBalance;
+    @Column(name = "payment_number", nullable = false)
+    private long paymentNumber;
 
-    @Column(name = "lock_value")
-    private String lockValue;
+    @Column(name = "authorization_balance", nullable = false)
+    private BigDecimal authorizationBalance;
 
-    @Column(name = "authorization_amount")
-    private BigDecimal authorizationAmount;
+    @Column(name = "actual_balance", nullable = false)
+    private BigDecimal actualBalance;
 
-    @Column(name = "actual_amount")
-    private BigDecimal actualAmount;
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private PaymentStatus paymentStatus;
+    @Column(name = "version", nullable = false)
+    private long version;
 
-    @Column(name = "audit_timestamp")
-    private LocalDateTime auditTimestamp;
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+        BalanceAudit that = (BalanceAudit) o;
+        return Objects.equals(getId(), that.getId());
+    }
 
-    @Column(name = "clear_scheduled_at")
-    private LocalDateTime clearScheduledAt;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "currency")
-    private Currency currency;
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
 }
-
