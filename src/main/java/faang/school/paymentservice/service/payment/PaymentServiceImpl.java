@@ -9,7 +9,6 @@ import faang.school.paymentservice.exception.NotEnoughMoneyOnBalanceException;
 import faang.school.paymentservice.exception.NotFoundException;
 import faang.school.paymentservice.exception.PaymentException;
 import faang.school.paymentservice.mapper.PaymentMapper;
-import faang.school.paymentservice.message.publisher.NewPaymentPublisher;
 import faang.school.paymentservice.model.Balance;
 import faang.school.paymentservice.model.Payment;
 import faang.school.paymentservice.repository.BalanceRepository;
@@ -31,14 +30,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final BalanceRepository balanceRepository;
     private final PaymentRepository paymentRepository;
-    private final NewPaymentPublisher newPaymentPublisher;
     private final PaymentMapper paymentMapper;
     private final AccountServiceClient accountService;
 
     @Override
     @Transactional
     public Long createPayment(Long userId, PaymentDtoToCreate dto) {
-        Payment payment;
+        Payment payment = new Payment();
         UUID idempotencyKey = dto.getIdempotencyKey();
 
         Balance senderBalance = balanceRepository.findBalanceByAccountNumber(payment.getSenderAccountNumber())
@@ -65,7 +63,7 @@ public class PaymentServiceImpl implements PaymentService {
         log.info("Payment with UUID={} was saved in DB successfully", idempotencyKey);
 
         try {
-            accountService.createPayment(userId, dto);
+            accountService.authorizePayment(payment.getId());
             log.info("New payment, UUID={}, has been posted to account-service", dto.getIdempotencyKey());
         } catch (FeignException e) {
             throw e;

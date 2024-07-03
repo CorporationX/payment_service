@@ -1,16 +1,12 @@
 package faang.school.paymentservice.service.transaction;
 
-import faang.school.paymentservice.dto.transaction.TransactionDtoToCreate;
 import faang.school.paymentservice.enums.TransactionStatus;
 import faang.school.paymentservice.exception.NotFoundException;
 import faang.school.paymentservice.model.Transaction;
-import faang.school.paymentservice.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
-import java.time.ZonedDateTime;
 
 @Service
 @RequiredArgsConstructor
