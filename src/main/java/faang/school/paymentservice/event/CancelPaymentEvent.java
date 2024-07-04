@@ -10,9 +10,6 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @Builder
-public class NewTransactionEvent implements Event {
-    private Long senderBalanceId;
-    private Long receiverBalanceId;
-    private Currency currency;
-    private BigDecimal amount;
+public class CancelPaymentEvent implements Event {
+    private Long paymentId;
 }
