@@ -1,11 +1,13 @@
 package faang.school.paymentservice.publisher;
 
-import faang.school.paymentservice.event.CancelPaymentEvent;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import faang.school.paymentservice.event.ClearPaymentEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.common.errors.SerializationException;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -13,13 +15,19 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ClearPaymentPublisher implements MessagePublisher<ClearPaymentEvent> {
 
-    @Value("${spring.data.channel.premium_bought.name}")
-    private String topic;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final ObjectMapper objectMapper;
+    private final NewTopic clearPaymentTopic;
+
 
     @Override
     public void publish(ClearPaymentEvent event) {
-        redisTemplate.convertAndSend(topic, event);
-        log.info("Published new cancel payment event: {}", event);
+        try {
+            String message = objectMapper.writeValueAsString(event);
+            kafkaTemplate.send(clearPaymentTopic.name(), message);
+            log.info("Published clear payment event to Kafka - {}: {}", clearPaymentTopic.name(), message);
+        } catch (JsonProcessingException e) {
+            throw new SerializationException("Error serializing profile view event", e);
+        }
     }
 }

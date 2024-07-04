@@ -1,7 +1,7 @@
 package faang.school.paymentservice.dto;
 
 import faang.school.paymentservice.enums.Currency;
-import faang.school.paymentservice.enums.TransactionStatus;
+import faang.school.paymentservice.enums.PaymentStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -18,5 +18,5 @@ public class RedisPaymentDto{
         @NotNull
         Currency currency;
         @NotNull
-        TransactionStatus status;
+        PaymentStatus status;
 }

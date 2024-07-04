@@ -6,10 +6,7 @@ import faang.school.paymentservice.enums.PaymentStatus;
 import faang.school.paymentservice.event.CancelPaymentEvent;
 import faang.school.paymentservice.event.ClearPaymentEvent;
 import faang.school.paymentservice.event.NewPaymentEvent;
-import faang.school.paymentservice.exception.IdempotencyException;
-import faang.school.paymentservice.exception.NotEnoughMoneyOnBalanceException;
 import faang.school.paymentservice.exception.NotFoundException;
-import faang.school.paymentservice.exception.PaymentException;
 import faang.school.paymentservice.mapper.PaymentMapper;
 import faang.school.paymentservice.model.Balance;
 import faang.school.paymentservice.model.Payment;
@@ -22,6 +19,7 @@ import faang.school.paymentservice.validator.payment.PaymentValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -44,37 +42,45 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public Long createPayment(Long userId, PaymentDtoToCreate dto) {
-        Payment payment = new Payment();
         UUID idempotencyKey = dto.getIdempotencyKey();
+        log.info("Got idempotency key");
 
-        Balance senderBalance = balanceRepository.findBalanceByAccountNumber(payment.getSenderAccountNumber())
-                .orElseThrow(() -> new NotFoundException("Sender balance hasn't been found"));
+        try {
+            Balance senderBalance = balanceRepository.findBalanceByAccountNumber(dto.getSenderAccountNumber())
+                    .orElseThrow(() -> new NotFoundException("Sender balance hasn't been found"));
+            log.info("Found balance {}", senderBalance.getId());
 
-        if (senderBalance.getAuthorizationBalance().compareTo(payment.getAmount()) < 0) {
-            throw new NotEnoughMoneyOnBalanceException("Not enough money");
-        }
+            paymentValidator.validateSenderHaveEnoughMoneyOnBalance(senderBalance, dto);
 
-        Optional<Payment> optionalPayment = paymentRepository.findPaymentByIdempotencyKey(idempotencyKey);
-        if (optionalPayment.isPresent()) {
-            payment = optionalPayment.get();
-            boolean isIdempotency = checkPaymentWithSameUUID(dto, payment);
-            if (!isIdempotency) {
-                throw new IdempotencyException("This payment has already been made with other details! Try again!");
+            Optional<Payment> optionalPayment = paymentRepository.findPaymentByIdempotencyKey(idempotencyKey);
+            if (optionalPayment.isPresent()) {
+                Payment payment = optionalPayment.get();
+                paymentValidator.validatePaymentOnSameIdempotencyToken(dto, payment);
+                log.info("Payment with UUID={} is idempotency and already been processed", idempotencyKey);
+                return payment.getId();
             }
-            log.info("Payment with UUID={} is idempotency and already been processed", idempotencyKey);
+
+            dto.setPaymentStatus(PaymentStatus.NEW);
+            dto.setScheduledAt(LocalDateTime.now().plusHours(8));
+            Payment payment = paymentRepository.save(paymentMapper.toEntity(dto));
+            log.info("Payment with UUID={} was saved in DB successfully", idempotencyKey);
+
+            NewPaymentEvent event = new NewPaymentEvent(payment.getId());
+            newPaymentPublisher.publish(event);
+
             return payment.getId();
+        } catch (Exception e) {
+            log.error("Error occurred while creating payment: ", e);
+            saveFailedPayment(dto);
+            throw e;
         }
+    }
 
-        dto.setPaymentStatus(PaymentStatus.NEW);
-        dto.setScheduledAt(LocalDateTime.now().plusHours(8));
-        payment = paymentRepository.save(paymentMapper.toEntity(dto));
-        log.info("Payment with UUID={} was saved in DB successfully", idempotencyKey);
-
-        NewPaymentEvent event = new NewPaymentEvent(payment.getId());
-
-        newPaymentPublisher.publish(event);
-
-        return payment.getId();
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void saveFailedPayment(PaymentDtoToCreate dto) {
+        Payment failedPayment = paymentMapper.toEntity(dto);
+        failedPayment.setPaymentStatus(PaymentStatus.FAILURE);
+        paymentRepository.save(failedPayment);
     }
 
     @Override
@@ -90,36 +96,20 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new NotFoundException("This payment doesn't exist"));
 
-        if (payment.getPaymentStatus() != PaymentStatus.NEW &&
-            payment.getPaymentStatus() != PaymentStatus.READY_TO_CLEAR) {
-            throw new PaymentException("It is impossible to perform this operation with this payment, since it has already been closed");
-        }
+        paymentValidator.validatePaymentStatusForCancel(payment);
 
         CancelPaymentEvent event = new CancelPaymentEvent(paymentId);
 
         cancelPaymentPublisher.publish(event);
-        log.info("Payment with ID={} has been processed and is ready to clear", paymentId);
     }
 
     @Transactional(readOnly = true)
     public void clearPayment(Long paymentId) {
-        Payment payment = paymentRepository.findById(paymentId)
+        paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new NotFoundException("This payment doesn't exist"));
-
-        if (payment.getPaymentStatus() != PaymentStatus.READY_TO_CLEAR) {
-            throw new PaymentException("It is impossible to perform this operation with this payment, since it has already been closed");
-        }
 
         ClearPaymentEvent event = new ClearPaymentEvent(paymentId);
 
         clearPaymentPublisher.publish(event);
-        log.info("Payment with ID={} has been processed and is ready to clear", paymentId);
-    }
-
-    private boolean checkPaymentWithSameUUID(PaymentDtoToCreate newPayment, Payment oldPayment) {
-        return newPayment.getSenderAccountNumber().equals(oldPayment.getSenderAccountNumber())
-               && newPayment.getReceiverAccountNumber().equals(oldPayment.getReceiverAccountNumber())
-               && newPayment.getAmount().compareTo(oldPayment.getAmount()) == 0
-               && newPayment.getCurrency() == oldPayment.getCurrency();
     }
 }
