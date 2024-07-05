@@ -31,6 +31,12 @@ logging:
   level:
     root: info
 
+currency:
+  exchange:
+    url: https://openexchangerates.org
+    appId: ca800d6c1f28496a9461bd842d20b919
+    commission: 1
+
 clear-scheduler:
   cron: "0 */5 * * * *" # every 5 minute
   auto-clear-delay-amount: 15 # in minutes
