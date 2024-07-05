@@ -69,7 +69,7 @@ public class PaymentService {
         List<PaymentRequest> pendingRequests = repository.findPendingPaymentRequests();
 
         pendingRequests.stream()
-                .filter(PaymentRequest::isClearScheduledAtNow)
+                .filter(PaymentRequest::shouldClearNow)
                 .forEach(pendingRequest -> clearRequest(pendingRequest, OperationType.CONFIRMATION));
     }
 

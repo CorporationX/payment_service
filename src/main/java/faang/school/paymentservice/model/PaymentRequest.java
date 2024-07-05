@@ -66,7 +66,7 @@ public class PaymentRequest {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public boolean isClearScheduledAtNow() {
+    public boolean shouldClearNow() {
         return clearScheduledAt.isBefore(LocalDateTime.now());
     }
 }

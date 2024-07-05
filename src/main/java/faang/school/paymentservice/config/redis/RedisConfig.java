@@ -1,7 +1,6 @@
 package faang.school.paymentservice.config.redis;
 
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -11,23 +10,22 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Setter
 @Configuration
-@ConfigurationProperties(prefix = "spring.data.redis")
+@RequiredArgsConstructor
 public class RedisConfig {
-    private int port;
-    private String host;
-    private String channel;
+    private final RedisProperties redisProperties;
 
 
     @Bean
     public ChannelTopic paymentTopic() {
-        return new ChannelTopic(channel);
+        return new ChannelTopic(redisProperties.getChannels().getPayment());
     }
 
     @Bean
     public RedisConnectionFactory jedisConnectionFactory() {
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(
+                redisProperties.getHost(),
+                redisProperties.getPort());
         return new JedisConnectionFactory(config);
     }
 

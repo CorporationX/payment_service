@@ -9,9 +9,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PaymentEventPublisher extends AbstractEventPublisher {
-    public PaymentEventPublisher(ObjectMapper objectMapper,
-                                 RedisTemplate<String, Object> redisTemplate,
-                                 @Qualifier("paymentTopic") ChannelTopic topic) {
+    public PaymentEventPublisher(
+            ObjectMapper objectMapper,
+            RedisTemplate<String, Object> redisTemplate,
+            @Qualifier("paymentTopic") ChannelTopic topic) {
         super(objectMapper, redisTemplate, topic);
     }
 }

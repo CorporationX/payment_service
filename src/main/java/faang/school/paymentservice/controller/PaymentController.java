@@ -8,7 +8,8 @@ import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
 import faang.school.paymentservice.service.CurrencyConverterService;
 import faang.school.paymentservice.service.PaymentService;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -31,15 +32,12 @@ import java.util.Random;
 public class PaymentController {
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
     private static final String CONVERTING_MONEY_MESSAGE = "Dear friend! Thank you for converting money! You converted %s %s to %s %s with commission %f%%";
-    private static final String PAYMENT_MESSAGE = "Dear friend! Thank you for your purchase!. Your payment on %s %s was accepted.";
 
     private final CurrencyConverterService service;
     private final CurrencyExchangeConfig exchangeConfig;
 
     /**
      * Получение текущего соотношения валют к доллару из внешнего источника
-     *
-     * @return
      */
     @GetMapping("currency")
     public CurrencyExchangeResponse getCurrentCurrencyExchangeRate() {
@@ -49,17 +47,19 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/payment")
-    public PaymentResponse sendPayment(@RequestBody @Validated PaymentRequestDto dto) {
+    public PaymentResponse sendPayment(@RequestBody @Valid PaymentRequestDto dto) {
         return paymentService.sendPayment(dto);
     }
 
     @PatchMapping("/payment/{paymentId}/cancel")
-    public PaymentResponse cancelPayment(@PathVariable @NotNull Long paymentId) {
+    public PaymentResponse cancelPayment(@PathVariable @NonNull Long paymentId) {
         return paymentService.cancelPayment(paymentId);
     }
 
     @PatchMapping("/payment/{paymentId}/confirm")
-    public PaymentResponse confirmPayment(@PathVariable @NotNull Long paymentId, @RequestParam(required = false) BigDecimal newAmount) {
+    public PaymentResponse confirmPayment(
+            @PathVariable @NonNull Long paymentId,
+            @RequestParam(required = false) BigDecimal newAmount) {
         return paymentService.confirmPayment(paymentId, newAmount);
     }
 
@@ -91,9 +91,5 @@ public class PaymentController {
                 .message(message)
                 .build()
         );
-    }
-
-    private int getVerificationCode() {
-        return new Random().nextInt(1000, 10000);
     }
 }
