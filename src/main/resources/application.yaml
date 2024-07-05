@@ -12,5 +12,6 @@ currency:
   cron: "0 0 8 * * *"
 
 payment:
+  exchange_url: "https://openexchangerates.org"
   exchange_appId: ca800d6c1f28496a9461bd842d20b919
   exchange_fee: 1.01

@@ -2,6 +2,7 @@ package faang.school.paymentservice.client;
 
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.CurrencyResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

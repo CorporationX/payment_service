@@ -19,6 +19,7 @@ import java.util.List;
 @Slf4j
 public class OpenExchangeRatesService {
     private final OpenExchangeRatesClient openExchangeRatesClient;
+
     @Value("${payment.exchange_appId}")
     private String appId;
 
