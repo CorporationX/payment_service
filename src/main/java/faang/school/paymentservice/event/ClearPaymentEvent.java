@@ -1,15 +1,16 @@
 package faang.school.paymentservice.event;
 
-import faang.school.paymentservice.enums.Currency;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
-import java.math.BigDecimal;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class ClearPaymentEvent implements Event {
+    @JsonProperty("paymentId")
     private Long paymentId;
 }

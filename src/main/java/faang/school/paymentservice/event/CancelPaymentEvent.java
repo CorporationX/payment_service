@@ -11,5 +11,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class CancelPaymentEvent implements Event {
+    private Long userId;
     private Long paymentId;
 }

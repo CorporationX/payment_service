@@ -50,7 +50,8 @@ public class PaymentServiceImpl implements PaymentService {
                     .orElseThrow(() -> new NotFoundException("Sender balance hasn't been found"));
             log.info("Found balance {}", senderBalance.getId());
 
-            paymentValidator.validateSenderHaveEnoughMoneyOnBalance(senderBalance, dto);
+            paymentValidator.validateAmountIsPositive(dto);
+            paymentValidator.validateSenderHaveEnoughMoneyOnAuthorizationBalance(senderBalance, dto);
 
             Optional<Payment> optionalPayment = paymentRepository.findPaymentByIdempotencyKey(idempotencyKey);
             if (optionalPayment.isPresent()) {
@@ -65,7 +66,7 @@ public class PaymentServiceImpl implements PaymentService {
             Payment payment = paymentRepository.save(paymentMapper.toEntity(dto));
             log.info("Payment with UUID={} was saved in DB successfully", idempotencyKey);
 
-            NewPaymentEvent event = new NewPaymentEvent(payment.getId());
+            NewPaymentEvent event = new NewPaymentEvent(userId, payment.getId());
             newPaymentPublisher.publish(event);
 
             return payment.getId();
@@ -96,9 +97,9 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new NotFoundException("This payment doesn't exist"));
 
-        paymentValidator.validatePaymentStatusForCancel(payment);
+        paymentValidator.validatePaymentStatusIsAlreadyCorrect(payment, PaymentStatus.CANCELED);
 
-        CancelPaymentEvent event = new CancelPaymentEvent(paymentId);
+        CancelPaymentEvent event = new CancelPaymentEvent(userId, paymentId);
 
         cancelPaymentPublisher.publish(event);
     }
