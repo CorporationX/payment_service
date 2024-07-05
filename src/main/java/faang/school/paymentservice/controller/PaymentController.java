@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import faang.school.paymentservice.config.currency.CurrencyExchangeConfig;
 import faang.school.paymentservice.dto.Currency;
-import faang.school.paymentservice.dto.PaymentRequest;
+import faang.school.paymentservice.dto.PaymentRequestDto;
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
@@ -44,7 +44,7 @@ public class PaymentController {
     }
 
     @PostMapping("payment")
-    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
+    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequestDto dto) {
         String message = String.format(
             PAYMENT_MESSAGE,
             DECIMAL_FORMAT.format(dto.amount()),
@@ -70,7 +70,7 @@ public class PaymentController {
      * @return Объект результата конвертации
      */
     @PostMapping("exchange")
-    public ResponseEntity<PaymentResponse> exchangeCurrency(@RequestBody @Validated PaymentRequest dto, @RequestParam Currency targetCurrency) {
+    public ResponseEntity<PaymentResponse> exchangeCurrency(@RequestBody @Validated PaymentRequestDto dto, @RequestParam Currency targetCurrency) {
         BigDecimal newAmount = service.convertWithCommission(dto, targetCurrency);
         
         String message = String.format(
