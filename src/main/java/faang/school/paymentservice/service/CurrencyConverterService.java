@@ -38,9 +38,9 @@ public class CurrencyConverterService {
             Currency targetCurrency,
             CurrencyExchangeResponse currentCurrencyExchange
     ) {
-        BigDecimal amount = dto.amount();
+        BigDecimal amount = dto.getAmount();
         BigDecimal targetRate = currentCurrencyExchange.getRate(targetCurrency);
-        BigDecimal baseRate = currentCurrencyExchange.getRate(dto.currency());
+        BigDecimal baseRate = currentCurrencyExchange.getRate(dto.getCurrency());
         return (amount.multiply(targetRate)).divide(baseRate, 2, RoundingMode.HALF_UP);
     }
 }

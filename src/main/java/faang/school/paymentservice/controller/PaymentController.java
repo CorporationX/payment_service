@@ -1,25 +1,5 @@
 package faang.school.paymentservice.controller;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.util.Random;
-
-import org.springframework.http.ResponseEntity;
-import faang.school.paymentservice.dto.PaymentRequestDto;
-import faang.school.paymentservice.dto.PaymentResponse;
-import faang.school.paymentservice.service.PaymentService;
-import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import faang.school.paymentservice.config.currency.CurrencyExchangeConfig;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequestDto;
@@ -27,7 +7,23 @@ import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
 import faang.school.paymentservice.service.CurrencyConverterService;
+import faang.school.paymentservice.service.PaymentService;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/api")
@@ -70,9 +66,8 @@ public class PaymentController {
     /**
      * Конвертация одной валюты в другую
      *
-     * @param dto Объект для конвертации
+     * @param dto            Объект для конвертации
      * @param targetCurrency целевая валюта
-     *
      * @return Объект результата конвертации
      */
     @PostMapping("exchange")
@@ -80,21 +75,21 @@ public class PaymentController {
         BigDecimal newAmount = service.convertWithCommission(dto, targetCurrency);
 
         String message = String.format(
-            CONVERTING_MONEY_MESSAGE,
-            DECIMAL_FORMAT.format(dto.amount()),
-            dto.currency(),
-            DECIMAL_FORMAT.format(newAmount),
-            targetCurrency,
-            exchangeConfig.getCommission()
+                CONVERTING_MONEY_MESSAGE,
+                DECIMAL_FORMAT.format(dto.getAmount()),
+                dto.getCurrency(),
+                DECIMAL_FORMAT.format(newAmount),
+                targetCurrency,
+                exchangeConfig.getCommission()
         );
 
-        return ResponseEntity.ok(new PaymentResponse(
-            PaymentStatus.SUCCESS,
-            getVerificationCode(),
-            dto.paymentNumber(),
-            newAmount,
-            targetCurrency,
-            message)
+        return ResponseEntity.ok(PaymentResponse.builder()
+                .status(PaymentStatus.SUCCESS)
+                .debitAccountId(dto.getDebitAccountId())
+                .amount(newAmount)
+                .currency(targetCurrency)
+                .message(message)
+                .build()
         );
     }
 
