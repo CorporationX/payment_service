@@ -65,6 +65,9 @@ scheduler:
   fetch:
     currency-rates:
       cron: "0 0 0 * * *" # every day at 00:00
+  payments:
+    clear:
+      cron: "0 0 0 * * *" # every day at 00:00
 
 async:
   currency-rates-fetch:

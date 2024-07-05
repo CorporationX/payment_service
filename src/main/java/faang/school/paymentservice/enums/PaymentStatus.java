@@ -5,5 +5,5 @@ public enum PaymentStatus {
     READY_TO_CLEAR,
     CLEAR,
     CANCELED,
-    FAILURE
+    FAILURE;
 }

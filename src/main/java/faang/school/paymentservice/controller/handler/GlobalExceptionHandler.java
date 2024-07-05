@@ -1,9 +1,7 @@
 package faang.school.paymentservice.controller.handler;
 
 import faang.school.paymentservice.enums.Currency;
-import faang.school.paymentservice.exception.IdempotencyException;
 import faang.school.paymentservice.exception.IncorrectCurrencyException;
-import faang.school.paymentservice.exception.NotEnoughMoneyOnBalanceException;
 import faang.school.paymentservice.exception.NotFoundException;
 import faang.school.paymentservice.exception.PaymentException;
 import feign.FeignException;
@@ -59,13 +57,6 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(e, request, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(NotEnoughMoneyOnBalanceException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handleBalanceException(NotEnoughMoneyOnBalanceException e, HttpServletRequest request) {
-        log.error("BalanceException ", e);
-        return buildErrorResponse(e, request, HttpStatus.FORBIDDEN);
-    }
-
     @ExceptionHandler(IncorrectCurrencyException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleCurrencyException(IncorrectCurrencyException e, HttpServletRequest request) {
@@ -83,13 +74,6 @@ public class GlobalExceptionHandler {
                 .build();
         log.error("PaymentException ", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-    }
-
-    @ExceptionHandler(IdempotencyException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleIdempotencyException(IdempotencyException e, HttpServletRequest request) {
-        log.error("IdempotencyException ", e);
-        return buildErrorResponse(e, request, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(FeignException.class)

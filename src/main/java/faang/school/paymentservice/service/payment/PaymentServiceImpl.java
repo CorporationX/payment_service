@@ -7,6 +7,7 @@ import faang.school.paymentservice.event.CancelPaymentEvent;
 import faang.school.paymentservice.event.ClearPaymentEvent;
 import faang.school.paymentservice.event.NewPaymentEvent;
 import faang.school.paymentservice.exception.NotFoundException;
+import faang.school.paymentservice.exception.PaymentException;
 import faang.school.paymentservice.mapper.PaymentMapper;
 import faang.school.paymentservice.model.Balance;
 import faang.school.paymentservice.model.Payment;
@@ -48,9 +49,12 @@ public class PaymentServiceImpl implements PaymentService {
         try {
             Balance senderBalance = balanceRepository.findBalanceByAccountNumber(dto.getSenderAccountNumber())
                     .orElseThrow(() -> new NotFoundException("Sender balance hasn't been found"));
-            log.info("Found balance {}", senderBalance.getId());
 
-            paymentValidator.validateSenderHaveEnoughMoneyOnBalance(senderBalance, dto);
+            balanceRepository.findBalanceByAccountNumber(dto.getReceiverAccountNumber())
+                    .orElseThrow(() -> new NotFoundException("Receiver balance hasn't been found"));
+            paymentValidator.validateAmountIsPositive(dto);
+            paymentValidator.validateNumbersAreDifferent(dto);
+            paymentValidator.validateSenderHaveEnoughMoneyOnAuthorizationBalance(senderBalance, dto);
 
             Optional<Payment> optionalPayment = paymentRepository.findPaymentByIdempotencyKey(idempotencyKey);
             if (optionalPayment.isPresent()) {
@@ -60,19 +64,20 @@ public class PaymentServiceImpl implements PaymentService {
                 return payment.getId();
             }
 
-            dto.setPaymentStatus(PaymentStatus.NEW);
-            dto.setScheduledAt(LocalDateTime.now().plusHours(8));
-            Payment payment = paymentRepository.save(paymentMapper.toEntity(dto));
+            Payment payment = paymentMapper.toEntity(dto);
+            payment.setPaymentStatus(PaymentStatus.NEW);
+            payment.setScheduledAt(LocalDateTime.now().plusHours(8));
+            payment = paymentRepository.save(payment);
             log.info("Payment with UUID={} was saved in DB successfully", idempotencyKey);
 
-            NewPaymentEvent event = new NewPaymentEvent(payment.getId());
+            NewPaymentEvent event = new NewPaymentEvent(userId, payment.getId());
             newPaymentPublisher.publish(event);
 
             return payment.getId();
         } catch (Exception e) {
             log.error("Error occurred while creating payment: ", e);
             saveFailedPayment(dto);
-            throw e;
+            throw new PaymentException(e.getMessage());
         }
     }
 
@@ -96,9 +101,9 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new NotFoundException("This payment doesn't exist"));
 
-        paymentValidator.validatePaymentStatusForCancel(payment);
+        paymentValidator.validatePaymentStatusIsAlreadyCorrect(payment, PaymentStatus.CANCELED);
 
-        CancelPaymentEvent event = new CancelPaymentEvent(paymentId);
+        CancelPaymentEvent event = new CancelPaymentEvent(userId, paymentId);
 
         cancelPaymentPublisher.publish(event);
     }

@@ -5,6 +5,7 @@ import faang.school.paymentservice.repository.PaymentRepository;
 import faang.school.paymentservice.service.payment.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class PaymentClearingScheduler {
     private final PaymentRepository paymentRepository;
     private final PaymentService paymentService;
 
-//    @Scheduled(fixedRate = 5000)
+    @Scheduled(cron = "${scheduler.payments.clear.cron}")
     public void clearPayments() {
         List<Payment> payments = paymentRepository.findReadyToClearTransactions();
 
