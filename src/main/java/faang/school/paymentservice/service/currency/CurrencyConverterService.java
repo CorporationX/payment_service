@@ -5,6 +5,7 @@ import faang.school.paymentservice.config.currency.CurrencyExchangeConfig;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequestDto;
 import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,11 @@ public class CurrencyConverterService {
     private final CurrencyConverterClient currencyConverterClient;
     private final CurrencyExchangeConfig exchangeConfig;
     private CurrencyExchangeResponse currentCurrencyExchange;
+    
+    @PostConstruct
+    public void postConstruct() {
+        getCurrentCurrencyExchangeRate();
+    }
     
     public CurrencyExchangeResponse getCurrentCurrencyExchangeRate() {
         currentCurrencyExchange = currencyConverterClient.getCurrentCurrencyExchangeRate(exchangeConfig.getAppId());

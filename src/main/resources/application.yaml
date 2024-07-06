@@ -29,6 +29,4 @@ currency:
     url: https://openexchangerates.org
     appId: ca800d6c1f28496a9461bd842d20b919
     commission: 1
-    refresh_cron: "0 0 0 * * ?"
-#   Каждый день в полночь "0 0 0 * * ?"
-#   Каждую секунду "* * * * * ?"
+    refresh_cron: "0 0 0 * * ?"  # Каждый день в полночь "0 0 0 * * ?"
