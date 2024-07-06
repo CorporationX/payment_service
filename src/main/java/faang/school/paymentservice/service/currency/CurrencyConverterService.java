@@ -1,10 +1,12 @@
-package faang.school.paymentservice.service;
+package faang.school.paymentservice.service.currency;
 
 import faang.school.paymentservice.client.CurrencyConverterClient;
 import faang.school.paymentservice.config.currency.CurrencyExchangeConfig;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequestDto;
 import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
+import jakarta.annotation.PostConstruct;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,16 +17,24 @@ import java.math.RoundingMode;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Data
 public class CurrencyConverterService {
     private final CurrencyConverterClient currencyConverterClient;
     private final CurrencyExchangeConfig exchangeConfig;
-
+    private CurrencyExchangeResponse currentCurrencyExchange;
+    
+    @PostConstruct
+    public void postConstruct() {
+        getCurrentCurrencyExchangeRate();
+    }
+    
     public CurrencyExchangeResponse getCurrentCurrencyExchangeRate() {
-        return currencyConverterClient.getCurrentCurrencyExchangeRate(exchangeConfig.getAppId());
+        currentCurrencyExchange = currencyConverterClient.getCurrentCurrencyExchangeRate(exchangeConfig.getAppId());
+        return currentCurrencyExchange;
     }
 
     public BigDecimal convertWithCommission(PaymentRequestDto dto, Currency targetCurrency) {
-        BigDecimal newAmount = getAmountInNewCurrency(dto, targetCurrency, getCurrentCurrencyExchangeRate());
+        BigDecimal newAmount = getAmountInNewCurrency(dto, targetCurrency, currentCurrencyExchange);
         return addCommision(newAmount);
     }
 
