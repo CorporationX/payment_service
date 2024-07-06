@@ -1,0 +1,1 @@
+alter table payments add unique idempotency_key;
