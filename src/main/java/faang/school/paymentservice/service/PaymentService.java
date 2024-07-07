@@ -1,15 +1,15 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.dto.PaymentRequestDto;
-import faang.school.paymentservice.dto.PaymentResponse;
-import faang.school.paymentservice.dto.PaymentStatus;
-import faang.school.paymentservice.dto.event.PaymentEventDto;
+import faang.school.paymentservice.dto.PaymentResponseDto;
+import faang.school.paymentservice.exception.DataValidationException;
 import faang.school.paymentservice.mapper.PaymentRequestMapper;
-import faang.school.paymentservice.model.OperationType;
+import faang.school.paymentservice.model.OperationStatus;
 import faang.school.paymentservice.model.PaymentRequest;
 import faang.school.paymentservice.redis.PaymentEventPublisher;
 import faang.school.paymentservice.repository.PaymentRequestRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,7 +21,9 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.List;
+import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
@@ -32,94 +34,104 @@ public class PaymentService {
     private final PaymentRequestMapper mapper;
     private final PaymentEventPublisher eventPublisher;
     private final PaymentServiceValidator verifier;
+    private final AccountServiceConnector accountServiceConnector;
 
 
     @Transactional
-    public PaymentResponse sendPayment(PaymentRequestDto dto) {
-        PaymentRequest pendingRequest = repository.save(createPendingRequest(dto));
-        publishPaymentEvent(pendingRequest);
+    public PaymentResponseDto sendPayment(PaymentRequestDto dto) {
+        if (repository.existsByIdAndStatusIsNotFailed(dto.getPaymentId())) {
+            throw new DataValidationException("This payment has already been registered for authorization");
+        }
 
-        return formAuthorizationResponse(pendingRequest);
+        PaymentRequest pendingRequest = repository.save(createPendingRequest(dto));
+        log.info("Saved new pending operation with id = {}", dto.getPaymentId());
+
+        PaymentResponseDto responseDto = accountServiceConnector.authorizePayment(dto);
+        pendingRequest.setStatus(responseDto.getStatus());
+        log.info("Updated status of pending operation with id = {} to status = {}", dto.getPaymentId(), responseDto.getStatus());
+
+        return responseDto;
     }
 
-    @Transactional
-    public PaymentResponse cancelPayment(Long paymentId) {
-        PaymentRequest pendingRequestForClearing = getPendingRequest(paymentId);
 
-        clearRequest(pendingRequestForClearing, OperationType.CANCELING);
+    @Transactional
+    public PaymentResponseDto cancelPayment(UUID paymentId) {
+        PaymentRequest pendingRequestForClearing = getPendingRequestForClearing(paymentId);
+
+        log.info("Start canceling operation with id = {}", paymentId);
+        clearRequest(pendingRequestForClearing, OperationStatus.CANCELING);
 
         return formCancelingResponse(pendingRequestForClearing);
     }
 
     @Transactional
-    public PaymentResponse confirmPayment(Long paymentId, BigDecimal newAmount) {
-        PaymentRequest pendingRequest = getPendingRequest(paymentId);
+    public PaymentResponseDto confirmPayment(UUID paymentId, BigDecimal newAmount) {
+        PaymentRequest pendingRequestForClearing = getPendingRequestForClearing(paymentId);
 
         if (newAmount != null) {
-            pendingRequest.setAmount(newAmount);
+            pendingRequestForClearing.setAmount(newAmount);
         }
 
-        clearRequest(pendingRequest, OperationType.CONFIRMATION);
+        log.info("Start confirming operation with id = {}", paymentId);
+        clearRequest(pendingRequestForClearing, OperationStatus.CONFIRMATION);
 
-        return formSucceedResponse(pendingRequest);
+        return formConfirmationResponse(pendingRequestForClearing);
     }
 
     @Scheduled(cron = "${clear-scheduler.cron}")
     public void autoClearRequest() {
-        List<PaymentRequest> pendingRequests = repository.findPendingPaymentRequests();
+        log.info("Selecting first 5 requests to be cleared.");
+        List<PaymentRequest> pendingRequests = repository.findReadyToClearRequests();
 
-        pendingRequests.stream()
-                .filter(PaymentRequest::shouldClearNow)
-                .forEach(pendingRequest -> clearRequest(pendingRequest, OperationType.CONFIRMATION));
+        log.info("Clearing {} requests.", pendingRequests.size());
+        pendingRequests.forEach(pendingRequest -> clearRequest(pendingRequest, OperationStatus.CONFIRMATION));
     }
 
     @Async
     @Transactional
-    public void clearRequest(PaymentRequest pendingRequest, OperationType operationType) {
-        pendingRequest.setIsCleared(true);
-        pendingRequest.setType(operationType);
+    public void clearRequest(PaymentRequest pendingRequest, OperationStatus operationStatus) {
+        pendingRequest.setStatus(operationStatus);
         repository.save(pendingRequest);
 
-        publishPaymentEvent(pendingRequest);
+        accountServiceConnector.publishClearingEvent(pendingRequest);
+
+        pendingRequest.setStatus(OperationStatus.CLEARING);
+        repository.save(pendingRequest);
     }
 
-    private PaymentRequest getPendingRequest(Long paymentId) {
+    private PaymentRequest getPendingRequestForClearing(UUID paymentId) {
         PaymentRequest pendingRequest = repository.findById(paymentId);
 
         verifier.validateRequestBeforeClearing(pendingRequest);
         return pendingRequest;
     }
 
-
-    private PaymentResponse formAuthorizationResponse(PaymentRequest pendingRequest) {
-        return formResponse(pendingRequest, PaymentStatus.AUTHORIZATION, "To confirm payment send a confirmation request.");
+    private PaymentResponseDto formCancelingResponse(PaymentRequest pendingRequest) {
+        return formResponse(
+                pendingRequest,
+                OperationStatus.CANCELED,
+                "Your payment has been canceled.");
     }
 
-    private PaymentResponse formCancelingResponse(PaymentRequest pendingRequest) {
-        return formResponse(pendingRequest, PaymentStatus.CANCELED, "Your payment has been canceled.");
+    private PaymentResponseDto formConfirmationResponse(PaymentRequest pendingRequest) {
+        return formResponse(
+                pendingRequest,
+                OperationStatus.CONFIRMED,
+                "Your payment has been confirmed and succeed.");
     }
 
-    private PaymentResponse formSucceedResponse(PaymentRequest pendingRequest) {
-        return formResponse(pendingRequest, PaymentStatus.SUCCESS, "Your payment has been confirmed and succeed.");
-    }
-
-    private PaymentResponse formResponse(PaymentRequest pendingRequest, PaymentStatus status, String message) {
-        PaymentResponse response = mapper.toPaymentResponse(pendingRequest);
+    private PaymentResponseDto formResponse(PaymentRequest pendingRequest, OperationStatus status, String message) {
+        PaymentResponseDto response = mapper.toPaymentResponse(pendingRequest);
         response.setStatus(status);
         response.setMessage(message);
 
         return response;
     }
 
-    private void publishPaymentEvent(PaymentRequest pendingRequest) {
-        PaymentEventDto paymentEvent = mapper.toPaymentEvent(pendingRequest);
-        eventPublisher.publish(paymentEvent);
-    }
-
     private PaymentRequest createPendingRequest(PaymentRequestDto dto) {
         PaymentRequest pendingRequest = mapper.toModel(dto);
-        pendingRequest.setType(OperationType.AUTHORIZATION);
-        pendingRequest.setIsCleared(false);
+        pendingRequest.setStatus(OperationStatus.NEW);
+        dto.setStatus(OperationStatus.NEW);
         pendingRequest.setClearScheduledAt(LocalDateTime.now().plus(clearingDelay, CLEARING_DELAY_TEMPORAL_UNIT));
 
         return pendingRequest;

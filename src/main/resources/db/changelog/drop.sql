@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS payment_operation;
+DROP TABLE IF EXISTS payment_request;
 
 DELETE
 FROM databasechangelog;

@@ -1,19 +1,22 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.exception.DataValidationException;
-import faang.school.paymentservice.model.OperationType;
+import faang.school.paymentservice.model.OperationStatus;
 import faang.school.paymentservice.model.PaymentRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 class PaymentServiceValidator {
     public void validateRequestBeforeClearing(PaymentRequest paymentRequest) {
-        if (!paymentRequest.getType().equals(OperationType.AUTHORIZATION)) {
-            throw new DataValidationException("Only pending operations (with \"AUTHORIZATION\" status) can be canceled.");
-        }
+        OperationStatus paymentRequestStatus = paymentRequest.getStatus();
+        if (!paymentRequestStatus.equals(OperationStatus.AUTHORIZED)) {
+            log.warn("""
+                    Clearing was terminated due to wrong status of request. Attempted to clear request with status {}.
+                    """, paymentRequestStatus);
 
-        if (paymentRequest.getIsCleared().equals(true)) {
-            throw new DataValidationException("This operation is already finished.");
+            throw new DataValidationException("Only pending operations (with \"AUTHORIZED\" status) can be cleared.");
         }
     }
 }

@@ -39,6 +39,10 @@ currency:
     commission: 1
 
 clear-scheduler:
-  cron: "0 */5 * * * *" # every 5 minute
+  cron: "0 */10 * * * *" # every 5 minute
   auto-clear-delay-amount: 15 # in minutes
 
+account-service:
+  host: localhost
+  port: 8090
+  repeatable-delay: 3000

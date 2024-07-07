@@ -1,36 +1,23 @@
 package faang.school.paymentservice.mapper;
 
-import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequestDto;
-import faang.school.paymentservice.dto.PaymentResponse;
-import faang.school.paymentservice.dto.event.PaymentEventDto;
-import faang.school.paymentservice.model.OperationType;
+import faang.school.paymentservice.dto.PaymentResponseDto;
 import faang.school.paymentservice.model.PaymentRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
-import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PaymentRequestMapper {
+    @Mapping(target = "id", source = "paymentId")
     PaymentRequest toModel(PaymentRequestDto dto);
 
-    @Mapping(target = "paymentNumber", source = "id")
-    PaymentResponse toPaymentResponse(PaymentRequest pendingRequest);
+    @Mapping(target = "paymentId", source = "id")
+    PaymentResponseDto toPaymentResponse(PaymentRequest model);
 
-    @Mapping(target = "currency", source = "currency", qualifiedByName = "getCurrencyName")
-    @Mapping(target = "type", source = "type", qualifiedByName = "getOperationTypeName")
-    @Mapping(target = "paymentNumber", source = "id")
-    PaymentEventDto toPaymentEvent(PaymentRequest pendingRequest);
+    PaymentResponseDto toPaymentResponse(PaymentRequestDto dto);
 
-    @Named("getCurrencyName")
-    default String getCurrencyName(Currency currency) {
-        return currency.name();
-    }
-
-    @Named("getOperationTypeName")
-    default String getOperationTypeName(OperationType type) {
-        return type.name();
-    }
+    @Mapping(target = "paymentId", source = "id")
+    PaymentRequestDto toDto(PaymentRequest pendingRequest);
 }

@@ -2,7 +2,7 @@ package faang.school.paymentservice.redis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import faang.school.paymentservice.dto.event.PaymentEventDto;
+import faang.school.paymentservice.dto.PaymentRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,7 +16,7 @@ public abstract class AbstractEventPublisher {
     private final ChannelTopic topic;
 
 
-    public void publish(PaymentEventDto event) {
+    public void publish(PaymentRequestDto event) {
         try {
             redisTemplate.convertAndSend(topic.getTopic(), objectMapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {

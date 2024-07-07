@@ -2,9 +2,9 @@ package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.client.CurrencyConverterClient;
 import faang.school.paymentservice.config.currency.CurrencyExchangeConfig;
-import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequestDto;
 import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
+import faang.school.paymentservice.model.Currency;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
