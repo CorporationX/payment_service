@@ -52,7 +52,6 @@ public class PaymentServiceImpl implements PaymentService {
 
             balanceRepository.findBalanceByAccountNumber(dto.getReceiverAccountNumber())
                     .orElseThrow(() -> new NotFoundException("Receiver balance hasn't been found"));
-            paymentValidator.validateAmountIsPositive(dto);
             paymentValidator.validateNumbersAreDifferent(dto);
             paymentValidator.validateSenderHaveEnoughMoneyOnAuthorizationBalance(senderBalance, dto);
 

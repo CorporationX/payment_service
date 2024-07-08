@@ -8,7 +8,7 @@ import faang.school.paymentservice.model.Payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -40,14 +40,8 @@ public class PaymentValidator {
                 && newPayment.getCurrency() == oldPayment.getCurrency();
     }
 
-    public void validateAmountIsPositive(PaymentDtoToCreate dto) {
-        if (dto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new DataValidationException("Amount cannot be negative or zero");
-        }
-    }
-
     public void validateNumbersAreDifferent(PaymentDtoToCreate dto) {
-        if(dto.getSenderAccountNumber() == dto.getReceiverAccountNumber()){
+        if(Objects.equals(dto.getSenderAccountNumber(), dto.getReceiverAccountNumber())){
             throw new DataValidationException("Sender and Receiver number should be different");
         }
     }
