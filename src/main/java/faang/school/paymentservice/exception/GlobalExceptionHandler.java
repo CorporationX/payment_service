@@ -43,9 +43,9 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(message);
     }
 
-    /*@ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleRuntimeException(RuntimeException e) {
         return new ErrorResponse(e.getMessage());
-    }*/
+    }
 }
