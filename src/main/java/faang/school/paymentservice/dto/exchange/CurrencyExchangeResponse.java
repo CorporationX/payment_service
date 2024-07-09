@@ -1,12 +1,11 @@
 package faang.school.paymentservice.dto.exchange;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import faang.school.paymentservice.model.Currency;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import faang.school.paymentservice.dto.Currency;
-import lombok.Data;
 
 /**
  * Класс ответа от API обменного курса

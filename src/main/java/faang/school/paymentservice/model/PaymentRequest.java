@@ -1,34 +1,39 @@
 package faang.school.paymentservice.model;
 
-import faang.school.paymentservice.dto.Currency;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "payment_request")
 public class PaymentRequest {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
-    @Column(name = "debit_account_id", nullable = false)
-    private Long debitAccountId;
+    @Column(name = "sender_account_number", nullable = false)
+    private String senderAccountNumber;
 
-    @Column(name = "credit_account_id", nullable = false)
-    private Long creditAccountId;
+    @Column(name = "receiver_account_number", nullable = false)
+    private String receiverAccountNumber;
 
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
@@ -38,11 +43,12 @@ public class PaymentRequest {
     private Currency currency;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
+    @Column(name = "operation_type", nullable = false)
     private OperationType type;
 
-    @Column(name = "is_cleared", nullable = false)
-    private Boolean isCleared;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "operation_status", nullable = false)
+    private OperationStatus status;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "clear_scheduled_at", nullable = false)
@@ -57,4 +63,8 @@ public class PaymentRequest {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public boolean shouldClearNow() {
+        return clearScheduledAt.isBefore(LocalDateTime.now());
+    }
 }
