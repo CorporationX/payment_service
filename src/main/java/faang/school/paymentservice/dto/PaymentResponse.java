@@ -1,12 +1,18 @@
 package faang.school.paymentservice.dto;
 
-import java.math.BigDecimal;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public record PaymentResponse(
+        @NotNull
         PaymentStatus status,
-        int verificationCode,
-        long paymentNumber,
-        BigDecimal amount,
-        Currency currency,
-        String message
+        @NotBlank
+        String requestId,
+        @NotNull
+        Product product,
+        @NotNull
+        Long paymentNumber,
+        @NotNull
+        Long paidDateTime
 ) {
 }
