@@ -4,3 +4,53 @@ server:
 logging:
   level:
     root: info
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payment-service
+    username: postgres
+    password: v@krjD5
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      max-lifetime: 600000
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      client-id: paymentservice
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        enable.idempotence: false
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: paymentservice
+      enable-auto-commit: false
+    listener:
+      ack-mode: manual
+
+kafka-topic:
+  consumer:
+    payment-request: paymentservice.payment.request
+    payment-response: paymentservice.payment.response
+  producer:
+    payment-response: paymentservice.payment.response
+    user-service-payment-response: userservice.payment.response
+
+payment:
+  request:
+    validityMinutes: 30
