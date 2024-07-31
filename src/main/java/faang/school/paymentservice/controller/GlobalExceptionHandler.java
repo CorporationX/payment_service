@@ -27,6 +27,7 @@ public class GlobalExceptionHandler {
                 );
     }
 
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
@@ -35,6 +36,7 @@ public class GlobalExceptionHandler {
 
         return new ErrorResponse(message);
     }
+
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
