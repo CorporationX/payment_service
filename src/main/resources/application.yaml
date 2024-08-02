@@ -4,3 +4,10 @@ server:
 logging:
   level:
     root: info
+
+currency:
+  fetch:
+    url: https://openexchangerates.org
+    appId: ca800d6c1f28496a9461bd842d20b919
+    commission: 1
+    cron: "0 0 12 * * ?" # Cron-выражения, которое запускает метод каждый день в 12:00
