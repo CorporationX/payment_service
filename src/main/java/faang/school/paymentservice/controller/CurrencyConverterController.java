@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CurrencyConverterController {
     private final CurrencyConverterService service;
 
-    @GetMapping("/convert")
+    @GetMapping("/convert/currency")
     public CurrencyConverterDto convert(@RequestBody CurrencyConverterDto dto) {
         return service.convert(dto);
     }
