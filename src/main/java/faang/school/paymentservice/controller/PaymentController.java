@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
-import faang.school.paymentservice.service.CurrencyConverterService;
+import faang.school.paymentservice.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -25,7 +25,7 @@ public class PaymentController {
     private static final String CONVERTING_MONEY_MESSAGE = "Dear friend! Thank you for converting money! You converted %s %s to %s %s with commission %f%%";
     private static final String PAYMENT_MESSAGE = "Dear friend! Thank you for your purchase!. Your payment on %s %s was accepted.";
 
-    private final CurrencyConverterService currencyConverterService;
+    private final CurrencyService currencyService;
     private final CurrencyExchangeConfig exchangeConfig;
 
     @PostMapping("/payment")
@@ -54,7 +54,7 @@ public class PaymentController {
      */
     @GetMapping("/currency")
     public CurrencyExchangeResponse getCurrentCurrencyExchangeRate() {
-        return currencyConverterService.getCurrentCurrencyExchangeRate();
+        return currencyService.getCurrentCurrencyExchangeRate();
     }
 
     /**
@@ -67,7 +67,7 @@ public class PaymentController {
     @PostMapping("/exchange")
     public ResponseEntity<PaymentResponse> exchangeCurrency(@RequestBody @Validated PaymentRequest dto,
                                                             @RequestParam Currency targetCurrency) {
-        BigDecimal newAmount = currencyConverterService.convertWithCommission(dto, targetCurrency);
+        BigDecimal newAmount = currencyService.convertWithCommission(dto, targetCurrency);
 
         String message = String.format(
                 CONVERTING_MONEY_MESSAGE,

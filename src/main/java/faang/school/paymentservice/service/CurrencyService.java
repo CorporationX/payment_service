@@ -18,18 +18,10 @@ import java.math.RoundingMode;
 @RequiredArgsConstructor
 @Slf4j
 @Data
-public class CurrencyConverterService {
+public class CurrencyService {
     private final CurrencyConverterClient currencyConverterClient;
     private final CurrencyExchangeConfig exchangeConfig;
     private CurrencyExchangeResponse currentCurrencyExchange;
-
-//    public CurrencyConverterService(CurrencyConverterClient currencyConverterClient,
-//                                    CurrencyExchangeConfig exchangeConfig,
-//                                    CurrencyExchangeResponse currentCurrencyExchange) {
-//        this.currencyConverterClient = currencyConverterClient;
-//        this.exchangeConfig = exchangeConfig;
-//        this.currentCurrencyExchange = currentCurrencyExchange;
-//    }
 
     @PostConstruct
     public void postConstruct() {

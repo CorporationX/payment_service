@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CurrencyRateFetcher {
-    private CurrencyConverterService currencyConverterService;
+    private CurrencyService currencyService;
 
     @Scheduled(cron = "${currency.fetch.cron}")
     public void getExchangeRates() {
-        currencyConverterService.getCurrentCurrencyExchangeRate();
+        currencyService.getCurrentCurrencyExchangeRate();
         System.out.println("Fetching currency rates...");
     }
 }
