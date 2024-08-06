@@ -16,11 +16,10 @@ import lombok.Data;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CurrencyExchangeResponse {
-    private Long timestamp; //Время ответа
-    private String base; //Базовая валюта. По умолчанию USD.
-    private Map<String, Double> rates; //Cоотношения к base валюте
+    private String base_code; //Базовая валюта. По умолчанию USD.
+    private Map<String, Double> conversion_rates; //Cоотношения к base валюте
 
     public BigDecimal getRate(Currency currency) {
-        return BigDecimal.valueOf(rates.get(currency.name()));
+        return BigDecimal.valueOf(conversion_rates.get(currency.name()));
     }
 }
