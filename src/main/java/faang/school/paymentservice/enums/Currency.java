@@ -1,4 +1,4 @@
-package faang.school.paymentservice.dto;
+package faang.school.paymentservice.enums;
 
 public enum Currency {
     USD,

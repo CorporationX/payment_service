@@ -20,7 +20,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
     implementation ("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.retry:spring-retry:2.0.2")
+    implementation("org.springframework.kafka:spring-kafka:3.1.3")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     /**
@@ -40,6 +42,13 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    /**
+     * Database
+     */
+    implementation("org.liquibase:liquibase-core")
+    implementation("redis.clients:jedis:4.3.2")
+    runtimeOnly("org.postgresql:postgresql")
 }
 
 tasks.withType<Test> {
