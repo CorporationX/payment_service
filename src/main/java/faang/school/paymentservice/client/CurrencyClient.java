@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface CurrencyClient {
     @GetMapping("/latest.json")
     CurrencyResponse getCurrencyRates(
-            @RequestParam("app.id") String appId,
+            @RequestParam("app_id") String appId,
             @RequestParam("base") String baseCurrency,
             @RequestParam("symbols") String targetCurrency);
 }
