@@ -4,3 +4,13 @@ server:
 logging:
   level:
     root: info
+
+app:
+  currency:
+    base: USD
+    commission: 1.01
+
+services:
+  currencyClient:
+    url: https://openexchangerates.org/api
+    appId: ca800d6c1f28496a9461bd842d20b919
