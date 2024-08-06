@@ -6,12 +6,14 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import faang.school.paymentservice.dto.Currency;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
  * Класс ответа от API обменного курса
  */
 @Data
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CurrencyExchangeResponse {
     private Long timestamp; //Время ответа

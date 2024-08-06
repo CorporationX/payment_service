@@ -1,5 +1,6 @@
 package faang.school.paymentservice.controller;
 
+import faang.school.paymentservice.client.CurrencyConverterClient;
 import faang.school.paymentservice.config.currency.CurrencyExchangeConfig;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
@@ -12,6 +13,8 @@ import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
 import faang.school.paymentservice.service.CurrencyService;
+import feign.Feign;
+import feign.jackson.JacksonDecoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -55,6 +58,12 @@ public class PaymentController {
     @GetMapping("/currency")
     public CurrencyExchangeResponse getCurrentCurrencyExchangeRate() {
         return currencyService.getCurrentCurrencyExchangeRate();
+//        CurrencyConverterClient client = Feign.builder()
+//                .decoder(new JacksonDecoder())
+//                .target(CurrencyConverterClient.class, "https://v6.exchangerate-api.com/v6");
+//
+//        CurrencyExchangeResponse response = client.getCurrentCurrencyExchangeRate("5ffab83bf33aa9ef905e62b6");
+//        return response;
     }
 
     /**

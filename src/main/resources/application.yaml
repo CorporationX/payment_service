@@ -7,7 +7,7 @@ logging:
 
 currency:
   fetch:
-    url: https://v6.exchangerate-api.com/v6/YOUR-API-KEY/latest/USD
+    url: https://v6.exchangerate-api.com/v6/
     appId: 5ffab83bf33aa9ef905e62b6
     commission: 1
     cron: "0 0 12 * * ?" # Cron-выражения, которое запускает метод каждый день в 12:00
