@@ -4,3 +4,11 @@ server:
 logging:
   level:
     root: info
+
+openExchangeRates:
+  url: "https://openexchangerates.org"
+  appId: ca800d6c1f28496a9461bd842d20b919
+
+payment:
+  baseCurrency: USD
+  exchangeFee: 1.01
