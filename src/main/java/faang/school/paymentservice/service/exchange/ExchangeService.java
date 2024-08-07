@@ -3,7 +3,6 @@ package faang.school.paymentservice.service.exchange;
 import faang.school.paymentservice.client.CurrencyClient;
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.exchange.CurrencyResponse;
-import faang.school.paymentservice.exception.CurrencyConversionException;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,11 +33,6 @@ public class ExchangeService {
         CurrencyResponse response = getCurrencyRates(targetCurrency);
 
         BigDecimal rate = response.getRate(targetCurrency);
-        if (rate == null) {
-            log.error("No exchange rate available for " + targetCurrency);
-            throw new CurrencyConversionException("No exchange rate available for " + targetCurrency);
-        }
-
         BigDecimal convertedAmount = dto.amount().divide(rate, MathContext.DECIMAL128);
         BigDecimal amountWithCommission = convertedAmount.multiply(commission);
 
