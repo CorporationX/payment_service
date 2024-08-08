@@ -1,6 +1,7 @@
 package faang.school.paymentservice.service.exchange;
 
 import faang.school.paymentservice.client.CurrencyClient;
+import faang.school.paymentservice.client.OpenExchangeClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.exchange.CurrencyResponse;
@@ -27,10 +28,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class ExchangeServiceTest {
     @Mock
-    private CurrencyClient currencyClient;
+    private OpenExchangeClient currencyClient;
     @InjectMocks
     private ExchangeService exchangeService;
-    private String appId = "appId";
     private BigDecimal commission = BigDecimal.valueOf(1.01);
     private Long paymentNumber = 1L;
     private BigDecimal amount = BigDecimal.valueOf(100);
@@ -43,7 +43,6 @@ public class ExchangeServiceTest {
     void setUp() {
         ReflectionTestUtils.setField(exchangeService, "baseCurrency", baseCurrency);
         ReflectionTestUtils.setField(exchangeService, "commission", commission);
-        ReflectionTestUtils.setField(exchangeService, "appId", appId);
     }
 
     @Test
@@ -52,7 +51,7 @@ public class ExchangeServiceTest {
         rates.put(targetCurrency, rate);
         CurrencyResponse currencyResponse = new CurrencyResponse(rates);
 
-        when(currencyClient.getCurrencyRates(appId, baseCurrency, targetCurrency)).thenReturn(currencyResponse);
+        when(currencyClient.getCurrencyRates(targetCurrency)).thenReturn(currencyResponse);
 
         BigDecimal result = exchangeService.getAmountInBaseCurrency(dto);
         BigDecimal expected = amount.divide(BigDecimal.valueOf(rate), MathContext.DECIMAL128);
@@ -66,7 +65,7 @@ public class ExchangeServiceTest {
         Map<String, Double> rates = new HashMap<>();
         CurrencyResponse currencyResponse = new CurrencyResponse(rates);
 
-        when(currencyClient.getCurrencyRates(appId, baseCurrency, targetCurrency)).thenReturn(currencyResponse);
+        when(currencyClient.getCurrencyRates(targetCurrency)).thenReturn(currencyResponse);
 
         CurrencyConversionException e = assertThrows(
                 CurrencyConversionException.class, () -> exchangeService.getAmountInBaseCurrency(dto));
