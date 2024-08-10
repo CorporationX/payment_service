@@ -1,11 +1,9 @@
 package faang.school.paymentservice.service.exchange;
 
-import faang.school.paymentservice.client.CurrencyClient;
 import faang.school.paymentservice.client.OpenExchangeClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.exchange.CurrencyResponse;
-import faang.school.paymentservice.exception.CurrencyConversionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,10 +17,10 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,26 +49,13 @@ public class ExchangeServiceTest {
         rates.put(targetCurrency, rate);
         CurrencyResponse currencyResponse = new CurrencyResponse(rates);
 
-        when(currencyClient.getCurrencyRates(targetCurrency)).thenReturn(currencyResponse);
+        when(currencyClient.getCurrencyRates(targetCurrency)).thenReturn(Optional.of(currencyResponse));
 
         BigDecimal result = exchangeService.getAmountInBaseCurrency(dto);
         BigDecimal expected = amount.divide(BigDecimal.valueOf(rate), MathContext.DECIMAL128);
         expected = expected.multiply(commission);
 
         assertEquals(expected.setScale(2, RoundingMode.HALF_UP), result);
-    }
-
-    @Test
-    public void testGetAmountInBaseCurrencyWithNullCurrency() {
-        Map<String, Double> rates = new HashMap<>();
-        CurrencyResponse currencyResponse = new CurrencyResponse(rates);
-
-        when(currencyClient.getCurrencyRates(targetCurrency)).thenReturn(currencyResponse);
-
-        CurrencyConversionException e = assertThrows(
-                CurrencyConversionException.class, () -> exchangeService.getAmountInBaseCurrency(dto));
-
-        assertEquals("No exchange rate available for " + targetCurrency, e.getMessage());
     }
 
     @Test

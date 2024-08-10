@@ -3,6 +3,7 @@ package faang.school.paymentservice.service.exchange;
 import faang.school.paymentservice.client.OpenExchangeClient;
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.exchange.CurrencyResponse;
+import faang.school.paymentservice.exception.CurrencyConversionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +26,8 @@ public class ExchangeService {
     public BigDecimal getAmountInBaseCurrency(PaymentRequest dto) {
         String targetCurrency = dto.currency().name();
 
-        CurrencyResponse response = currencyClient.getCurrencyRates(targetCurrency);
+        CurrencyResponse response = currencyClient.getCurrencyRates(targetCurrency).orElseThrow(
+                () -> new CurrencyConversionException("Something went wrong by fetching currency " + targetCurrency));
 
         BigDecimal rate = response.getRate(targetCurrency);
         BigDecimal convertedAmount = dto.amount().divide(rate, MathContext.DECIMAL128);

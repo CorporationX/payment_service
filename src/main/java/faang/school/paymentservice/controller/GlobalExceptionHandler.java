@@ -3,6 +3,7 @@ package faang.school.paymentservice.controller;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ErrorResponse;
 import faang.school.paymentservice.exception.CurrencyConversionException;
+import feign.FeignException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -41,6 +42,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CurrencyConversionException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleCurrencyConversionException(CurrencyConversionException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(FeignException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleFeignException(FeignException e) {
         return new ErrorResponse(e.getMessage());
     }
 
