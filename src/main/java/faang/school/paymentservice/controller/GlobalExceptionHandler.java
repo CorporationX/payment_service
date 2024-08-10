@@ -2,10 +2,8 @@ package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ErrorResponse;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import faang.school.paymentservice.exception.CurrencyConversionException;
+import feign.FeignException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -13,6 +11,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -34,6 +37,18 @@ public class GlobalExceptionHandler {
                 : e.getMessage();
 
         return new ErrorResponse(message);
+    }
+
+    @ExceptionHandler(CurrencyConversionException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleCurrencyConversionException(CurrencyConversionException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(FeignException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleFeignException(FeignException e) {
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
