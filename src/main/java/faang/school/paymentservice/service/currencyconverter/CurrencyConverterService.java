@@ -2,6 +2,7 @@ package faang.school.paymentservice.service.currencyconverter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import faang.school.paymentservice.client.CurrencyConverterClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.CurrencyConverterDto;
 import faang.school.paymentservice.dto.CurrencyRate;
@@ -20,13 +21,13 @@ import java.math.RoundingMode;
 @RequiredArgsConstructor
 @Slf4j
 public class CurrencyConverterService {
-    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
-    @Value("${percentCommission}")
+    private final CurrencyConverterClient currencyConverterClient;
+    @Value("${currency-converter.percentCommission}")
     private BigDecimal percentCommission;
-    @Value("${foreignConverterUrl}")
+    @Value("${currency-converter.foreignConverterUrl}")
     private String converterUrl;
-    @Value("${foreignConverterAppId}")
+    @Value("${currency-converter.foreignConverterAppId}")
     private String converterAppId;
     public CurrencyConverterDto convert(CurrencyConverterDto dto) {
         // Будет работать только если одна из валют - USD
@@ -40,15 +41,15 @@ public class CurrencyConverterService {
             transmittedCurrency = dto.getReceivedCurrency().toString();
             receivedCurrency = dto.getTransmittedCurrency().toString();
         }
-        String url = converterUrl
-                + "?app_id=" + converterAppId
-                + "&base=" + transmittedCurrency
-                + "&symbols=" + receivedCurrency;
-        ResponseEntity<String> responseEntity =  restTemplate.getForEntity(url, String.class);
+        ResponseEntity<String> responseEntity = currencyConverterClient.getCurrencyRate(
+                converterAppId,
+                transmittedCurrency,
+                receivedCurrency
+        );
         String responseJson = responseEntity.getBody();
         try {
             CurrencyRate currencyRate = objectMapper.readValue(responseJson, CurrencyRate.class);
-            BigDecimal rateValue = BigDecimal.valueOf(currencyRate.getRates().get(dto.getTransmittedCurrency().toString()));
+            BigDecimal rateValue = BigDecimal.valueOf(currencyRate.getRates().get(receivedCurrency));
             BigDecimal commission;
             BigDecimal convertSum;
             BigDecimal transmittedSum = dto.getTransmittedSum();

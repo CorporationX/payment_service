@@ -4,3 +4,9 @@ server:
 logging:
   level:
     root: info
+
+currency-converter:
+  percentCommission: 0.01
+  foreignConverterUrl: https://openexchangerates.org
+  foreignConverterPath: /api/latest.json
+  foreignConverterAppId: ca800d6c1f28496a9461bd842d20b919
