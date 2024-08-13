@@ -1,12 +1,9 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.config.currency.CurrencyExchangeConfig;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
-
 import java.text.DecimalFormat;
 import java.util.Random;
-import java.math.BigDecimal;
 
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
@@ -21,10 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class PaymentController {
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
-    private static final String CONVERTING_MONEY_MESSAGE = "Dear friend! Thank you for converting money! You converted %s %s to %s %s with commission %f%%";
     private final CurrencyService currencyService;
-    private final CurrencyExchangeConfig exchangeConfig;
 
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
@@ -60,30 +54,14 @@ public class PaymentController {
      *
      * @param dto            Объект для конвертации
      * @param targetCurrency целевая валюта
-     * @return Объект результата конвертации
+     * @return Строку результата конвертации
      */
     @PostMapping("/exchange")
-    public ResponseEntity<PaymentResponse> exchangeCurrency(@RequestBody @Validated PaymentRequest dto,
+    public String exchangeCurrency(@RequestBody @Validated PaymentRequest dto,
                                                             @RequestParam Currency targetCurrency) {
-        BigDecimal newAmount = currencyService.convertWithCommission(dto, targetCurrency);
+        String message = currencyService.convertWithCommission(dto, targetCurrency);
 
-        String message = String.format(
-                CONVERTING_MONEY_MESSAGE,
-                DECIMAL_FORMAT.format(dto.amount()),
-                dto.currency(),
-                DECIMAL_FORMAT.format(newAmount),
-                targetCurrency,
-                exchangeConfig.getCommission()
-        );
-
-        return ResponseEntity.ok(new PaymentResponse(
-                PaymentStatus.SUCCESS,
-                getVerificationCode(),
-                dto.paymentNumber(),
-                newAmount,
-                targetCurrency,
-                message)
-        );
+        return message;
     }
 
     private int getVerificationCode() {

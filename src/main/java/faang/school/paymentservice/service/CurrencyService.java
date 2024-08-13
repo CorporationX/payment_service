@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,10 @@ public class CurrencyService {
     private final CurrencyConverterClient currencyConverterClient;
     private final CurrencyExchangeConfig exchangeConfig;
     private CurrencyExchangeResponse currentCurrencyExchange;
+
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
+    private static final String CONVERTING_MONEY_MESSAGE = "Dear friend! Thank you for converting money! You converted %s %s to %s %s with commission %f%%";
+
 
     @PostConstruct
     public void postConstruct() {
@@ -33,9 +38,19 @@ public class CurrencyService {
         return currentCurrencyExchange;
     }
 
-    public BigDecimal convertWithCommission(PaymentRequest dto, Currency targetCurrency) {
+    public String convertWithCommission(PaymentRequest dto, Currency targetCurrency) {
         BigDecimal newAmount = getAmountInNewCurrency(dto, targetCurrency, currentCurrencyExchange);
-        return addCommision(newAmount);
+        BigDecimal newAmountWithComission = addCommision(newAmount);
+
+        String message = String.format(
+                CONVERTING_MONEY_MESSAGE,
+                DECIMAL_FORMAT.format(dto.amount()),
+                dto.currency(),
+                DECIMAL_FORMAT.format(newAmountWithComission),
+                targetCurrency,
+                exchangeConfig.getCommission()
+        );
+        return message;
     }
 
     private BigDecimal addCommision(BigDecimal amount) {
