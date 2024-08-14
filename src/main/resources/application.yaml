@@ -7,7 +7,7 @@ logging:
 
 openExchangeRates:
   url: "https://openexchangerates.org"
-  appId: ca800d6c1f28496a9461bd842d20b919
+  appId: ${OPEN_EXCHANGE_RATES_APPID}
 
 payment:
   baseCurrency: USD
