@@ -1,7 +1,6 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.client.CurrencyConverterClient;
-import faang.school.paymentservice.config.currency.CurrencyExchangeConfig;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
@@ -9,6 +8,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,12 +21,17 @@ import java.text.DecimalFormat;
 @Data
 public class CurrencyService {
     private final CurrencyConverterClient currencyConverterClient;
-    private final CurrencyExchangeConfig exchangeConfig;
     private CurrencyExchangeResponse currentCurrencyExchange;
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
     private static final String CONVERTING_MONEY_MESSAGE = "Dear friend! Thank you for converting money! You converted %s %s to %s %s with commission %f%%";
 
+    @Value("${currency.fetch.url}")
+    private String url;
+    @Value("${currency.fetch.appId}")
+    private String appId;
+    @Value("${currency.fetch.commission}")
+    private Double commission;
 
     @PostConstruct
     public void postConstruct() {
@@ -34,7 +39,7 @@ public class CurrencyService {
     }
 
     public CurrencyExchangeResponse getCurrentCurrencyExchangeRate() {
-        currentCurrencyExchange = currencyConverterClient.getCurrentCurrencyExchangeRate(exchangeConfig.getAppId());
+        currentCurrencyExchange = currencyConverterClient.getCurrentCurrencyExchangeRate(appId);
         return currentCurrencyExchange;
     }
 
@@ -48,14 +53,14 @@ public class CurrencyService {
                 dto.currency(),
                 DECIMAL_FORMAT.format(newAmountWithComission),
                 targetCurrency,
-                exchangeConfig.getCommission()
+                commission
         );
         return message;
     }
 
     private BigDecimal addCommision(BigDecimal amount) {
-        BigDecimal commission = BigDecimal.valueOf(1).add(BigDecimal.valueOf(exchangeConfig.getCommission() / 100.0));
-        return amount.multiply(commission);
+        BigDecimal commissionResult = BigDecimal.valueOf(1).add(BigDecimal.valueOf(commission / 100.0));
+        return amount.multiply(commissionResult);
     }
 
     private BigDecimal getAmountInNewCurrency(
