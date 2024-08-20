@@ -28,7 +28,7 @@ public class CurrencyExchangeResponse {
         return BigDecimal.valueOf(conversionRates.get(currency.name()));
     }
 
-    public BigDecimal setConversion_rates(Currency currency, BigDecimal number) {
+    public BigDecimal setConversionRates(Currency currency, BigDecimal number) {
         return BigDecimal.valueOf(conversionRates.put(currency.name(), number.doubleValue()));
     }
 }

@@ -40,16 +40,6 @@ public class PaymentController {
     }
 
     /**
-     * Получение текущего соотношения валют к доллару из внешнего источника
-     *
-     * @return
-     */
-    @GetMapping("/currency")
-    public CurrencyExchangeResponse getCurrentCurrencyExchangeRate() {
-        return currencyService.getCurrentCurrencyExchangeRate();
-    }
-
-    /**
      * Конвертация одной валюты в другую
      *
      * @param dto            Объект для конвертации
@@ -62,9 +52,5 @@ public class PaymentController {
         String message = currencyService.convertWithCommission(dto, targetCurrency);
 
         return message;
-    }
-
-    private int getVerificationCode() {
-        return new Random().nextInt(1000, 10000);
     }
 }
