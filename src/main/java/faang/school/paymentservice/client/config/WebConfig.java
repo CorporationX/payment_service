@@ -9,14 +9,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebConfig {
     @Value("${currency.exchange.url}")
     private String BASE_URL;
-    @Value("${currency.exchange.apiKey}")
-    private String API_KEY;
 
     @Bean
     public WebClient webClient() {
         return WebClient.builder()
                 .baseUrl(BASE_URL)
-                .defaultHeader("access_key",API_KEY)
                 .build();
     }
 }

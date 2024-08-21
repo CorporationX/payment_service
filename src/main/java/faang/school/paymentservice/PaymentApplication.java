@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableRetry
-@EnableFeignClients("faang.school.paymentservice.client")
 public class PaymentApplication {
     public static void main(String[] args) {
         SpringApplication.run(PaymentApplication.class, args);

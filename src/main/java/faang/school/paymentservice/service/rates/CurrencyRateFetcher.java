@@ -14,7 +14,7 @@ public class CurrencyRateFetcher {
      @Scheduled(cron = "${currency.cron}")
     public void getCurrencyRate() {
         exchangeRatesCash.getRates().clear();
-        exchangeRatesCash.setRates(currencyService.getAsyncActualRates());
+        exchangeRatesCash.setRates(currencyService.getActualRates());
         log.info("Update actual currency rate and save in cash.");
     }
 
