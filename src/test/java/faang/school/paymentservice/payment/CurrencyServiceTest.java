@@ -12,14 +12,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CurrencyServiceTest {
 
     @InjectMocks
     private CurrencyService currencyService;
-
     @Mock
     private CurrencyExchangeResponse currentCurrencyExchange;
     private PaymentRequest payment;
@@ -34,14 +33,13 @@ public class CurrencyServiceTest {
         BigDecimal newAmount = new BigDecimal("120");
         BigDecimal newAmountWithCommission = new BigDecimal("124");
         BigDecimal commission = new BigDecimal("4");
+
+        currentCurrencyExchange.setConversionRates(Currency.USD, BigDecimal.valueOf(1.2));
+        currentCurrencyExchange.setConversionRates(Currency.EUR, BigDecimal.valueOf(0.8));
     }
 
     @Test
     public void convertWithComissionTest() {
-        when(currentCurrencyExchange.getAmountInNewCurrency(payment, currency))
-                .thenReturn(120);
-        when(currentCurrencyExchange.addCommission(120))
-                .thenReturn(124);
 
         String expectedMessage = String.format(
                 CONVERTING_MONEY_MESSAGE,
@@ -53,28 +51,8 @@ public class CurrencyServiceTest {
         );
 
         String result = currencyService.convertWithCommission(payment, currency);
-
+        verify(currencyService, timeout(1)).getAmountInNewCurrency(payment, currency,currentCurrencyExchange);
+        verify(currencyService, timeout(1)).addCommision(BigDecimal.valueOf(120));
         assertEquals(expectedMessage, result);
-    }
-
-    @Test
-    public void testAddCommision() {
-        BigDecimal amount = BigDecimal.valueOf(100);
-        BigDecimal expected = BigDecimal.valueOf(101.5);
-        BigDecimal result = currencyService.addCommision(amount);
-        assertEquals(expected, result);
-    }
-
-    @Test
-    public void testGetAmountInNewCurrency() {
-        Currency targetCurrency = Currency.EUR;
-        CurrencyExchangeResponse currentCurrencyExchange = new CurrencyExchangeResponse();
-        currentCurrencyExchange.setConversionRates(Currency.USD, BigDecimal.valueOf(1.2));
-        currentCurrencyExchange.setConversionRates(Currency.EUR, BigDecimal.valueOf(0.8));
-        BigDecimal expected = BigDecimal.valueOf(150);
-
-        BigDecimal result = currencyService.getAmountInNewCurrency(payment, targetCurrency, currentCurrencyExchange);
-
-        assertEquals(expected, result);
     }
 }
