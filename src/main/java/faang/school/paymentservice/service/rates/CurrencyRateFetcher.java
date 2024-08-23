@@ -1,5 +1,6 @@
 package faang.school.paymentservice.service.rates;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Component;
 public class CurrencyRateFetcher {
     private final ExchangeRatesCash exchangeRatesCash;
     private final CurrencyService currencyService;
-     @Scheduled(cron = "${currency.cron}")
+
+    @PostConstruct
+    @Scheduled(cron = "${currency.cron}")
     public void getCurrencyRate() {
         exchangeRatesCash.getRates().clear();
         exchangeRatesCash.setRates(currencyService.getActualRates());

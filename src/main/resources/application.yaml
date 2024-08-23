@@ -12,3 +12,7 @@ currency:
     apiKey: "856ac664093bbf92b68d11ac46543ab6"
     baseCurrency: "" #функция не доступна для бесплатных аккаунтов
     actualCurrency: "EUR,USD,RUB,BYN"
+    convert:
+      roundingMode: "HALF_UP"
+      scale: "2"
+
