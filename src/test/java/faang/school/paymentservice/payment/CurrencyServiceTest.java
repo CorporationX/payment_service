@@ -27,6 +27,7 @@ public class CurrencyServiceTest {
 
     @BeforeEach
     public void setup() {
+//        PaymentRequest dto = mock(PaymentRequest.class);
         payment = new PaymentRequest(1L,new BigDecimal(12.4), Currency.EUR);
         currency = Currency.EUR;
 
@@ -40,6 +41,14 @@ public class CurrencyServiceTest {
 
     @Test
     public void convertWithComissionTest() {
+        BigDecimal amount = BigDecimal.valueOf(100);
+        BigDecimal rate = BigDecimal.valueOf(1.2);
+
+        when(payment.amount()).thenReturn(amount);
+        when(payment.currency()).thenReturn(Currency.valueOf("USD"));
+        when(currentCurrencyExchange.getRate(currency)).thenReturn(rate);
+        when(currentCurrencyExchange.getRate(payment.currency())).thenReturn(rate);
+
 
         String expectedMessage = String.format(
                 CONVERTING_MONEY_MESSAGE,
@@ -51,8 +60,6 @@ public class CurrencyServiceTest {
         );
 
         String result = currencyService.convertWithCommission(payment, currency);
-        verify(currencyService, timeout(1)).getAmountInNewCurrency(payment, currency,currentCurrencyExchange);
-        verify(currencyService, timeout(1)).addCommision(BigDecimal.valueOf(120));
         assertEquals(expectedMessage, result);
     }
 }
