@@ -1,6 +1,21 @@
+spring:
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
 server:
   port: 9080
 
 logging:
   level:
     root: info
+
+currency:
+  rate:
+    access-key: "your-key"
+    baseUrl: "https://api.exchangeratesapi.io/v1/"
+    fetch-url: "latest"
+    timeout: 10000
+    scheduler:
+      cron: "0 0/1 * 1/1 * ?"
