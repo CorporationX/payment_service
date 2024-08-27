@@ -18,4 +18,4 @@ currency:
     fetch-url: "latest"
     timeout: 10000
     scheduler:
-      cron: "0 0/1 * 1/1 * ?"
+      cron: "0 0 2 * * ?"
