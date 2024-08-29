@@ -10,9 +10,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class CurrencyServiceTest {
@@ -23,17 +27,12 @@ public class CurrencyServiceTest {
     private CurrencyExchangeResponse currentCurrencyExchange;
     private PaymentRequest payment;
     private Currency currency;
-    private static final String CONVERTING_MONEY_MESSAGE = "Converting %s %s to %s %s with commission %s";
+    private static final String CONVERTING_MONEY_MESSAGE = "Dear friend! Thank you for converting money! You converted %s %s to %s %s with commission %f%%";
 
     @BeforeEach
     public void setup() {
-//        PaymentRequest dto = mock(PaymentRequest.class);
-        payment = new PaymentRequest(1L,new BigDecimal(12.4), Currency.EUR);
+        payment = new PaymentRequest(1L, new BigDecimal(12.4), Currency.EUR);
         currency = Currency.EUR;
-
-        BigDecimal newAmount = new BigDecimal("120");
-        BigDecimal newAmountWithCommission = new BigDecimal("124");
-        BigDecimal commission = new BigDecimal("4");
 
         currentCurrencyExchange.setConversionRates(Currency.USD, BigDecimal.valueOf(1.2));
         currentCurrencyExchange.setConversionRates(Currency.EUR, BigDecimal.valueOf(0.8));
@@ -41,22 +40,20 @@ public class CurrencyServiceTest {
 
     @Test
     public void convertWithComissionTest() {
-        BigDecimal amount = BigDecimal.valueOf(100);
         BigDecimal rate = BigDecimal.valueOf(1.2);
-
-        when(payment.amount()).thenReturn(amount);
-        when(payment.currency()).thenReturn(Currency.valueOf("USD"));
+        currencyService.setCurrentCurrencyExchange(currentCurrencyExchange);
+        ReflectionTestUtils.setField(currencyService, "commission", Double.valueOf("2.1"));
         when(currentCurrencyExchange.getRate(currency)).thenReturn(rate);
         when(currentCurrencyExchange.getRate(payment.currency())).thenReturn(rate);
 
 
         String expectedMessage = String.format(
                 CONVERTING_MONEY_MESSAGE,
-                "100.00",
-                "USD",
-                "124.00",
+                "12,40",
                 "EUR",
-                "4.00"
+                "12,66",
+                "EUR",
+                Double.valueOf("2.1")
         );
 
         String result = currencyService.convertWithCommission(payment, currency);
