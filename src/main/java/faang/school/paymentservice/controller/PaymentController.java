@@ -2,23 +2,26 @@ package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
-import java.text.DecimalFormat;
-import java.util.Random;
-
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
 import faang.school.paymentservice.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
+import faang.school.paymentservice.service.PaymentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.DecimalFormat;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class PaymentController {
     private final CurrencyService currencyService;
+    private final PaymentService paymentService;
 
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
@@ -33,7 +36,7 @@ public class PaymentController {
                 PaymentStatus.SUCCESS,
                 verificationCode,
                 dto.paymentNumber(),
-                dto.amount(),
+                paymentService.calculateAmount(dto.amount(), dto.currency()),
                 dto.currency(),
                 message)
         );

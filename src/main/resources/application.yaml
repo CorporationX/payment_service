@@ -5,6 +5,14 @@ logging:
   level:
     root: info
 
+openExchangeRates:
+  url: "https://openexchangerates.org"
+  appId: ${OPEN_EXCHANGE_RATES_APPID}
+
+payment:
+  baseCurrency: USD
+  exchangeFee: 1.01
+
 currency:
   fetch:
     url: https://v6.exchangerate-api.com/v6/
