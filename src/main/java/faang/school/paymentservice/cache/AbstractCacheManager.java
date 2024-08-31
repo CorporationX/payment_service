@@ -18,15 +18,10 @@ public abstract class AbstractCacheManager<T> {
     protected final RedisTemplate<String, Object> redisTemplate;
 
     protected void put(String key, Map<String, T> values) {
-        clear(key);
         this.redisTemplate.opsForHash().putAll(key, values);
     }
 
     protected T get(String key, String hashKey) {
         return (T) this.redisTemplate.opsForHash().get(key, hashKey);
-    }
-
-    private void clear(String key) {
-        this.redisTemplate.delete(key);
     }
 }
