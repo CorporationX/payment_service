@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.util.ReflectionUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class CurrencyServiceTest {
@@ -41,7 +42,9 @@ public class CurrencyServiceTest {
     @Test
     public void convertWithComissionTest() {
         BigDecimal rate = BigDecimal.valueOf(1.2);
-        currencyService.setCurrentCurrencyExchange(currentCurrencyExchange);
+
+        ReflectionTestUtils.setField(currencyService, "currentCurrencyExchange", currentCurrencyExchange);
+
         ReflectionTestUtils.setField(currencyService, "commission", Double.valueOf("2.1"));
         when(currentCurrencyExchange.getRate(currency)).thenReturn(rate);
         when(currentCurrencyExchange.getRate(payment.currency())).thenReturn(rate);

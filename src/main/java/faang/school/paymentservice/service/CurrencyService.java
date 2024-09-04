@@ -6,6 +6,7 @@ import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +19,7 @@ import java.text.DecimalFormat;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Data
+@Getter
 public class CurrencyService {
     private final CurrencyConverterClient currencyConverterClient;
     private CurrencyExchangeResponse currentCurrencyExchange;
