@@ -12,3 +12,7 @@ openExchangeRates:
 payment:
   baseCurrency: USD
   exchangeFee: 1.01
+
+spring:
+  profiles:
+    active: local
