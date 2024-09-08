@@ -1,0 +1,3 @@
+<included>
+    <logger name="faang.school.paymentservice" level="DEBUG" />
+</included>
