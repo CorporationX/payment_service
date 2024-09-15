@@ -13,6 +13,6 @@ public interface ExchangeRatesClient {
 
     @GetMapping("/api/latest.json")
     ExchangeRatesResponse getExchangeRates(@RequestParam(name = "app_id") String appId,
-                                           @RequestParam(required = false) Currency base,
-                                           @RequestParam(required = false) List<Currency> symbols);
+                                           @RequestParam(required = false) String base,
+                                           @RequestParam(required = false) List<String> symbols);
 }

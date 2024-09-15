@@ -1,6 +1,5 @@
 package faang.school.paymentservice.client.config;
 
-import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.client.ExchangeRatesResponse;
 import faang.school.paymentservice.exception.ExchangeRatesException;
 import lombok.RequiredArgsConstructor;
@@ -20,19 +19,16 @@ public class ExchangeRatesInterceptor {
     @Value("${feign_client.exchange_rates.appId}")
     private String appId;
 
-    public BigDecimal getExchangeRate(Currency baseCurrency, Currency fromCurrency) {
+    public BigDecimal getExchangeRate(String baseCurrency, String fromCurrency) {
         ExchangeRatesResponse exchangeRatesResponse = exchangeRatesClient.getExchangeRates(appId, baseCurrency, List.of(fromCurrency));
 
         if (exchangeRatesResponse.getRates().isEmpty()) {
             String errorMessage = "Error when trying to get exchange rates";
-            log.error("{} - {}: {}",
-                    getClass().getSimpleName(),
-                    new Object() {
-                    }.getClass().getEnclosingMethod().getName(),
-                    errorMessage);
+            log.error("ExchangeRatesInterceptor.class " + errorMessage);
             throw new ExchangeRatesException(errorMessage);
         }
+        Double exchangeRate = exchangeRatesResponse.getRates().get(fromCurrency);
 
-        return BigDecimal.valueOf(exchangeRatesResponse.getRates().get(fromCurrency.toString()));
+        return BigDecimal.valueOf(exchangeRate);
     }
 }
