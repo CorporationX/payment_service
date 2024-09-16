@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
+@EnableFeignClients
 @EnableRetry
 public class PaymentApplication {
     public static void main(String[] args) {

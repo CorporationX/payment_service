@@ -16,3 +16,11 @@ currency:
       roundingMode: "HALF_UP"
       scale: "2"
 
+feign_client:
+  exchange_rates:
+    url: https://openexchangerates.org
+    appId: d79cdb3297a94dd09a29fde5fbb8ec22
+
+convector:
+  base_commission: 0.01
+  base_currency: USD
