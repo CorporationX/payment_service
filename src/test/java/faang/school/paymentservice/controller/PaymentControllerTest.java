@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.PaymentStatus;
+import faang.school.paymentservice.service.CurrencyService;
 import faang.school.paymentservice.service.PaymentService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ class PaymentControllerTest {
 
     @MockBean
     private PaymentService paymentService;
+    @MockBean
+    private CurrencyService currencyService;
 
     @Test
     void testSendPayment() throws Exception {
