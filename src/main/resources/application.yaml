@@ -13,6 +13,10 @@ payment:
   baseCurrency: USD
   exchangeFee: 1.01
 
+spring:
+  profiles:
+    active: local
+
 currency:
   fetch:
     url: https://v6.exchangerate-api.com/v6/
