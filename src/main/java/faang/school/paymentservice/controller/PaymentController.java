@@ -1,24 +1,26 @@
 package faang.school.paymentservice.controller;
 
+import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
+import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
+import faang.school.paymentservice.service.CurrencyService;
+import lombok.RequiredArgsConstructor;
 import faang.school.paymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.DecimalFormat;
 import java.util.Random;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class PaymentController {
+    private final CurrencyService currencyService;
     private final PaymentService paymentService;
 
     @PostMapping("/payment")
@@ -38,5 +40,20 @@ public class PaymentController {
                 dto.currency(),
                 message)
         );
+    }
+
+    /**
+     * Конвертация одной валюты в другую
+     *
+     * @param dto            Объект для конвертации
+     * @param targetCurrency целевая валюта
+     * @return Строку результата конвертации
+     */
+    @PostMapping("/exchange")
+    public String exchangeCurrency(@RequestBody @Validated PaymentRequest dto,
+                                                            @RequestParam Currency targetCurrency) {
+        String message = currencyService.convertWithCommission(dto, targetCurrency);
+
+        return message;
     }
 }
