@@ -7,3 +7,6 @@ logging:
 
 currency-rate-fetcher:
   cron: 0 * * * * *
+  url: https://api.exchangeratesapi.io/v1/latest
+  access_key: 2013557734a6dbc4c96e59020af22c48
+  base_currency: USD

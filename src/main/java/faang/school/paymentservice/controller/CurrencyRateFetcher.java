@@ -1,16 +1,31 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.service.CurrencyService;
+import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.service.currency.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+import java.util.concurrent.ConcurrentMap;
+
+@RestController
+@RequestMapping("/api/currency-rate")
 @RequiredArgsConstructor
 public class CurrencyRateFetcher {
     private final CurrencyService service;
     @Scheduled(cron = "${currency-rate-fetcher.cron}")
     public void UpdateActualCurrencyRate() {
+        System.out.println();
+        System.out.println("Вызов обновления курса валют");
+        System.out.println();
         service.UpdateActualCurrencyRate();
+    }
+
+    @GetMapping("/health")
+    public ConcurrentMap<Currency, Double> checkHealth() {
+        return service.getCurrencyRates();
     }
 }
