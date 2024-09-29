@@ -18,9 +18,6 @@ public class CurrencyRateFetcher {
     private final CurrencyService service;
     @Scheduled(cron = "${currency-rate-fetcher.cron}")
     public void UpdateActualCurrencyRate() {
-        System.out.println();
-        System.out.println("Вызов обновления курса валют");
-        System.out.println();
         service.UpdateActualCurrencyRate();
     }
 
