@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class CurrencyExchangeConfig {
     private String url;
-    private String apiKey;
+    private String appId;
     private Double commission;
 }

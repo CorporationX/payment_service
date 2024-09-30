@@ -14,11 +14,5 @@ public record PaymentRequest(
         BigDecimal amount,
 
         @NotNull
-        Currency currency,
-
-        @NotEmpty
-        String fromCurrency,
-
-        @NotEmpty
-        String toCurrency
+        Currency currency
 ) {}

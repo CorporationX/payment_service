@@ -7,6 +7,6 @@ logging:
 
 currency:
   exchange:
-    url: https://openexchangerates.org
+    url: https://openexchangerates.org/api/latest.json
     appId:
-    commission: 1.01
+    commission: 0.01
