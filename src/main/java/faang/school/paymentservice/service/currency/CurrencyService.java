@@ -12,6 +12,7 @@ import reactor.util.retry.Retry;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -44,12 +45,12 @@ public class CurrencyService {
                 .block();
 
         validateCurrencyRateResponse(rateDto);
-        ConcurrentMap<Currency, Double> rates = new ConcurrentHashMap<>(rateDto.rates());
+        Map<Currency, Double> rates = rateDto.rates();
         currencyRateCache.setCurrencyRate(rates);
         log.info("Сохранён курс валют: " + rates);
     }
 
-    public ConcurrentMap<Currency, Double> getCurrencyRates() {
+    public Map<Currency, Double> getCurrencyRates() {
         return currencyRateCache.getAllCurrencyRates();
     }
 

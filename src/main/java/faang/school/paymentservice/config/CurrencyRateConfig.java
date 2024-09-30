@@ -9,6 +9,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Configuration
 public class CurrencyRateConfig {
@@ -16,14 +18,14 @@ public class CurrencyRateConfig {
     private String url;
 
     @Bean
-    public ConcurrentMap<Currency, Double> currencyUsdRate() {
-        return new ConcurrentHashMap<>();
-    }
-
-    @Bean
     public WebClient webClient() {
         return WebClient.builder()
                 .baseUrl(url)
                 .build();
+    }
+
+    @Bean(name = "currencyRateCacheLock")
+    public ReadWriteLock readWriteLock() {
+        return new ReentrantReadWriteLock();
     }
 }
