@@ -1,6 +1,7 @@
 package faang.school.paymentservice.dto;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
@@ -13,6 +14,11 @@ public record PaymentRequest(
         BigDecimal amount,
 
         @NotNull
-        Currency currency
-) {
-}
+        Currency currency,
+
+        @NotEmpty
+        String fromCurrency,
+
+        @NotEmpty
+        String toCurrency
+) {}
