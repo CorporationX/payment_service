@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 @Service
 public class CurrencyConverter {
     private final OpenExchangeRatesClient openExchangeRatesClient;
-    private final int COMMISION = 1;
+    private final int COMMISSION_PERCENT = 1;
 
     @Value("${services.openexchange.appId}")
     private String appId;
@@ -31,14 +31,18 @@ public class CurrencyConverter {
         try {
             CurrencyDto currencyDto = objectMapper.readValue(jsonFromExtService, CurrencyDto.class);
 //            BigDecimal result = convertCurrency(paymentRequest.amount(), currencyDto.getRates().get(currency.toString()));
-            if (currencyDto.getRates().get(currency) == null) {
+            if (currencyDto.getRates().get(currency.toString()) == null) {
                 throw new NotFoundException("Currency not found");
             }
-            BigDecimal result = convertCurrency(paymentRequest.amount(), currencyDto.getRates().get(currency.toString()));
-            result = addCommission(result, COMMISION);
+
+            BigDecimal result;
+            if (!paymentRequest.currency().equals(currency)) {
+                result = convertCurrency(paymentRequest.amount(), currencyDto.getRates().get(currency.toString()));
+            } else {
+                result = paymentRequest.amount();
+            }
+            result = addCommission(result, COMMISSION_PERCENT);
             return result;
-//            System.out.println(currencyDto.getBase());
-//            System.out.println("RUB" + currencyDto.getRates().get("RUB"));
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
             throw new RuntimeException(e);
@@ -46,8 +50,8 @@ public class CurrencyConverter {
     }
 
     private BigDecimal addCommission(BigDecimal amount, int commissionPercent) {
-        BigDecimal temp = amount.divide(BigDecimal.valueOf(100)).multiply(BigDecimal.valueOf(commissionPercent));
-        amount = amount.add(temp);
+        BigDecimal percentAmount = amount.divide(BigDecimal.valueOf(100)).multiply(BigDecimal.valueOf(commissionPercent));
+        amount = amount.add(percentAmount);
         return amount;
     }
 

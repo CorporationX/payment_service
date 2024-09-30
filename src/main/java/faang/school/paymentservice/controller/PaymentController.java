@@ -10,6 +10,7 @@ import java.util.Random;
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.service.CurrencyConverter;
+import faang.school.paymentservice.validator.ValidatorPaymentController;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentController {
     private final CurrencyConverter currencyConverter;
     private final Currency currencyOnOurAccount = Currency.RUB;
+    private final ValidatorPaymentController validator;
 //    private final Currency currencyOnOurAccount = null;
 
     @Operation(description = "Service for payments")
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
+        validator.checkCurrency(dto.currency());
         BigDecimal finalAmount = currencyConverter.getLatestExchangeRates(dto, currencyOnOurAccount);
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         String formattedSum = decimalFormat.format(finalAmount);
