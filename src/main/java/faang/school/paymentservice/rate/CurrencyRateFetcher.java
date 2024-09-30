@@ -12,6 +12,6 @@ public class CurrencyRateFetcher {
 
     @Scheduled(cron = "0 0 * * *")
     public void update() {
-
+        service.updateCurrency();
     }
 }
