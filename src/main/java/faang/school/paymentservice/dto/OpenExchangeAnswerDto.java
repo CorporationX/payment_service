@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Map;
 
 @Data
-public class CurrencyDto {
+public class OpenExchangeAnswerDto {
     private String disclaimer;
     private String license;
     private Long timestamp;

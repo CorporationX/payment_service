@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import faang.school.paymentservice.client.OpenExchangeRatesClient;
 import faang.school.paymentservice.dto.Currency;
-import faang.school.paymentservice.dto.CurrencyDto;
+import faang.school.paymentservice.dto.OpenExchangeAnswerDto;
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +26,10 @@ public class CurrencyConverter {
     private String appId;
 
     public BigDecimal getLatestExchangeRates(PaymentRequest paymentRequest, Currency currency) {
-        String jsonFromExtService = openExchangeRatesClient.getLatest(appId);
+        String jsonFromOpenExchange = openExchangeRatesClient.getLatest(appId);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            CurrencyDto mapCurrencies = objectMapper.readValue(jsonFromExtService, CurrencyDto.class);
+            OpenExchangeAnswerDto mapCurrencies = objectMapper.readValue(jsonFromOpenExchange, OpenExchangeAnswerDto.class);
             if (mapCurrencies.getRates().get(currency.toString()) == null) {
                 throw new NotFoundException("Currency not found");
             }
