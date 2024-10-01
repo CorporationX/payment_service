@@ -59,7 +59,7 @@ class PaymentControllerTest {
         doNothing().when(validator).checkCurrency(currencyUsd);
         when(currencyConverter.getLatestExchangeRates(dto, currency)).thenReturn(expectedAmount);
 
-        mockMvc.perform(post("/api/payment")
+        mockMvc.perform(post("/api/v1/payment")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ \"amount\": 1000, \"currency\": \"" + currencyUsd + "\", " +
                                 "\"paymentNumber\": \"" + paymentNumber + "\" }"))

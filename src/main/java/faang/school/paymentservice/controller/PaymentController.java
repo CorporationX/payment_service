@@ -21,7 +21,7 @@ import java.util.Random;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class PaymentController {
     private final CurrencyConverter currencyConverter;
     private final Currency currencyOnOurAccount = Currency.RUB;
