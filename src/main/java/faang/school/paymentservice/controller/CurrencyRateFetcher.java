@@ -17,12 +17,12 @@ public class CurrencyRateFetcher {
     private final CurrencyService service;
 
     @Scheduled(fixedDelayString = "${currency-rate-fetcher.cron}")
-    public void UpdateActualCurrencyRate() {
-        service.UpdateActualCurrencyRate();
+    public void updateActualCurrencyRate() {
+        service.updateActualCurrencyRate();
     }
 
     @GetMapping("/health")
     public Map<Currency, Double> checkHealth() {
-        return service.getCurrencyRates();
+        return service.getAllCurrencyRates();
     }
 }

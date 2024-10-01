@@ -13,8 +13,6 @@ import reactor.util.retry.Retry;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,7 +24,7 @@ public class CurrencyService {
     @Value("${currency-rate-fetcher.access_key}")
     private String accessKey;
 
-    public void UpdateActualCurrencyRate() {
+    public void updateActualCurrencyRate() {
         String baseCurrency = currencyRateCache.getBaseCurrency();
         String symbols = Arrays.stream(Currency.values())
                 .map(Enum::name)
@@ -50,7 +48,7 @@ public class CurrencyService {
         log.info("Сохранён курс валют: " + rates);
     }
 
-    public Map<Currency, Double> getCurrencyRates() {
+    public Map<Currency, Double> getAllCurrencyRates() {
         return currencyRateCache.getAllCurrencyRates();
     }
 
