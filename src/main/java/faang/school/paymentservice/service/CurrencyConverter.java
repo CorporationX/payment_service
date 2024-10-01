@@ -29,15 +29,14 @@ public class CurrencyConverter {
         String jsonFromExtService = openExchangeRatesClient.getLatest(appId);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            CurrencyDto currencyDto = objectMapper.readValue(jsonFromExtService, CurrencyDto.class);
-//            BigDecimal result = convertCurrency(paymentRequest.amount(), currencyDto.getRates().get(currency.toString()));
-            if (currencyDto.getRates().get(currency.toString()) == null) {
+            CurrencyDto mapCurrencies = objectMapper.readValue(jsonFromExtService, CurrencyDto.class);
+            if (mapCurrencies.getRates().get(currency.toString()) == null) {
                 throw new NotFoundException("Currency not found");
             }
 
             BigDecimal result;
             if (!paymentRequest.currency().equals(currency)) {
-                result = convertCurrency(paymentRequest.amount(), currencyDto.getRates().get(currency.toString()));
+                result = convertCurrency(paymentRequest.amount(), mapCurrencies.getRates().get(currency.toString()));
             } else {
                 result = paymentRequest.amount();
             }

@@ -2,11 +2,6 @@ package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
-
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.util.Random;
-
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.service.CurrencyConverter;
@@ -20,6 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.Random;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
@@ -27,7 +26,6 @@ public class PaymentController {
     private final CurrencyConverter currencyConverter;
     private final Currency currencyOnOurAccount = Currency.RUB;
     private final ValidatorPaymentController validator;
-//    private final Currency currencyOnOurAccount = null;
 
     @Operation(description = "Service for payments")
     @PostMapping("/payment")
