@@ -4,7 +4,7 @@ import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
-import faang.school.paymentservice.service.CurrencyExchangeServiceImpl;
+import faang.school.paymentservice.service.CurrencyExchangeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 @Validated
 public class PaymentController {
-    private final CurrencyExchangeServiceImpl currencyExchangeService;
+    private final CurrencyExchangeService currencyExchangeService;
 
     @Value("${currency.exchange.appId}")
     String appId;

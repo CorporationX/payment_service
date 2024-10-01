@@ -1,12 +1,12 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.client.OpenExchangesRatesClient;
+import faang.school.paymentservice.config.currency.CurrencyExchangeConfig;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.exchange.CurrencyExchangeResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,14 +17,11 @@ import java.text.DecimalFormat;
 @RequiredArgsConstructor
 @Getter
 public class CurrencyExchangeServiceImpl implements CurrencyExchangeService {
-    boolean isAddCommission = false;
-
-    @Value("${currency.exchange.commission}")
-    private double commission;
+    private boolean isAddCommission = false;
+    private final CurrencyExchangeConfig exchangeConfig;
     private final OpenExchangesRatesClient ratesClient;
-
-    @Value("${currency.exchange.appId}")
-    String appId;
+    private final double commission = exchangeConfig.getCommission();
+    private final String appId = exchangeConfig.getAppId();
 
     @Override
     public BigDecimal convertCurrency(Currency currency, Currency toCurrency,
@@ -65,6 +62,7 @@ public class CurrencyExchangeServiceImpl implements CurrencyExchangeService {
 
         String formattedSum = decimalFormat.format(addCommission(dto.amount(), getCommission(), dto.currency(), toCurrency));
         if (isAddCommission) {
+            isAddCommission = false;
             return String.format("Dear friend! Thank you for your purchase! " +
                             "Converted amount is %.2f %s. You have to pay commission %s %s.",
                     convertedAmount, toCurrency, formattedSum, dto.currency().name());
