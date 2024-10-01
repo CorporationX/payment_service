@@ -38,7 +38,6 @@ public class PaymentController {
         String message = String.format("Dear friend! Thank you for your purchase! " +
                         "Your payment on %s %s was accepted.",
                 formattedSum, currencyOnOurAccount);
-
         return ResponseEntity.ok(new PaymentResponse(PaymentStatus.SUCCESS, verificationCode,
                 dto.paymentNumber(), finalAmount, currencyOnOurAccount, message)
         );

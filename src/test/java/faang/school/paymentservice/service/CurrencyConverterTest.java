@@ -64,12 +64,12 @@ class CurrencyConverterTest {
         PaymentRequest request = new PaymentRequest(2L, amount, Currency.USD);
         when(openExchangeRatesClient.getLatest(null)).thenReturn(jsonAnswer);
 
-        BigDecimal res = currencyConverter.getLatestExchangeRates(request, Currency.RUB);
+        BigDecimal result = currencyConverter.getLatestExchangeRates(request, Currency.RUB);
 
         MathContext mathContext = new MathContext(4);
         BigDecimal expectedResult = amountAfterCommision.round(mathContext);
-        res = res.round(mathContext);
-        assertEquals(0, res.compareTo(expectedResult));
+        result = result.round(mathContext);
+        assertEquals(0, result.compareTo(expectedResult));
         verify(openExchangeRatesClient, times(1)).getLatest(null);
     }
 
@@ -82,27 +82,28 @@ class CurrencyConverterTest {
         PaymentRequest request = new PaymentRequest(2L, amount, Currency.RUB);
         when(openExchangeRatesClient.getLatest(null)).thenReturn(jsonAnswer);
 
-        BigDecimal res = currencyConverter.getLatestExchangeRates(request, Currency.RUB);
+        BigDecimal result = currencyConverter.getLatestExchangeRates(request, Currency.RUB);
 
         MathContext mathContext = new MathContext(4);
         BigDecimal expectedResult = amountAfterCommision.round(mathContext);
-        res = res.round(mathContext);
-        assertEquals(0, res.compareTo(expectedResult));
+        result = result.round(mathContext);
+        assertEquals(0, result.compareTo(expectedResult));
         verify(openExchangeRatesClient, times(1)).getLatest(null);
     }
 
     @Test
     void getLatestExchangeUnSuccess() {
-        String jsonAnswer = "{\n" +
-                "  \"disclaimer\": \"Usage subject to terms: https://openexchangerates.org/terms\",\n" +
-                "  \"license\": \"https://openexchangerates.org/license\",\n" +
-                "  \"timestamp\": 1727766000,\n" +
-                "  \"base\": \"USD\",\n" +
-                "  \"rates\": {\n" +
-                "    \"AED\": 3.67295,\n" +
-                "    \"ZWL\": 322\n" +
-                "  }\n" +
-                "}";
+        String jsonAnswer = """
+                {
+                  "disclaimer": "Usage subject to terms: https://openexchangerates.org/terms",
+                  "license": "https://openexchangerates.org/license",
+                  "timestamp": 1727766000,
+                  "base": "USD",
+                  "rates": {
+                    "AED": 3.67295,
+                    "ZWL": 322
+                  }
+                }""";
         PaymentRequest request = new PaymentRequest(2L, amount, Currency.USD);
         when(openExchangeRatesClient.getLatest(null)).thenReturn(jsonAnswer);
 
