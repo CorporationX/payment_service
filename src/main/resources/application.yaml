@@ -12,6 +12,8 @@ spring:
     redis:
       host: localhost
       port: 6379
+      caches:
+        current_rate: rateCache
 
 exchange_rates:
   base_url: https://api.exchangeratesapi.io/v1
