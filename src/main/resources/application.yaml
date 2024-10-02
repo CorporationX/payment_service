@@ -5,6 +5,14 @@ logging:
   level:
     root: info
 
+
+
+spring:
+  cache:
+    redis:
+      host: localhost
+      port: 6379
+
 exchange_rates:
   base_url: https://api.exchangeratesapi.io/v1
   key: cba8ca20db03393be3670c7032da8e21

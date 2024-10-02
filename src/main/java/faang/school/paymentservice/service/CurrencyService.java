@@ -1,6 +1,6 @@
 package faang.school.paymentservice.service;
 
-import faang.school.paymentservice.dto.RateResponse;
+import faang.school.paymentservice.dto.Rate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,11 +24,10 @@ public class CurrencyService {
 
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 3000))
     public void updateCurrency() {
-        Mono<RateResponse> response = webClient.get()
+        Mono<Rate> response = webClient.get()
                 .uri(String.join("", "/latest?access_key =" + key + "& base=" + base))
                 .retrieve()
-                .bodyToMono(RateResponse.class);
+                .bodyToMono(Rate.class);
         log.info("rate got: " + response);
-
     }
 }
