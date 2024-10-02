@@ -32,8 +32,12 @@ public class CurrencyRateFetcherTest {
     @Mock
     private CurrencyService service;
     private Map<Currency, Double> rates;
+    private final String baseCurrency = "EUR";
+    private final String date = "2022-01-01";
     private Map<Currency, Double> expectedRates;
     private MockMvc mockMvc;
+    private CurrencyRateDto dto;
+    private CurrencyRateDto expectedDto;
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @BeforeEach
@@ -45,6 +49,8 @@ public class CurrencyRateFetcherTest {
         expectedRates = new HashMap<>();
         expectedRates.put(Currency.RUB, 100.0);
         expectedRates.put(Currency.USD, 1.1);
+        dto = new CurrencyRateDto(date, baseCurrency, rates);
+        expectedDto = new CurrencyRateDto(date, baseCurrency, expectedRates);
     }
 
     @Test
@@ -57,11 +63,11 @@ public class CurrencyRateFetcherTest {
     @Test
     public void testCheckHealth() throws Exception {
         // Arrange
-        when(service.getAllCurrencyRates()).thenReturn(rates);
+        when(service.checkHealth()).thenReturn(dto);
 
         // Act & Assert
         mockMvc.perform(get("/api/currency-rate/health"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(expectedRates)));
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedDto)));
     }
 }

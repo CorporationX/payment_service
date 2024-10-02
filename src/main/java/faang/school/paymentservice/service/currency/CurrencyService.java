@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class CurrencyService {
     private final CurrencyRateCache currencyRateCache;
     private final WebClient webClient;
+
     @Value("${currency-rate-fetcher.access_key}")
     private String accessKey;
 
@@ -45,23 +46,26 @@ public class CurrencyService {
         validateCurrencyRateResponse(rateDto);
         Map<Currency, Double> rates = rateDto.rates();
         currencyRateCache.setCurrencyRate(rates);
-        log.info("Сохранён курс валют: " + rates);
+        currencyRateCache.setDate(rateDto.date());
+        log.info("The exchange rate has been saved: " + rates);
     }
 
-    public Map<Currency, Double> getAllCurrencyRates() {
-        return currencyRateCache.getAllCurrencyRates();
+    public CurrencyRateDto checkHealth() {
+        return new CurrencyRateDto(
+                currencyRateCache.getDate(),
+                currencyRateCache.getBaseCurrency(),
+                currencyRateCache.getAllCurrencyRates()
+        );
     }
 
     private void validateCurrencyRateResponse(CurrencyRateDto rateDto) {
         if (rateDto == null) {
-            String message = "Получен пустой ответ от сервиса курса валют.Обновление курса валют не выполнено";
-            log.error(message);
+            String message = "An empty response was received from the exchange rate service.Currency exchange rate update failed";
             throw new NullPointerException(message);
         }
 
         if (rateDto.rates() == null) {
-            String message = "Получен пустой список курса от сервиса курса валют.Обновление курса валют не выполнено";
-            log.error(message);
+            String message = "An empty list of the exchange rate was received from the exchange rate service.Currency exchange rate update failed";
             throw new NullPointerException(message);
         }
     }

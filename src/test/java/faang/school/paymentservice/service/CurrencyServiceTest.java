@@ -28,42 +28,51 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CurrencyServiceTest {
+
     @InjectMocks
     private CurrencyService service;
+
     @Mock
     private CurrencyRateCache currencyRateCache;
+
     @Mock
     private WebClient webClient;
     private final String baseCurrency = "EUR";
+    private final String date = "2022-01-01";
     private CurrencyRateDto dto;
     private Map<Currency, Double> rates;
     private Map<Currency, Double> expectedRates;
+    private CurrencyRateDto expectedDto;
+
     @Captor
     private ArgumentCaptor<Map<Currency, Double>> ratesCaptor;
 
 
     @BeforeEach
     public void setup() {
-        dto = new CurrencyRateDto("EUR", new HashMap<>(Map.of(Currency.USD, 1.11)));
         rates = new HashMap<>();
         rates.put(Currency.RUB, 100.0);
         rates.put(Currency.USD, 1.1);
         expectedRates = new HashMap<>();
         expectedRates.put(Currency.RUB, 100.0);
         expectedRates.put(Currency.USD, 1.1);
+        dto = new CurrencyRateDto(date, baseCurrency, rates);
+        expectedDto = new CurrencyRateDto(date, baseCurrency, expectedRates);
     }
 
 
     @Test
-    public void testGetCurrencyRates() {
+    public void testCheckHealth() {
         // Arrange
         when(currencyRateCache.getAllCurrencyRates()).thenReturn(rates);
+        when(currencyRateCache.getDate()).thenReturn(date);
+        when(currencyRateCache.getBaseCurrency()).thenReturn(baseCurrency);
 
         // Act
-        Map<Currency, Double> returnRates = service.getAllCurrencyRates();
+        CurrencyRateDto returnDto = service.checkHealth();
 
         // Assert
-        Assertions.assertEquals(expectedRates, returnRates);
+        Assertions.assertEquals(expectedDto, returnDto);
     }
 
     @Test
@@ -94,7 +103,7 @@ public class CurrencyServiceTest {
                 .bodyToMono(CurrencyRateDto.class)
                 .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
                 .block()
-        ).thenReturn(new CurrencyRateDto("EUR", null));
+        ).thenReturn(new CurrencyRateDto("2022-01-01", "EUR", null ));
 
         // Act & Assert
         Exception exception = Assertions.assertThrows(NullPointerException.class,() -> service.updateActualCurrencyRate());
@@ -112,7 +121,7 @@ public class CurrencyServiceTest {
                 .bodyToMono(CurrencyRateDto.class)
                 .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
                 .block()
-        ).thenReturn(new CurrencyRateDto("EUR", null));
+        ).thenReturn(new CurrencyRateDto("2022-01-01", "EUR", null ));
 
         // Act & Assert
         service.updateActualCurrencyRate();

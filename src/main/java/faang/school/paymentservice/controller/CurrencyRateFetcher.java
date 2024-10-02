@@ -1,6 +1,7 @@
 package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.dto.CurrencyRateDto;
 import faang.school.paymentservice.service.currency.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,13 +17,13 @@ import java.util.Map;
 public class CurrencyRateFetcher {
     private final CurrencyService service;
 
-    @Scheduled(fixedDelayString = "${currency-rate-fetcher.cron}")
+    @Scheduled(fixedDelayString = "${currency-rate-fetcher.fixedDelay}")
     public void updateActualCurrencyRate() {
         service.updateActualCurrencyRate();
     }
 
     @GetMapping("/health")
-    public Map<Currency, Double> checkHealth() {
-        return service.getAllCurrencyRates();
+    public CurrencyRateDto checkHealth() {
+        return service.checkHealth();
     }
 }
