@@ -9,3 +9,6 @@ services:
   openexchange:
     url: https://openexchangerates.org/
     appId: f3c37613244e47979f50c0451a24291d
+
+cron:
+  currency-rate-fetcher: "0 0 * * * *"
