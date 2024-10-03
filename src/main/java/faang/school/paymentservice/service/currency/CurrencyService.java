@@ -1,5 +1,6 @@
 package faang.school.paymentservice.service.currency;
 
+import faang.school.paymentservice.client.CurrencyClient;
 import faang.school.paymentservice.dto.Currency;
 
 import faang.school.paymentservice.dto.CurrencyRateDto;
@@ -20,10 +21,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CurrencyService {
     private final CurrencyRateCache currencyRateCache;
-    private final WebClient webClient;
-
-    @Value("${currency-rate-fetcher.access_key}")
-    private String accessKey;
+    private final CurrencyClient client;
 
     public void updateActualCurrencyRate() {
         String baseCurrency = currencyRateCache.getBaseCurrency();
@@ -31,17 +29,7 @@ public class CurrencyService {
                 .map(Enum::name)
                 .filter(currency -> !currency.equals(baseCurrency))
                 .collect(Collectors.joining(","));
-        CurrencyRateDto rateDto = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .queryParam("access_key", accessKey)
-                        .queryParam("base", baseCurrency)
-                        .queryParam("symbols", symbols)
-                        .build()
-                )
-                .retrieve()
-                .bodyToMono(CurrencyRateDto.class)
-                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
-                .block();
+        CurrencyRateDto rateDto = client.getCurrencyRates(baseCurrency, symbols);
 
         validateCurrencyRateResponse(rateDto);
         Map<Currency, Double> rates = rateDto.rates();

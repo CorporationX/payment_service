@@ -1,5 +1,6 @@
 package faang.school.paymentservice.service;
 
+import faang.school.paymentservice.client.CurrencyClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.CurrencyRateDto;
 import faang.school.paymentservice.service.currency.CurrencyRateCache;
@@ -36,7 +37,7 @@ public class CurrencyServiceTest {
     private CurrencyRateCache currencyRateCache;
 
     @Mock
-    private WebClient webClient;
+    private CurrencyClient client;
     private final String baseCurrency = "EUR";
     private final String date = "2022-01-01";
     private CurrencyRateDto dto;
@@ -79,17 +80,11 @@ public class CurrencyServiceTest {
     public void testUpdateActualCurrencyRate_EmptyResponse() {
         // Arrange
         when(currencyRateCache.getBaseCurrency()).thenReturn(baseCurrency);
-        when(webClient.get()
-                .uri((URI) any())
-                .retrieve()
-                .bodyToMono(CurrencyRateDto.class)
-                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
-                .block()
-        ).thenReturn(null);
+        when(client.getCurrencyRates(any(), any())).thenReturn(null);
 
         // Act & Assert
         Exception exception = Assertions.assertThrows(NullPointerException.class,() -> service.updateActualCurrencyRate());
-        Assertions.assertEquals("Получен пустой ответ от сервиса курса валют.Обновление курса валют не выполнено",
+        Assertions.assertEquals("An empty response was received from the exchange rate service.Currency exchange rate update failed",
                 exception.getMessage());
     }
 
@@ -97,17 +92,12 @@ public class CurrencyServiceTest {
     public void testUpdateActualCurrencyRate_EmptyRates() {
         // Arrange
         when(currencyRateCache.getBaseCurrency()).thenReturn(baseCurrency);
-        when(webClient.get()
-                .uri((URI) any())
-                .retrieve()
-                .bodyToMono(CurrencyRateDto.class)
-                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
-                .block()
-        ).thenReturn(new CurrencyRateDto("2022-01-01", "EUR", null ));
+        when(client.getCurrencyRates(any(), any()))
+                .thenReturn(new CurrencyRateDto("2022-01-01", "EUR", null ));
 
         // Act & Assert
         Exception exception = Assertions.assertThrows(NullPointerException.class,() -> service.updateActualCurrencyRate());
-        Assertions.assertEquals("Получен пустой список курса от сервиса курса валют.Обновление курса валют не выполнено",
+        Assertions.assertEquals("An empty list of the exchange rate was received from the exchange rate service.Currency exchange rate update failed",
                 exception.getMessage());
     }
 
@@ -115,13 +105,8 @@ public class CurrencyServiceTest {
     public void testUpdateActualCurrencyRate() {
         // Arrange
         when(currencyRateCache.getBaseCurrency()).thenReturn(baseCurrency);
-        when(webClient.get()
-                .uri((URI) any())
-                .retrieve()
-                .bodyToMono(CurrencyRateDto.class)
-                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
-                .block()
-        ).thenReturn(new CurrencyRateDto("2022-01-01", "EUR", null ));
+        when(client.getCurrencyRates(any(), any()))
+                .thenReturn(dto);
 
         // Act & Assert
         service.updateActualCurrencyRate();
