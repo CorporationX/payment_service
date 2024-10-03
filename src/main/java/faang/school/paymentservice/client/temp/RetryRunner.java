@@ -8,9 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class RetryRunner implements CommandLineRunner {
     @Autowired
-    private WebClientRetryService webClientRetryService;
-
-    @Autowired
     private CurrencyService currencyService;
 
     @Override
