@@ -1,11 +1,12 @@
 package faang.school.paymentservice.client;
 
-import faang.school.paymentservice.config.WebClientConfig;
 import faang.school.paymentservice.dto.ExchangeRatesDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
@@ -16,27 +17,26 @@ import java.time.Duration;
 @Service
 public class ExchangeRates {
 
-    private final WebClientConfig webClientConfig;
+    private final WebClient webClient;
 
     @Value("${services.exchangerates.appId}")
     private String appId;
 
     public Mono<ExchangeRatesDto> fetchData() {
-        return webClientConfig.createWebClient()
+        return webClient
                 .get()
-                .uri("/latestT?access_key=" + appId)
+                .uri("/latest?access_key=" + appId)
                 .retrieve()
-//                .onStatus(
-//                        statusCode -> statusCode.is4xxClientError(),
-//                        response -> Mono.error(new RuntimeException("Authorization error: " + response.statusCode()))
-//                )
+                .onStatus(
+                        HttpStatusCode::is4xxClientError,
+                        response -> Mono.error(new RuntimeException("Authorization error: " + response.statusCode()))
+                )
                 .bodyToMono(ExchangeRatesDto.class)
                 .onErrorResume(e -> {
                     log.error(e.getMessage(), e);
-                    log.info("Something went wrong, continue working");
                     return Mono.error(e);
                 })
                 .retryWhen(Retry.backoff(2, Duration.ofSeconds(1)))
-                .onErrorReturn(null); // TODO correct
+                .onErrorReturn(new ExchangeRatesDto());
     }
 }

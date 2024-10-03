@@ -12,5 +12,5 @@ public class ExchangeRatesDto {
     private Long timestamp;
     private String base;
     private Date date;
-    private Map<String, Double> rates;
+    private Map<String, String> rates;
 }

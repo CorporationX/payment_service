@@ -20,6 +20,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
     implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.4")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis:3.3.4")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:3.3.4")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     /**
@@ -33,7 +35,6 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.5.3.Final")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
-    implementation("io.projectreactor:reactor-core:3.6.10")
 
     /**
      * Tests
