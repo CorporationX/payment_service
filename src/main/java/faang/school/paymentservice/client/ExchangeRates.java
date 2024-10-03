@@ -1,26 +1,42 @@
 package faang.school.paymentservice.client;
 
+import faang.school.paymentservice.config.WebClientConfig;
 import faang.school.paymentservice.dto.ExchangeRatesDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
+
+@Slf4j
 @RequiredArgsConstructor
-@Component
+@Service
 public class ExchangeRates {
-    private final WebClient webClient = WebClient.builder()
-            .baseUrl("https://api.exchangeratesapi.io")
-            .build();
+
+    private final WebClientConfig webClientConfig;
+
+    @Value("${services.exchangerates.appId}")
+    private String appId;
 
     public Mono<ExchangeRatesDto> fetchData() {
-        return webClient.get()
-                .uri("/v1/latest?access_key=a9a4c62d6dbea49c6ea892287f57fc24")
+        return webClientConfig.createWebClient()
+                .get()
+                .uri("/latestT?access_key=" + appId)
                 .retrieve()
+//                .onStatus(
+//                        statusCode -> statusCode.is4xxClientError(),
+//                        response -> Mono.error(new RuntimeException("Authorization error: " + response.statusCode()))
+//                )
                 .bodyToMono(ExchangeRatesDto.class)
-                .onErrorResume(e->{
-                    System.out.println("Something went wrong, continue working");
-                    return Mono.empty();
-                });
+                .onErrorResume(e -> {
+                    log.error(e.getMessage(), e);
+                    log.info("Something went wrong, continue working");
+                    return Mono.error(e);
+                })
+                .retryWhen(Retry.backoff(2, Duration.ofSeconds(1)))
+                .onErrorReturn(null); // TODO correct
     }
 }
