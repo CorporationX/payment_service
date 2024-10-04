@@ -35,7 +35,8 @@ public class CurrencyService {
                 .retrieve()
                 .bodyToMono(Rate.class);
         log.info("rate got: " + response);
-        Objects.requireNonNull(cacheManager.getCache(cacheName)).put("current_rate", response);
+        Objects.requireNonNull(cacheManager.getCache(cacheName))
+                .put("current_rate", Objects.requireNonNull(response));
         log.info("rate send to cache");
     }
 }
