@@ -29,7 +29,7 @@ public class CurrencyService {
 
 
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 3000))
-    public void updateCurrency() {
+    public Rate updateCurrency() {
         Mono<Rate> response = webClient.get()
                 .uri(String.join("", "/latest?access_key =" + key + "& base=" + base))
                 .retrieve()
@@ -37,5 +37,6 @@ public class CurrencyService {
         log.info("rate got: " + response);
         Objects.requireNonNull(cacheManager.getCache(cacheName)).put("current_rate", response);
         log.info("rate send to cache");
+        return response.block();
     }
 }
