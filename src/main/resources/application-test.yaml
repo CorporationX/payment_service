@@ -10,7 +10,7 @@ services:
     appId: f3c37613244e47979f50c0451a24291d
 
   exchangerates:
-    url: https://api.exchangeratesapi.io/v1
+    url: http://127.0.0.1:8080
 #        url: 10.11.12.13
     appId: a9a4c62d6dbea49c6ea892287f57fc24
 

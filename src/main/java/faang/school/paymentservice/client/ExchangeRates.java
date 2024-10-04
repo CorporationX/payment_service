@@ -25,7 +25,10 @@ public class ExchangeRates {
     public Mono<ExchangeRatesDto> fetchData() {
         return webClient
                 .get()
-                .uri("/latest?access_key=" + appId)
+                .uri(uriBuilder -> uriBuilder
+                        .path("/latest")
+                        .queryParam("access_key", appId)
+                        .build())
                 .retrieve()
                 .onStatus(
                         HttpStatusCode::is4xxClientError,

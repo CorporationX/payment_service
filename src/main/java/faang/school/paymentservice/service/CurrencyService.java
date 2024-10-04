@@ -12,14 +12,10 @@ public class CurrencyService {
     private final ExchangeRates exchangeRates;
     private final RedisTemplate<String, String> redisTemplate;
 
-
     public void currencyRateFetcher() {
         ExchangeRatesDto exchangeRatesDto = exchangeRates.fetchData().block();
         if (exchangeRatesDto.getSuccess() != null) {
             exchangeRatesDto.getRates().forEach((key, value) -> redisTemplate.opsForValue().set(key, value));
-
-        } else {
-            System.out.println("something happened");
         }
     }
 }
