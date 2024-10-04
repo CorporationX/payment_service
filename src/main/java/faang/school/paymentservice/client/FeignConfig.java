@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class FeignConfig {
 
     @Bean
-    public FeignUserInterceptor feignPaymentInterceptor(UserContext userContext) {
+    public FeignUserInterceptor feignUserInterceptor(UserContext userContext) {
         return new FeignUserInterceptor(userContext);
     }
 }

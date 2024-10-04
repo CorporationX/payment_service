@@ -6,8 +6,9 @@ import faang.school.paymentservice.dto.PaymentRequest;
 import java.math.BigDecimal;
 
 public interface CurrencyExchangeService {
-    BigDecimal convertCurrency(Currency fromCurrency, Currency toCurrency,
-                               BigDecimal amount, String appId);
+    BigDecimal getAmountNewCurrency(PaymentRequest dto, Currency toCurrency);
 
-    String getMessage(PaymentRequest dto, Currency toCurrency);
+    BigDecimal addCommission(BigDecimal amount);
+
+    BigDecimal convertWithCommission(PaymentRequest dto, Currency toCurrency);
 }

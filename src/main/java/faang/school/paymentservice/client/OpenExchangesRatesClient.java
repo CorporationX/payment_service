@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "open-exchanges-rates", url = "${currency.exchange.url}")
 public interface OpenExchangesRatesClient {
 
-    @GetMapping()
+    @GetMapping
     CurrencyExchangeResponse getLatestRates(@RequestParam("app_id") String appId);
 }

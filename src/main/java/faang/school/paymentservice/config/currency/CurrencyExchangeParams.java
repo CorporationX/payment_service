@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "currency.exchange")
 @Data
-public class CurrencyExchangeConfig {
+public class CurrencyExchangeParams {
     private String url;
     private String appId;
     private Double commission;
