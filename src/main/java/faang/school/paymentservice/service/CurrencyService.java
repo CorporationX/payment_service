@@ -33,7 +33,8 @@ public class CurrencyService {
         Mono<Rate> response = webClient.get()
                 .uri(String.join("", "/latest?access_key =" + key + "& base=" + base))
                 .retrieve()
-                .bodyToMono(Rate.class);
+                .bodyToMono(Rate.class)
+                .onErrorResume(Mono::error);
         log.info("rate got: " + response);
         Objects.requireNonNull(cacheManager.getCache(cacheName))
                 .put("current_rate", Objects.requireNonNull(response));
