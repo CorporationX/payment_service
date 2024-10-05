@@ -5,16 +5,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Component
 public class CurrencyRateCache {
@@ -27,10 +24,8 @@ public class CurrencyRateCache {
     private String baseCurrency;
     private Map<Currency, Double> currencyRate = new HashMap<>();
 
-    @Autowired
     @Setter
-    @Qualifier("currencyRateCacheLock")
-    private ReadWriteLock lock;
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
 
     public Double getCurrencyRate(Currency currency) {
         try {

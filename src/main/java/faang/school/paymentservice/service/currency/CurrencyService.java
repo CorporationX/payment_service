@@ -49,12 +49,12 @@ public class CurrencyService {
     private void validateCurrencyRateResponse(CurrencyRateDto rateDto) {
         if (rateDto == null) {
             String message = "An empty response was received from the exchange rate service.Currency exchange rate update failed";
-            throw new NullPointerException(message);
+            throw new RuntimeException(message);
         }
 
         if (rateDto.rates() == null) {
-            String message = "An empty list of the exchange rate was received from the exchange rate service.Currency exchange rate update failed";
-            throw new NullPointerException(message);
+            String message = "The list of exchange rates was not received from the currency exchange service.Failed to update the currency exchange rate";
+            throw new RuntimeException(message);
         }
     }
 }

@@ -83,7 +83,7 @@ public class CurrencyServiceTest {
         when(client.getCurrencyRates(any(), any())).thenReturn(null);
 
         // Act & Assert
-        Exception exception = Assertions.assertThrows(NullPointerException.class,() -> service.updateActualCurrencyRate());
+        Exception exception = Assertions.assertThrows(RuntimeException.class,() -> service.updateActualCurrencyRate());
         Assertions.assertEquals("An empty response was received from the exchange rate service.Currency exchange rate update failed",
                 exception.getMessage());
     }
@@ -96,8 +96,8 @@ public class CurrencyServiceTest {
                 .thenReturn(new CurrencyRateDto("2022-01-01", "EUR", null ));
 
         // Act & Assert
-        Exception exception = Assertions.assertThrows(NullPointerException.class,() -> service.updateActualCurrencyRate());
-        Assertions.assertEquals("An empty list of the exchange rate was received from the exchange rate service.Currency exchange rate update failed",
+        Exception exception = Assertions.assertThrows(RuntimeException.class,() -> service.updateActualCurrencyRate());
+        Assertions.assertEquals("The list of exchange rates was not received from the currency exchange service.Failed to update the currency exchange rate",
                 exception.getMessage());
     }
 

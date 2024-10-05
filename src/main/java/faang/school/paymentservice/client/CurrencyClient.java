@@ -1,5 +1,7 @@
 package faang.school.paymentservice.client;
 
+import faang.school.paymentservice.config.currencyrate.CurrencyRateConfig;
+import faang.school.paymentservice.config.currencyrate.CurrencyRateParams;
 import faang.school.paymentservice.dto.CurrencyRateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,15 +14,13 @@ import java.time.Duration;
 @Component
 @RequiredArgsConstructor
 public class CurrencyClient {
+    private final CurrencyRateParams param;
     private final WebClient webClient;
-
-    @Value("${currency-rate-fetcher.access_key}")
-    private String accessKey;
 
     public CurrencyRateDto getCurrencyRates(String baseCurrency, String symbols) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .queryParam("access_key", accessKey)
+                        .queryParam("access_key", param.getAccessKey())
                         .queryParam("base", baseCurrency)
                         .queryParam("symbols", symbols)
                         .build()
