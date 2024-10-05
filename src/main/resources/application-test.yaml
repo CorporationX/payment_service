@@ -10,12 +10,11 @@ services:
     appId: f3c37613244e47979f50c0451a24291d
 
   exchangerates:
-    url: http://127.0.0.1:8080
-#        url: 10.11.12.13
+    url: http://localhost:8080
     appId: a9a4c62d6dbea49c6ea892287f57fc24
 
 cron:
-  currency-rate-fetcher: "0 */5 * * * *"
+  currency-rate-fetcher: "0 0 * * * *"
 
 spring:
   data:
