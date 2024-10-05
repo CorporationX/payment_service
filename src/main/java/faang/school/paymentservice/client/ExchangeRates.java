@@ -37,7 +37,7 @@ public class ExchangeRates {
                 .bodyToMono(ExchangeRatesDto.class)
                 .onErrorResume(e -> {
                     log.error(e.getMessage(), e);
-                    return Mono.error(e);
+                    return Mono.empty();
                 })
                 .retryWhen(Retry.backoff(2, Duration.ofSeconds(1)))
                 .onErrorReturn(new ExchangeRatesDto());

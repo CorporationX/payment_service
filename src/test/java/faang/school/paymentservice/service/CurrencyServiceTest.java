@@ -68,7 +68,7 @@ class CurrencyServiceTest {
     @Test
     void currencyRateFetcher_unsuccessfulResponse_noInteractionWithRedis() {
         exchangeRatesDto.setSuccess(null);
-        when(exchangeRates.fetchData()).thenReturn(Mono.just(exchangeRatesDto));
+        when(exchangeRates.fetchData()).thenReturn(Mono.empty());
 
         currencyService.currencyRateFetcher();
 

@@ -72,8 +72,8 @@ public class ExchangeRatesTests {
         Mono<ExchangeRatesDto> result = exchangeRates.fetchData();
 
         StepVerifier.create(result)
-                .expectNextMatches(dto -> dto != null && dto.getRates() == null)
-                .verifyComplete();
+                .expectComplete()
+                .verify();
 
         wireMockServer.verify(WireMock.getRequestedFor(urlPathEqualTo("/latest")).withQueryParam("access_key", equalTo(appId)));
     }

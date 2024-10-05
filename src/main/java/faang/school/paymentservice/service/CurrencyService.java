@@ -14,7 +14,7 @@ public class CurrencyService {
 
     public void currencyRateFetcher() {
         ExchangeRatesDto exchangeRatesDto = exchangeRates.fetchData().block();
-        if (exchangeRatesDto.getSuccess() != null) {
+        if (exchangeRatesDto != null) {
             exchangeRatesDto.getRates().forEach((key, value) -> redisTemplate.opsForValue().set(key, value));
         }
     }
