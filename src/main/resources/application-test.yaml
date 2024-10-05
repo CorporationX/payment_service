@@ -1,3 +1,9 @@
+spring:
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
 server:
   port: 9080
 
@@ -15,9 +21,3 @@ services:
 
 cron:
   currency-rate-fetcher: "0 0 * * * *"
-
-spring:
-  data:
-    redis:
-      port: 6379
-      host: 192.168.43.78
