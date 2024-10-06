@@ -40,7 +40,7 @@ public class PaymentController {
 
     @GetMapping("/currency")
     public CurrencyExchangeResponse getCurrency() {
-        return currencyService.getCurrencyExchange();
+        return currencyService.getCurrentCurrencyExchangeRate();
     }
 
     @PostMapping("/exchange")
