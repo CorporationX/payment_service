@@ -16,4 +16,8 @@ public class CurrencyService {
     public CurrencyExchangeResponse getCurrencyExchange() {
         return currencyConverter.getCurrentCurrencyExchangeRate(config.getAppId());
     }
+
+    public CurrencyExchangeResponse getCurrencyExchange(String currencyCode) {
+        return currencyConverter.getCurrentCurrencyExchangeRate(currencyCode);
+    }
 }

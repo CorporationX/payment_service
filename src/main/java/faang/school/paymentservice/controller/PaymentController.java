@@ -43,5 +43,10 @@ public class PaymentController {
         return currencyService.getCurrencyExchange();
     }
 
+    @PostMapping("/exchange")
+    public CurrencyExchangeResponse exchangeCurrency(@RequestBody @Validated PaymentRequest dto) {
+
+    }
+
 
 }
