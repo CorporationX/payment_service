@@ -66,8 +66,6 @@ public class PaymentController {
         );
 
         return ResponseEntity.ok(PaymentResponseDto.builder()
-                .status(OperationStatus.CONFIRMED)
-                .senderAccountNumber(dto.getSenderAccountNumber())
                 .amount(newAmount)
                 .currency(targetCurrency)
                 .message(message)
