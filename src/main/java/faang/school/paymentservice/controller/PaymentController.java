@@ -29,7 +29,7 @@ public class PaymentController {
     private final CurrencyExchangeConfig config;
 
     @PostMapping("/payment")
-    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
+    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody PaymentRequest dto) {
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         String formattedSum = decimalFormat.format(dto.amount());
         int verificationCode = new Random().nextInt(1000, 10000);
@@ -52,8 +52,8 @@ public class PaymentController {
         return currencyService.getCurrentCurrencyExchangeRate();
     }
 
-    @PostMapping("exchange")
-    public ResponseEntity<PaymentResponseDto> exchangeCurrency(@RequestBody @Validated PaymentRequestDto dto, @RequestParam Currency targetCurrency) {
+    @PostMapping("/exchange")
+    public ResponseEntity<PaymentResponseDto> exchangeCurrency(@RequestBody PaymentRequestDto dto, @RequestParam Currency targetCurrency) {
         BigDecimal newAmount = currencyService.convertWithCommission(dto, targetCurrency);
 
         String message = String.format(

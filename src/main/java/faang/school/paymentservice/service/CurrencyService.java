@@ -28,7 +28,7 @@ public class CurrencyService {
     }
 
     private BigDecimal addCommision(BigDecimal amount) {
-        BigDecimal commission = BigDecimal.valueOf(1).add(BigDecimal.valueOf(config.getCommission() / 100.0));
+        BigDecimal commission = BigDecimal.valueOf(1).subtract(BigDecimal.valueOf(config.getCommission() / 100.0));
         return amount.multiply(commission);
     }
 

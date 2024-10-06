@@ -1,5 +1,5 @@
 package faang.school.paymentservice.model;
 
 public enum Currency {
-    USD, EUR
+    USD, EUR, RUB
 }
