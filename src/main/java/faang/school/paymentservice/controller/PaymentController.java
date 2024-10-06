@@ -5,16 +5,19 @@ import java.text.DecimalFormat;
 import java.util.Random;
 import faang.school.paymentservice.model.PaymentResponse;
 import faang.school.paymentservice.model.PaymentStatus;
+import faang.school.paymentservice.response.CurrencyExchangeResponse;
+import faang.school.paymentservice.service.CurrencyService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class PaymentController {
+
+    private final CurrencyService currencyService;
 
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
@@ -33,6 +36,11 @@ public class PaymentController {
                 dto.currency(),
                 message)
         );
+    }
+
+    @GetMapping("/currency")
+    public CurrencyExchangeResponse getCurrency() {
+        return currencyService.getCurrencyExchange();
     }
 
 

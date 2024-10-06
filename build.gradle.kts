@@ -16,9 +16,10 @@ dependencies {
     /**
      * Spring boot starters
      */
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    implementation("org.springframework.boot:spring-boot-starter-web:3.3.4")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:3.1.9")
+    implementation("org.springframework.boot:spring-boot-starter-validation:3.3.4")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:3.3.4")
 
     /**
      * Utils & Logging
