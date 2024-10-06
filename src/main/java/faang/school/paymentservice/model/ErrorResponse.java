@@ -1,4 +1,4 @@
-package faang.school.paymentservice.dto;
+package faang.school.paymentservice.model;
 
 public record ErrorResponse(String message) {
 }
