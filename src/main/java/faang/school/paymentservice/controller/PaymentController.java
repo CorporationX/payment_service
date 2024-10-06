@@ -11,7 +11,6 @@ import faang.school.paymentservice.response.CurrencyExchangeResponse;
 import faang.school.paymentservice.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
