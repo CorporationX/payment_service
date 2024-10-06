@@ -7,9 +7,6 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.Map;
 
-/**
- * Класс ответа от API обменного курса
- */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CurrencyExchangeResponse {
