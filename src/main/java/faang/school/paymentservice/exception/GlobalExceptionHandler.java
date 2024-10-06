@@ -1,4 +1,4 @@
-package faang.school.paymentservice.controller;
+package faang.school.paymentservice.exception;
 
 import faang.school.paymentservice.model.Currency;
 import faang.school.paymentservice.model.ErrorResponse;

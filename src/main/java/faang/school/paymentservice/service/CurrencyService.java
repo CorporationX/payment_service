@@ -32,11 +32,7 @@ public class CurrencyService {
         return amount.multiply(commission);
     }
 
-    private BigDecimal getAmountInNewCurrency(
-            PaymentRequestDto dto,
-            Currency targetCurrency,
-            CurrencyExchangeResponse currentCurrencyExchange
-    ) {
+    private BigDecimal getAmountInNewCurrency(PaymentRequestDto dto, Currency targetCurrency, CurrencyExchangeResponse currentCurrencyExchange) {
         BigDecimal amount = dto.getAmount();
         BigDecimal targetRate = currentCurrencyExchange.getRate(targetCurrency);
         BigDecimal baseRate = currentCurrencyExchange.getRate(dto.getCurrency());
