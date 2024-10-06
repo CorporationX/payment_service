@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -16,8 +17,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Component
 public class CurrencyRateCache {
     @Getter
-    @Setter
-    private String date;
+    private LocalDateTime updatedAt;
 
     @Value("${currency-rate-fetcher.base_currency}")
     @Getter
@@ -52,6 +52,10 @@ public class CurrencyRateCache {
         } finally {
             lock.writeLock().unlock();
         }
+    }
+
+    public void updateUpdatedAt() {
+        this.updatedAt = LocalDateTime.now();
     }
 
 }

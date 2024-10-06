@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CurrencyRateController {
     private final CurrencyService service;
 
-    @GetMapping("/health")
-    public CurrencyRateDto checkHealth() {
-        return service.checkHealth();
+    @GetMapping("/info")
+    public CurrencyRateDto getInfo() {
+        return service.getInfo();
     }
 }

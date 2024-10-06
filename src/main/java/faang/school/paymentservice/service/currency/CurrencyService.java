@@ -23,8 +23,10 @@ public class CurrencyService {
     private final CurrencyRateCache currencyRateCache;
     private final CurrencyClient client;
 
+    @Value("${currency-rate-fetcher.base_currency}")
+    private String baseCurrency;
+
     public void updateActualCurrencyRate() {
-        String baseCurrency = currencyRateCache.getBaseCurrency();
         String symbols = Arrays.stream(Currency.values())
                 .map(Enum::name)
                 .filter(currency -> !currency.equals(baseCurrency))
@@ -34,13 +36,13 @@ public class CurrencyService {
         validateCurrencyRateResponse(rateDto);
         Map<Currency, Double> rates = rateDto.rates();
         currencyRateCache.setCurrencyRate(rates);
-        currencyRateCache.setDate(rateDto.date());
+        currencyRateCache.updateUpdatedAt();
         log.info("The exchange rate has been saved: " + rates);
     }
 
-    public CurrencyRateDto checkHealth() {
+    public CurrencyRateDto getInfo() {
         return new CurrencyRateDto(
-                currencyRateCache.getDate(),
+                currencyRateCache.getUpdatedAt(),
                 currencyRateCache.getBaseCurrency(),
                 currencyRateCache.getAllCurrencyRates()
         );

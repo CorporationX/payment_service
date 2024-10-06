@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 public record CurrencyRateDto(
-    String date,
+    LocalDateTime updatedAt,
     String base,
     Map<Currency, Double> rates
 ) {}

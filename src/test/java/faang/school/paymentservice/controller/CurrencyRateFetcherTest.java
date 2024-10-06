@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.CurrencyRateDto;
 import faang.school.paymentservice.service.currency.CurrencyService;
+import net.bytebuddy.asm.Advice;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +35,7 @@ public class CurrencyRateFetcherTest {
     private CurrencyService service;
     private Map<Currency, Double> rates;
     private final String baseCurrency = "EUR";
-    private final String date = "2022-01-01";
+    private final LocalDateTime now = LocalDateTime.now();
     private Map<Currency, Double> expectedRates;
     private MockMvc mockMvc;
     private CurrencyRateDto dto;
@@ -49,8 +51,8 @@ public class CurrencyRateFetcherTest {
         expectedRates = new HashMap<>();
         expectedRates.put(Currency.RUB, 100.0);
         expectedRates.put(Currency.USD, 1.1);
-        dto = new CurrencyRateDto(date, baseCurrency, rates);
-        expectedDto = new CurrencyRateDto(date, baseCurrency, expectedRates);
+        dto = new CurrencyRateDto(now, baseCurrency, rates);
+        expectedDto = new CurrencyRateDto(now, baseCurrency, expectedRates);
     }
 
     @Test
@@ -63,7 +65,7 @@ public class CurrencyRateFetcherTest {
     @Test
     public void testCheckHealth() throws Exception {
         // Arrange
-        when(service.checkHealth()).thenReturn(dto);
+        when(service.getInfo()).thenReturn(dto);
 
         // Act & Assert
         mockMvc.perform(get("/api/currency-rate/health"))

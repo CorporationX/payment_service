@@ -19,6 +19,7 @@ import reactor.util.retry.Retry;
 
 import java.net.URI;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +40,7 @@ public class CurrencyServiceTest {
     @Mock
     private CurrencyClient client;
     private final String baseCurrency = "EUR";
-    private final String date = "2022-01-01";
+    private final LocalDateTime now = LocalDateTime.now();
     private CurrencyRateDto dto;
     private Map<Currency, Double> rates;
     private Map<Currency, Double> expectedRates;
@@ -57,20 +58,20 @@ public class CurrencyServiceTest {
         expectedRates = new HashMap<>();
         expectedRates.put(Currency.RUB, 100.0);
         expectedRates.put(Currency.USD, 1.1);
-        dto = new CurrencyRateDto(date, baseCurrency, rates);
-        expectedDto = new CurrencyRateDto(date, baseCurrency, expectedRates);
+        dto = new CurrencyRateDto(now, baseCurrency, rates);
+        expectedDto = new CurrencyRateDto(now, baseCurrency, expectedRates);
     }
 
 
     @Test
-    public void testCheckHealth() {
+    public void testGetInfo() {
         // Arrange
         when(currencyRateCache.getAllCurrencyRates()).thenReturn(rates);
-        when(currencyRateCache.getDate()).thenReturn(date);
+        when(currencyRateCache.getUpdatedAt()).thenReturn(now);
         when(currencyRateCache.getBaseCurrency()).thenReturn(baseCurrency);
 
         // Act
-        CurrencyRateDto returnDto = service.checkHealth();
+        CurrencyRateDto returnDto = service.getInfo();
 
         // Assert
         Assertions.assertEquals(expectedDto, returnDto);
@@ -93,7 +94,7 @@ public class CurrencyServiceTest {
         // Arrange
         when(currencyRateCache.getBaseCurrency()).thenReturn(baseCurrency);
         when(client.getCurrencyRates(any(), any()))
-                .thenReturn(new CurrencyRateDto("2022-01-01", "EUR", null ));
+                .thenReturn(new CurrencyRateDto(now, "EUR", null ));
 
         // Act & Assert
         Exception exception = Assertions.assertThrows(RuntimeException.class,() -> service.updateActualCurrencyRate());

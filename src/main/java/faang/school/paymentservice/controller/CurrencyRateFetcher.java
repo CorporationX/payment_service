@@ -4,14 +4,13 @@ import faang.school.paymentservice.service.currency.CurrencyService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
 
-@RestController
 @RequestMapping("/api/currency-rate")
 @RequiredArgsConstructor
+@Controller
 public class CurrencyRateFetcher {
     private final CurrencyService service;
 
