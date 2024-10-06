@@ -1,8 +1,10 @@
 package faang.school.paymentservice.controller;
 
+import faang.school.paymentservice.config.CurrencyExchangeConfig;
+import faang.school.paymentservice.dto.PaymentRequestDto;
+import faang.school.paymentservice.dto.PaymentResponseDto;
+import faang.school.paymentservice.model.Currency;
 import faang.school.paymentservice.model.PaymentRequest;
-import java.text.DecimalFormat;
-import java.util.Random;
 import faang.school.paymentservice.model.PaymentResponse;
 import faang.school.paymentservice.model.PaymentStatus;
 import faang.school.paymentservice.response.CurrencyExchangeResponse;
@@ -12,12 +14,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.Random;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class PaymentController {
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
+    private static final String CONVERTING_MONEY_MESSAGE = "Dear friend! Thank you for converting money! You converted %s %s to %s %s with commission %f%%";
 
     private final CurrencyService currencyService;
+    private final CurrencyExchangeConfig config;
 
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
@@ -43,9 +52,26 @@ public class PaymentController {
         return currencyService.getCurrentCurrencyExchangeRate();
     }
 
-    @PostMapping("/exchange")
-    public CurrencyExchangeResponse exchangeCurrency(@RequestBody @Validated PaymentRequest dto) {
+    @PostMapping("exchange")
+    public ResponseEntity<PaymentResponseDto> exchangeCurrency(@RequestBody @Validated PaymentRequestDto dto, @RequestParam Currency targetCurrency) {
+        BigDecimal newAmount = currencyService.convertWithCommission(dto, targetCurrency);
 
+        String message = String.format(
+                CONVERTING_MONEY_MESSAGE,
+                DECIMAL_FORMAT.format(dto.getAmount()),
+                dto.getCurrency(),
+                DECIMAL_FORMAT.format(newAmount),
+                targetCurrency,
+                config.getCommission()
+        );
+
+        return ResponseEntity.ok(PaymentResponseDto.builder()
+                .status(OperationStatus.CONFIRMED)
+                .senderAccountNumber(dto.getSenderAccountNumber())
+                .amount(newAmount)
+                .currency(targetCurrency)
+                .message(message)
+                .build()
+        );
     }
-
 }
