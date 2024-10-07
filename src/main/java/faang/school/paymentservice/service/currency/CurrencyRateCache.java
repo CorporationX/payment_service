@@ -22,37 +22,19 @@ public class CurrencyRateCache {
     @Value("${currency-rate-fetcher.base_currency}")
     @Getter
     private String baseCurrency;
-    private Map<Currency, Double> currencyRate = new HashMap<>();
 
     @Setter
-    private ReadWriteLock lock = new ReentrantReadWriteLock();
+    private Map<Currency, Double> currencyRate = new HashMap<>();
+
 
     public Double getCurrencyRate(Currency currency) {
-        try {
-            lock.readLock().lock();
-            return currencyRate.get(currency);
-        } finally {
-            lock.readLock().unlock();
-        }
+        return currencyRate.get(currency);
     }
 
     public Map<Currency, Double> getAllCurrencyRates() {
-        try {
-            lock.readLock().lock();
-            return this.currencyRate;
-        } finally {
-            lock.readLock().unlock();
-        }
+        return this.currencyRate;
     }
 
-    public void setCurrencyRate(Map<Currency, Double> currencyRate) {
-        try {
-            lock.writeLock().lock();
-            this.currencyRate = currencyRate;
-        } finally {
-            lock.writeLock().unlock();
-        }
-    }
 
     public void updateUpdatedAt() {
         this.updatedAt = LocalDateTime.now();
