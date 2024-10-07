@@ -10,3 +10,9 @@ currency-rate-fetcher:
   url: https://api.exchangeratesapi.io/v1/latest
   access_key_path: /access_key_for_currency_rate.txt
   base_currency: EUR
+
+currency:
+  exchange:
+    url: https://openexchangerates.org/api/latest.json
+    appId: 5ef8acd7b3fd427796212f3971abf5d8
+    commission: 0.01
