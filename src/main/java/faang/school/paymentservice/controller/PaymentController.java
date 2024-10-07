@@ -1,10 +1,10 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.dto.Currency;
-import faang.school.paymentservice.dto.PaymentRequest;
-import faang.school.paymentservice.dto.PaymentResponse;
-import faang.school.paymentservice.dto.PaymentStatus;
-import faang.school.paymentservice.service.CurrencyConverter;
+import faang.school.paymentservice.model.enums.Currency;
+import faang.school.paymentservice.model.dto.PaymentRequest;
+import faang.school.paymentservice.model.dto.PaymentResponse;
+import faang.school.paymentservice.model.enums.PaymentStatus;
+import faang.school.paymentservice.service.impl.CurrencyConverter;
 import faang.school.paymentservice.validator.ValidatorPaymentController;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

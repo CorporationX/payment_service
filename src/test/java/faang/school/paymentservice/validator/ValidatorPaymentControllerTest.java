@@ -1,6 +1,6 @@
 package faang.school.paymentservice.validator;
 
-import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.model.enums.Currency;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -10,9 +10,7 @@ class ValidatorPaymentControllerTest {
     @Test
     void checkCurrencySuccess() {
         validatorPaymentController.checkCurrency(Currency.USD);
-        Assertions.assertDoesNotThrow(() -> {
-            validatorPaymentController.checkCurrency(Currency.USD);
-        });
+        Assertions.assertDoesNotThrow(() -> validatorPaymentController.checkCurrency(Currency.USD));
     }
 
     @Test
