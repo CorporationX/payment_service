@@ -1,6 +1,6 @@
 package faang.school.paymentservice.validator;
 
-import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.model.enums.Currency;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Component;

@@ -1,8 +1,8 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.dto.Currency;
-import faang.school.paymentservice.dto.PaymentRequest;
-import faang.school.paymentservice.service.CurrencyConverter;
+import faang.school.paymentservice.model.enums.Currency;
+import faang.school.paymentservice.model.dto.PaymentRequest;
+import faang.school.paymentservice.service.impl.CurrencyConverter;
 import faang.school.paymentservice.validator.ValidatorPaymentController;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;

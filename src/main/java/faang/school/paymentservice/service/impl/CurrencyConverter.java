@@ -1,12 +1,12 @@
-package faang.school.paymentservice.service;
+package faang.school.paymentservice.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import faang.school.paymentservice.client.OpenExchangeRatesClient;
-import faang.school.paymentservice.dto.Currency;
-import faang.school.paymentservice.dto.OpenExchangeAnswerDto;
-import faang.school.paymentservice.dto.PaymentRequest;
+import faang.school.paymentservice.model.enums.Currency;
+import faang.school.paymentservice.model.dto.OpenExchangeAnswerDto;
+import faang.school.paymentservice.model.dto.PaymentRequest;
 import faang.school.paymentservice.exception.NotFoundException;
+import faang.school.paymentservice.service.OpenExchangeRatesClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

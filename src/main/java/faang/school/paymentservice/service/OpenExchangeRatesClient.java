@@ -1,4 +1,4 @@
-package faang.school.paymentservice.client;
+package faang.school.paymentservice.service;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

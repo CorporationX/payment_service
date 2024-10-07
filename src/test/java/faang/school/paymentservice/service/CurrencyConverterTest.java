@@ -1,9 +1,9 @@
 package faang.school.paymentservice.service;
 
-import faang.school.paymentservice.client.OpenExchangeRatesClient;
-import faang.school.paymentservice.dto.Currency;
-import faang.school.paymentservice.dto.PaymentRequest;
+import faang.school.paymentservice.model.enums.Currency;
+import faang.school.paymentservice.model.dto.PaymentRequest;
 import faang.school.paymentservice.exception.NotFoundException;
+import faang.school.paymentservice.service.impl.CurrencyConverter;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
