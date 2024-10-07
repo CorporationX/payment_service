@@ -1,6 +1,6 @@
-package faang.school.paymentservice.client;
+package faang.school.paymentservice.service;
 
-import faang.school.paymentservice.dto.ExchangeRatesDto;
+import faang.school.paymentservice.model.dto.ExchangeRatesDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

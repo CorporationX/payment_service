@@ -2,7 +2,8 @@ package faang.school.paymentservice.client;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import faang.school.paymentservice.dto.ExchangeRatesDto;
+import faang.school.paymentservice.model.dto.ExchangeRatesDto;
+import faang.school.paymentservice.service.ExchangeRates;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

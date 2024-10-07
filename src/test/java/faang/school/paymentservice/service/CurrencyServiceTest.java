@@ -1,7 +1,6 @@
 package faang.school.paymentservice.service;
 
-import faang.school.paymentservice.client.ExchangeRates;
-import faang.school.paymentservice.dto.ExchangeRatesDto;
+import faang.school.paymentservice.model.dto.ExchangeRatesDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

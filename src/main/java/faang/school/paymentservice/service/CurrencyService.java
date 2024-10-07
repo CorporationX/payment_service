@@ -1,7 +1,6 @@
 package faang.school.paymentservice.service;
 
-import faang.school.paymentservice.client.ExchangeRates;
-import faang.school.paymentservice.dto.ExchangeRatesDto;
+import faang.school.paymentservice.model.dto.ExchangeRatesDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;

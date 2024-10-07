@@ -1,8 +1,7 @@
-package faang.school.paymentservice.dto;
+package faang.school.paymentservice.model.dto;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
 
