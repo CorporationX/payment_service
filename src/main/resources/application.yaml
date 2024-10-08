@@ -5,6 +5,12 @@ logging:
   level:
     root: info
 
+currency-rate-fetcher:
+  cron: 0 1 0 * * * # раз в сутки в 00:01
+  url: https://api.exchangeratesapi.io/v1/latest
+  access_key_path: /access_key_for_currency_rate.txt
+  base_currency: EUR
+
 currency:
   exchange:
     url: https://openexchangerates.org/api/latest.json
