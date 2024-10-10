@@ -1,13 +1,8 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.model.enums.Currency;
-import faang.school.paymentservice.model.dto.ErrorResponse;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 import faang.school.paymentservice.exception.NotFoundException;
+import faang.school.paymentservice.model.dto.ErrorResponse;
+import faang.school.paymentservice.model.enums.Currency;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,6 +11,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -52,4 +52,5 @@ public class GlobalExceptionHandler {
         log.error("Not found exception occurred", e);
         return new ErrorResponse(e.getMessage());
     }
+
 }
