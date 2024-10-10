@@ -1,6 +1,7 @@
 package faang.school.paymentservice.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import faang.school.paymentservice.dto.RedisCacheConfigurationProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -16,15 +17,12 @@ import java.time.Duration;
 
 @Configuration
 @EnableCaching
+@RequiredArgsConstructor
 public class RedisCacheConfig {
-    @Value("${spring.cache.redis.host}")
-    private String redisHost;
-    @Value("${spring.cache.redis.port}")
-    private int redisPort;
-    @Value("${spring.cache.redis.caches.current_rate}")
-    private String currentRateCacheName;
+    private final RedisCacheConfigurationProperties properties;
 
     @Bean
+
     public RedisCacheConfiguration cacheConfiguration() {
         return RedisCacheConfiguration.defaultCacheConfig()
                 .disableCachingNullValues()
@@ -32,15 +30,15 @@ public class RedisCacheConfig {
     }
 
     @Bean
-    public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
+    public RedisCacheManagerBuilderCustomizer redisCurrentRateCacheManagerBuilderCustomizer() {
         return builder -> builder
-                .withCacheConfiguration(currentRateCacheName,
+                .withCacheConfiguration(properties.getCaches().get("current_rate"),
                         RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofDays(1)));
     }
 
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
-        return new JedisConnectionFactory(new RedisStandaloneConfiguration(redisHost, redisPort));
+        return new JedisConnectionFactory(new RedisStandaloneConfiguration(properties.getHost(), properties.getPort()));
     }
 
     @Bean
