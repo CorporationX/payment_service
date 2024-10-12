@@ -1,8 +1,8 @@
 package faang.school.paymentservice.service;
 
-import faang.school.paymentservice.dto.ExchangeRatesProperties;
+import faang.school.paymentservice.config.ExchangeRatesProperties;
 import faang.school.paymentservice.dto.Rate;
-import faang.school.paymentservice.dto.RedisCacheConfigurationProperties;
+import faang.school.paymentservice.config.RedisCacheConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.cache.RedisCacheManager;

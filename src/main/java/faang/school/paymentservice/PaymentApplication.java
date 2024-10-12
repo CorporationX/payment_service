@@ -1,11 +1,10 @@
 package faang.school.paymentservice;
 
-import faang.school.paymentservice.dto.ExchangeRatesProperties;
-import faang.school.paymentservice.dto.RedisCacheConfigurationProperties;
+import faang.school.paymentservice.config.ExchangeRatesProperties;
+import faang.school.paymentservice.config.RedisCacheConfigurationProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 

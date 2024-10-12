@@ -1,6 +1,5 @@
 package faang.school.paymentservice.config;
 
-import faang.school.paymentservice.dto.RedisCacheConfigurationProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer;
 import org.springframework.cache.annotation.EnableCaching;

@@ -1,4 +1,4 @@
-package faang.school.paymentservice.dto;
+package faang.school.paymentservice.config;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
