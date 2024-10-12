@@ -22,7 +22,6 @@ public class RedisCacheConfig {
     private final RedisCacheConfigurationProperties properties;
 
     @Bean
-
     public RedisCacheConfiguration cacheConfiguration() {
         return RedisCacheConfiguration.defaultCacheConfig()
                 .disableCachingNullValues()
