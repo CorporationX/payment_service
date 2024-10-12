@@ -26,16 +26,17 @@ public class CurrencyServiceImpl implements CurrencyService {
     @Override
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 3000))
     public Rate updateCurrency() {
-        Mono<Rate> response = webClient.get()
+        Rate response = webClient.get()
                 .uri(String.join("", "/latest?access_key =" + exchangeRatesProperties.getKey()
                         + "& base=" + exchangeRatesProperties.getBase()))
                 .retrieve()
                 .bodyToMono(Rate.class)
-                .onErrorResume(Mono::error);
+                .onErrorResume(Mono::error)
+                .block();
         log.info("rate got: " + response);
         Objects.requireNonNull(cacheManager.getCache(redisCacheConfigurationProperties.getCaches().get("current_rate")))
                 .put("current_rate", Objects.requireNonNull(response));
         log.info("rate send to cache");
-        return response.block();
+        return response;
     }
 }
