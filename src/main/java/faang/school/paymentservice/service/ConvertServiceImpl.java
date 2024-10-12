@@ -23,7 +23,7 @@ public class ConvertServiceImpl implements ConvertService {
     private final RedisCacheManager manager;
     private final CurrencyServiceImpl currencyService;
 
-    @Value("${exchange_rates.base}")
+    @Value("${exchangerates.base}")
     private String base;
 
     @Value("${spring.cache.redis.caches.current_rate}")
