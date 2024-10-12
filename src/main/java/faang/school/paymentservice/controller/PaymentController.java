@@ -2,6 +2,7 @@ package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.PaymentResponse;
+import faang.school.paymentservice.service.ConvertService;
 import faang.school.paymentservice.service.ConvertServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,9 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class PaymentController {
-    @Value("${exchange_rates.base}")
-    private String base;
-    private final ConvertServiceImpl convertService;
+    private final ConvertService convertService;
 
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
