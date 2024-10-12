@@ -1,19 +1,20 @@
 package faang.school.paymentservice.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import faang.school.paymentservice.dto.ExchangeRatesProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebClientConfiguration {
-    @Value("${exchange_rates.base_url}")
-    private String BASE_URL;
+    private final ExchangeRatesProperties exchangeRatesProperties;
 
     @Bean
     public WebClient webClient() {
         return WebClient.builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(exchangeRatesProperties.getBaseUrl())
                 .build();
     }
 }

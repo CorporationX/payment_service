@@ -24,6 +24,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache:3.3.4")
     implementation("org.springframework.boot:spring-boot-starter-data-redis:3.3.4")
     implementation("org.springframework.data:spring-data-jpa:3.3.4")
+    implementation("redis.clients:jedis:3.10.0")
+
 
 
 
