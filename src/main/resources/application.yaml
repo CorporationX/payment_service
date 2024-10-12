@@ -19,4 +19,4 @@ exchangerates:
   base: USD
 
 cron:
-  every_day: 0 0 * * *
+  every_day: 0 10 * * * *
