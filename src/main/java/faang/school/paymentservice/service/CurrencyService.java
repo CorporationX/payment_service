@@ -22,7 +22,6 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 @Slf4j
 public class CurrencyService {
-
     private final WebClient currencyWebClient;
     private final RedisTemplate<String, Object> redisTemplate;
     private final CurrencyApiProperties currencyApiProperties;

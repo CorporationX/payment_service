@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 @RequiredArgsConstructor
 public class WebClientConfig {
-
     private final CurrencyApiProperties properties;
 
     @Bean

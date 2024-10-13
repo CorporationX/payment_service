@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 @Slf4j
 public class PaymentController {
-
     private final CurrencyService currencyService;
     private final CurrencyApiProperties currencyApiProperties;
 
