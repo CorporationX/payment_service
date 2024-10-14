@@ -1,5 +1,6 @@
-package faang.school.paymentservice.service.exchangerate;
+package faang.school.paymentservice.client;
 
+import faang.school.paymentservice.dto.ApiResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +14,7 @@ import java.util.Map;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class FetcherRatesFromApi {
+public class CurrencyRatesClient {
 
     private final WebClient webClient;
 
@@ -27,7 +28,7 @@ public class FetcherRatesFromApi {
     private String symbolsCurrency;
 
 
-    public Mono<Map<String, Double>> fetchRatesFromApi() {
+    public Mono<Map<String, Double>> fetchRates() {
         return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder

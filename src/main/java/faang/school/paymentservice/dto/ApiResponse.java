@@ -1,4 +1,4 @@
-package faang.school.paymentservice.service.exchangerate;
+package faang.school.paymentservice.dto;
 
 import lombok.Getter;
 import lombok.Setter;
