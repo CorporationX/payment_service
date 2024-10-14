@@ -7,3 +7,11 @@ server:
 logging:
   level:
     root: info
+
+currency:
+  rate:
+    baseUrl: "https://api.exchangeratesapi.io/v1/"
+    api-key: 3c0b2cc6c39dad86a64e12fe714386ca
+    fetch-cron: "0 0 0 * * *"
+    base: "USD"
+    symbols: "GBP,JPY,EUR"
