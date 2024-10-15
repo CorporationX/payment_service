@@ -7,7 +7,7 @@ import faang.school.paymentservice.model.Currency;
 import faang.school.paymentservice.model.PaymentRequest;
 import faang.school.paymentservice.model.PaymentResponse;
 import faang.school.paymentservice.model.PaymentStatus;
-import faang.school.paymentservice.response.CurrencyExchangeResponse;
+import faang.school.paymentservice.dto.response.CurrencyExchangeResponse;
 import faang.school.paymentservice.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +21,6 @@ import java.util.Random;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class PaymentController {
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
-    private static final String CONVERTING_MONEY_MESSAGE = "Dear friend! Thank you for converting money! You converted %s %s to %s %s with commission %f%%";
-
     private final CurrencyService currencyService;
     private final CurrencyExchangeConfig config;
 
@@ -54,16 +51,7 @@ public class PaymentController {
     @PostMapping("/exchange")
     public ResponseEntity<PaymentResponseDto> exchangeCurrency(@RequestBody PaymentRequestDto dto, @RequestParam Currency targetCurrency) {
         BigDecimal newAmount = currencyService.convertWithCommission(dto, targetCurrency);
-
-        String message = String.format(
-                CONVERTING_MONEY_MESSAGE,
-                DECIMAL_FORMAT.format(dto.getAmount()),
-                dto.getCurrency(),
-                DECIMAL_FORMAT.format(newAmount),
-                targetCurrency,
-                config.getCommission()
-        );
-
+        String message = currencyService.createMessage(dto, newAmount, targetCurrency);
         return ResponseEntity.ok(PaymentResponseDto.builder()
                 .amount(newAmount)
                 .currency(targetCurrency)
