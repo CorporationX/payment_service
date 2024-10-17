@@ -1,4 +1,4 @@
-package faang.school.paymentservice.dto;
+package faang.school.paymentservice.model;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
