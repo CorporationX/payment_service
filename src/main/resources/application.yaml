@@ -1,6 +1,27 @@
+spring:
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
 server:
   port: 9080
 
 logging:
   level:
     root: info
+
+payment:
+  exchange-rates:
+    api:
+      url: "https://v6.exchangerate-api.com/v6/{key}/latest/{conversion-rate}"
+      key: "dd32616c8ec9707b977a7895"
+      rate-usd: "USD"
+      response-json-field-name: "conversion_rates"
+      scheduler:
+        cron: "0 0 0 * * *"  # Запуск каждый день в полночь
+        retry:
+          maxAttempts: 10     # Максимум 10 попыток
+          backoff:
+            delay: 2000       # Начальный интервал между попытками (в миллисекундах)
+            multiplier: 2.0      # Интервал между попытками (в миллисекундах)
