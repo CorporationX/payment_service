@@ -3,6 +3,7 @@ package faang.school.paymentservice.service.currency;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import faang.school.paymentservice.dto.CurrencyRatesDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,7 +22,7 @@ public class CurrencyRedisService {
 
     public void saveCurrencyRates(Map<String, Object> jsonResponse) {
         try {
-            String rates = objectMapper.writeValueAsString(jsonResponse.get(conversionRatesFieldName));
+            String rates = objectMapper.writeValueAsString(jsonResponse);
             customRedisTemplateObject.opsForValue().set(conversionRatesFieldName, rates);
             log.info("Currency rates saved to Redis: {}", rates);
         } catch (JsonProcessingException e) {
@@ -29,14 +30,13 @@ public class CurrencyRedisService {
         }
     }
 
-    public Map<String, Object> getAllCurrencyRates() {
+    public CurrencyRatesDto getAllCurrencyRates() {
         String rates = (String) customRedisTemplateObject.opsForValue().get(conversionRatesFieldName);
         try {
-            return objectMapper.readValue(rates, new TypeReference<Map<String, Object>>() {
-            });
+            return objectMapper.readValue(rates, CurrencyRatesDto.class);
         } catch (JsonProcessingException e) {
             log.error("Error while getting currency rates from Redis", e);
-            return Collections.emptyMap();
+            return new CurrencyRatesDto();
         }
     }
 }

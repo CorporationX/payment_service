@@ -2,6 +2,7 @@ package faang.school.paymentservice.service.currency;
 
 
 import faang.school.paymentservice.client.api.CurrencyApiClient;
+import faang.school.paymentservice.dto.CurrencyRatesDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,12 +17,12 @@ public class CurrencyService {
     private final CurrencyApiClient currencyApiClient;
 
     public void updateCurrencyRates() {
-        currencyApiClient.updateCurrencyRates()
+        currencyApiClient.getAllCurrencyRates()
                 .doOnNext(currencyRedisService::saveCurrencyRates)
                 .subscribe();
     }
 
-    public Map<String, Object> getCurrencyRates() {
+    public CurrencyRatesDto getAllCurrencyRatesFromRedis() {
         return currencyRedisService.getAllCurrencyRates();
     }
 }

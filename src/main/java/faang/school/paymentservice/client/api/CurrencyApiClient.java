@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.Map;
 
 @Slf4j
@@ -25,7 +26,7 @@ public class CurrencyApiClient {
             maxAttemptsExpression = "${payment.exchange-rates.api.scheduler.retry.maxAttempts}",
             backoff = @Backoff(delayExpression = "${payment.exchange-rates.api.scheduler.retry.backoff.delay}",
                     multiplierExpression = "${payment.exchange-rates.api.scheduler.retry.backoff.multiplier}"))
-    public Mono<Map<String, Object>> updateCurrencyRates() {
+    public Mono<Map<String, Object>> getAllCurrencyRates() {
         return webClientBuilder.build().get()
                 .uri(currencyAPIUrl)
                 .retrieve()
@@ -38,8 +39,9 @@ public class CurrencyApiClient {
     }
 
     @Recover
-    private void recover(APIConversionRatesException ex) {
+    private Mono<Map<String, Object>> recover(APIConversionRatesException ex) {
         log.error("ConversionRates API call failed.\n" +
                 "All retry attempts failed: {}", ex.getMessage());
+        return Mono.just(Collections.emptyMap());
     }
 }
