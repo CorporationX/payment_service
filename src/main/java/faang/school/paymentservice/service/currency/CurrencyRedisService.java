@@ -22,9 +22,9 @@ public class CurrencyRedisService {
 
     public void saveCurrencyRates(Map<String, Object> jsonResponse) {
         try {
-            String rates = objectMapper.writeValueAsString(jsonResponse);
-            customRedisTemplateObject.opsForValue().set(conversionRatesFieldName, rates);
-            log.info("Currency rates saved to Redis: {}", rates);
+            String strResponse = objectMapper.writeValueAsString(jsonResponse);
+            customRedisTemplateObject.opsForValue().set(conversionRatesFieldName, strResponse);
+            log.info("Currency rates saved to Redis: {}", strResponse);
         } catch (JsonProcessingException e) {
             log.error("Error while saving currency rates to Redis", e);
         }
