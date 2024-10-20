@@ -52,8 +52,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.mockito:mockito-core:5.0.0") // Добавлено
-    testImplementation("io.projectreactor:reactor-test") // Добавлено
+    testImplementation("org.mockito:mockito-core:5.0.0")
+    testImplementation("io.projectreactor:reactor-test")
 }
 
 tasks.withType<Test> {
