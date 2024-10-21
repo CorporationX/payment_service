@@ -1,0 +1,24 @@
+CREATE TABLE payment_owners (
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY UNIQUE,
+    external_owner_id BIGINT NOT NULL,
+    type VARCHAR(32) NOT NULL,
+    created_at timestamptz DEFAULT current_timestamp NOT NULL
+);
+
+CREATE TABLE payment_accounts (
+    id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY UNIQUE,
+    account_number VARCHAR(20) NOT NULL UNIQUE,
+    owner_id bigint NOT NULL,
+    type VARCHAR(32) NOT NULL,
+    currency VARCHAR(8) NOT NULL,
+    status VARCHAR(32) DEFAULT 'ACTIVE' NOT NULL,
+    created_at timestamptz DEFAULT current_timestamp NOT NULL,
+    updated_at timestamptz DEFAULT current_timestamp NOT NULL,
+    closed_at timestamptz,
+    version bigint NOT NULL DEFAULT 0,
+
+    CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES payment_owners(id)
+);
+
+CREATE INDEX idx_external_owner_id ON payment_owners (external_owner_id);
+CREATE INDEX idx_owner_id ON payment_accounts (owner_id);
