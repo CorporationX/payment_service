@@ -1,10 +1,10 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.dto.PaymentRequest;
+import faang.school.paymentservice.dto.payment.PaymentRequest;
 import java.text.DecimalFormat;
 import java.util.Random;
-import faang.school.paymentservice.dto.PaymentResponse;
-import faang.school.paymentservice.dto.PaymentStatus;
+import faang.school.paymentservice.dto.payment.PaymentResponse;
+import faang.school.paymentservice.dto.payment.PaymentStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;

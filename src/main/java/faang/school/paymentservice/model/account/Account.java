@@ -15,8 +15,10 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.Version;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
@@ -28,6 +30,8 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "payment_accounts")
 public class Account {
@@ -36,10 +40,10 @@ public class Account {
     private Long id;
 
     @Column(name = "account_number", length = 20, unique = true, nullable = false)
-    private String number;
+    private String accountNumber;
 
     @ManyToOne
-    @JoinColumn(name = "owner", nullable = false)
+    @JoinColumn(name = "owner_id", nullable = false)
     private Owner owner;
 
     @Column(name = "type", nullable = false)

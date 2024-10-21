@@ -1,6 +1,6 @@
 CREATE TABLE payment_owners (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY UNIQUE,
-    external_owner_id BIGINT NOT NULL,
+    external_id BIGINT NOT NULL,
     type VARCHAR(32) NOT NULL,
     created_at timestamptz DEFAULT current_timestamp NOT NULL
 );
@@ -20,5 +20,6 @@ CREATE TABLE payment_accounts (
     CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES payment_owners(id)
 );
 
-CREATE INDEX idx_external_owner_id ON payment_owners (external_owner_id);
+
 CREATE INDEX idx_owner_id ON payment_accounts (owner_id);
+CREATE INDEX idx_payment_owners_external_type ON payment_owners (external_id, type);

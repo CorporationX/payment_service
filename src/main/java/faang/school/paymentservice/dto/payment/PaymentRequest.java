@@ -1,4 +1,4 @@
-package faang.school.paymentservice.dto;
+package faang.school.paymentservice.dto.payment;
 
 import faang.school.paymentservice.model.Currency;
 import jakarta.validation.constraints.Min;

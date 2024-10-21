@@ -12,8 +12,10 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
@@ -25,6 +27,8 @@ import java.util.List;
 @Setter
 @ToString
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "payment_owners")
 public class Owner {
@@ -33,8 +37,8 @@ public class Owner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "external_owner_id", nullable = false)
-    private Long owner_id;
+    @Column(name = "external_id", nullable = false)
+    private Long externalId;
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
