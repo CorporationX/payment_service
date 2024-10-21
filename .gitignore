@@ -53,3 +53,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+/logs/
+
+### DOT ENV ###
+.env
