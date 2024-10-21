@@ -63,10 +63,14 @@ tasks.bootJar {
  * JaCoCo settings
  */
 val jacocoInclude = listOf(
-    "**//**"
+    "**/service/**"
 )
 val jacocoExclude = listOf(
-    "**/dto/**"
+    "**/config/**",
+    "**/controller/**",
+    "**/dto/**",
+    "**/exception/**",
+    "**/task/**"
 )
 
 jacoco {
