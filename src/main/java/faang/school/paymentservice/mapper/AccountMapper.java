@@ -3,9 +3,12 @@ package faang.school.paymentservice.mapper;
 
 import faang.school.paymentservice.dto.account.AccountDto;
 import faang.school.paymentservice.model.account.Account;
+import faang.school.paymentservice.model.account.AccountStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface AccountMapper {
@@ -21,4 +24,6 @@ public interface AccountMapper {
     @Mapping(target = "accountType", source = "type")
     @Mapping(target = "accountStatus", source = "status")
     AccountDto toAccountDto(Account account);
+
+    List<AccountDto> toAccountDtoList(List<Account> accounts);
 }

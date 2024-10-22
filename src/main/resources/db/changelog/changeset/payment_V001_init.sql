@@ -20,6 +20,5 @@ CREATE TABLE payment_accounts (
     CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES payment_owners(id)
 );
 
-
-CREATE INDEX idx_owner_id ON payment_accounts (owner_id);
 CREATE INDEX idx_payment_owners_external_type ON payment_owners (external_id, type);
+CREATE INDEX idx_account_number ON payment_accounts(account_number);

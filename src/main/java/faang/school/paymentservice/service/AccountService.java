@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -25,7 +27,7 @@ public class AccountService {
     private final ProjectServiceClient projectServiceClient;
 
     @Transactional
-    public Account create(Account account) {
+    public Account createAccount(Account account) {
         Owner owner = account.getOwner();
         Long externalId = owner.getExternalId();
         OwnerType ownerType = owner.getType();
@@ -41,9 +43,51 @@ public class AccountService {
         return accountRepository.save(account);
     }
 
-    private String generateAccountNumber() {
-        //TODO: реализовать логику генерации номера счета
-        return "00000000000000000000";
+    @Transactional(readOnly = true)
+    public Account getAccountByNumber(String number) {
+        validateAccountNumber(number);
+        return accountRepository.findByAccountNumber(number).orElseThrow();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Account> getAccountByOwner(Long externalId, OwnerType type) {
+        return accountRepository.findByOwner(externalId, type);
+    }
+
+    @Transactional
+    public Account freezeAccount(String number) {
+        validateAccountNumber(number);
+        Account account = accountRepository.findByAccountNumber(number).orElseThrow();
+        if (account.getStatus().equals(AccountStatus.ACTIVE)) {
+            account.setStatus(AccountStatus.FROZEN);
+        } else {
+            throw new IllegalStateException("Cannot freeze a non-ACTIVE account");
+        }
+        return account;
+    }
+
+    @Transactional
+    public Account unfreezeAccount(String number) {
+        validateAccountNumber(number);
+        Account account = accountRepository.findByAccountNumber(number).orElseThrow();
+        if (account.getStatus().equals(AccountStatus.FROZEN)) {
+            account.setStatus(AccountStatus.ACTIVE);
+        } else {
+            throw new IllegalStateException("Cannot unfreeze a non-FROZEN account");
+        }
+        return account;
+    }
+
+    @Transactional
+    public Account closeAccount(String number) {
+        Account account = accountRepository.findByAccountNumber(number).orElseThrow();
+        if (!account.getStatus().equals(AccountStatus.CLOSED)) {
+            account.setStatus(AccountStatus.CLOSED);
+            account.setClosedAt(LocalDateTime.now());
+        } else {
+            throw new IllegalStateException("Cannot close a CLOSED account");
+        }
+        return account;
     }
 
     private Owner createOwner(Long externalId, OwnerType type) {
@@ -61,5 +105,17 @@ public class AccountService {
                 .externalId(externalId)
                 .type(type)
                 .build());
+    }
+
+    private String generateAccountNumber() {
+        //TODO: реализовать логику генерации УНИКАЛЬНОГО номера счета
+        return "00000000000000000000";
+    }
+
+    private void validateAccountNumber(String accountNumber) {
+        if (!(accountNumber.length() == 20 && accountNumber.matches("\\d+"))) {
+            log.error("Invalid accountNumber={}", accountNumber);
+            throw new IllegalArgumentException("Invalid accountNumber");
+        }
     }
 }
