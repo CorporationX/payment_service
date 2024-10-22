@@ -1,6 +1,5 @@
 package faang.school.paymentservice.service;
 
-import faang.school.paymentservice.client.ProjectServiceClient;
 import faang.school.paymentservice.client.UserServiceClient;
 import faang.school.paymentservice.dto.client.UserDto;
 import faang.school.paymentservice.model.account.Account;
@@ -21,7 +20,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceTest {

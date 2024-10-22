@@ -3,7 +3,6 @@ package faang.school.paymentservice.mapper;
 
 import faang.school.paymentservice.dto.account.AccountDto;
 import faang.school.paymentservice.model.account.Account;
-import faang.school.paymentservice.model.account.AccountStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
