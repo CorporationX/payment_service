@@ -1,0 +1,1 @@
+CREATE INDEX account_id_index ON account (id);
