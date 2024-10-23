@@ -14,4 +14,9 @@ public class SomeTest {
         String hello = "Hello World";
         assertEquals(hello, "Hello World");
     }
+
+    @Test
+    public void secondaryTest() {
+        assertEquals(2, 1 + 3);
+    }
 }
