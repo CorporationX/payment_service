@@ -16,7 +16,7 @@ spring:
 exchangerates:
   base_url: https://api.exchangeratesapi.io/v1
   key: cba8ca20db03393be3670c7032da8e21
-  base: USD
+  base: EUR
 
 cron:
   every_day: 0 10 * * * *

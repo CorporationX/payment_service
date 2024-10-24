@@ -7,7 +7,6 @@ import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.dto.Rate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,14 +19,10 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 public class ConvertServiceImpl implements ConvertService {
-    private final RedisCacheManager manager;
     private final CurrencyServiceImpl currencyService;
 
     @Value("${exchangerates.base}")
     private String base;
-
-    @Value("${spring.cache.redis.caches.current_rate}")
-    private String rateCache;
 
     @Override
     public PaymentResponse getConvertedPayment(PaymentRequest dto) {
@@ -53,13 +48,7 @@ public class ConvertServiceImpl implements ConvertService {
     }
 
     private Rate addCommission(Currency convertable, Currency base1) {
-        Rate rate = (Rate) Objects.requireNonNull(manager.getCache(rateCache))
-                .get("current_rate")
-                .get();
-
-        if (rate == null) {
-            rate = currencyService.updateCurrency();
-        }
+        Rate rate = currencyService.updateCurrency();
 
         Map<String, Double> mapRate = rate.getRates();
         Map<String, Double> newMapRate = new HashMap<>();
