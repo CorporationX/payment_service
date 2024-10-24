@@ -9,6 +9,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
@@ -35,8 +36,8 @@ public class RedisCacheConfig {
     }
 
     @Bean
-    public JedisConnectionFactory jedisConnectionFactory() {
-        return new JedisConnectionFactory(new RedisStandaloneConfiguration(properties.getHost(), properties.getPort()));
+    public LettuceConnectionFactory jedisConnectionFactory() {
+        return new LettuceConnectionFactory(new RedisStandaloneConfiguration(properties.getHost(), properties.getPort()));
     }
 
     @Bean
