@@ -3,10 +3,10 @@ name: CI for payment_service
 on:
   push:
     branches:
-      - test-feature-40410
+      - kraken-master-stream6
   pull_request:
     branches:
-      - test-feature-40410
+      - kraken-master-stream6
 
 jobs:
   build:
@@ -34,8 +34,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle.properties', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
 
-      - name: Project Build
+      - name: Gradle Build
         run: ./gradlew build
 
-      - name: Running Tests
+      - name: Gradle Tests
         run: ./gradlew test
