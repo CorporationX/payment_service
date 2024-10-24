@@ -19,6 +19,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    implementation("org.springframework.boot:spring-boot-starter-webflux:2.7.0")
+    implementation("org.springframework.retry:spring-retry:2.0.3")
+    implementation("org.springframework.boot:spring-boot-starter-cache:3.3.4")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis:3.3.4")
+    implementation("org.springframework.data:spring-data-jpa:3.3.4")
+    implementation("redis.clients:jedis:3.10.0")
+    implementation("org.springframework:spring-aspects:6.1.13")
+
 
     /**
      * Utils & Logging
@@ -30,6 +38,8 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.26")
     implementation("org.mapstruct:mapstruct:1.5.3.Final")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
+    implementation("org.hibernate:hibernate-entitymanager:5.6.15.Final")
+
 
     /**
      * Tests

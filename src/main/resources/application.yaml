@@ -4,3 +4,19 @@ server:
 logging:
   level:
     root: info
+
+spring:
+  cache:
+    redis:
+      host: localhost
+      port: 6379
+      caches:
+        current_rate: rateCache
+
+exchangerates:
+  base_url: https://api.exchangeratesapi.io/v1
+  key: cba8ca20db03393be3670c7032da8e21
+  base: EUR
+
+cron:
+  every_day: 0 10 * * * *
