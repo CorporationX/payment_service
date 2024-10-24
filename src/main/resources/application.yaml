@@ -4,3 +4,10 @@ server:
 logging:
   level:
     root: info
+
+openexchangerates:
+  appId: d3855066b9e6498b9ca8309299fcc280
+
+exchange:
+  service:
+    commission: 0.01
