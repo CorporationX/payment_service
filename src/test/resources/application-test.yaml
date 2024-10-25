@@ -1,0 +1,19 @@
+spring:
+  data:
+    redis:
+      host: ${spring.redis.host:localhost}
+      port: ${spring.redis.port:6379}
+
+retry:
+  retry: 1
+  delay: 0
+
+currency-api:
+  url: http://localhost:12123/
+  api-key: TEST_API_KEY
+  base-currency: EUR
+  redis-key: currencyRates
+  cron: "00 30 09 * * *"
+  timeout:
+    connection: 5000
+    read: 1000

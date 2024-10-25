@@ -34,11 +34,12 @@ public class PaymentController {
         int verificationCode = new Random().nextInt(1000, 10000);
 
         BigDecimal convertedPayment = currencyService.convertToBaseCurrency(dto.amount(), dto.currency().toString());
+        String formattedConvertedPayment = decimalFormat.format(convertedPayment);
         log.info("Converted payment to {} {}", convertedPayment, currencyApiProperties.getBaseCurrency());
 
         String message = String.format("Dear friend! Thank you for your purchase! " +
-                        "Your payment on %s %s was accepted and converted to our internal currency %s %s ",
-                formattedSum, dto.currency().name(), convertedPayment.toString(), currencyApiProperties.getBaseCurrency().toUpperCase());
+                        "Your payment on %s %s was accepted and converted to our internal currency %s %s",
+                formattedSum, dto.currency().name(), formattedConvertedPayment, currencyApiProperties.getBaseCurrency().toUpperCase());
 
         return ResponseEntity.ok(new PaymentResponse(
                 PaymentStatus.SUCCESS,
