@@ -42,6 +42,7 @@ dependencies {
     /**
      * Database
      */
+    implementation("org.liquibase:liquibase-core")
     runtimeOnly("org.postgresql:postgresql")
 }
 
