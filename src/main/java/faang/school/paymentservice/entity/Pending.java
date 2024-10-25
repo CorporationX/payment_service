@@ -22,7 +22,7 @@ public class Pending {
     private Long id;
 
     @Enumerated(EnumType.ORDINAL)
-    @Column(name = "currency",nullable = false)
+    @Column(name = "status", nullable = false)
     private PendingStatus status;
 
     @Column(name = "amount",nullable = false, precision = 10, scale = 2)
