@@ -21,6 +21,8 @@ spring:
     redis:
       port: 6379
       host: localhost
+      channel:
+        payment-event: payment_event
 
 server:
   port: 9080

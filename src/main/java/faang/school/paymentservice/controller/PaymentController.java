@@ -23,9 +23,5 @@ public class PaymentController {
         Payment requestPayment = paymentMapper.toPaymentEntity(paymentDto);
         Payment responcePayment = paymentService.authorizePayment(requestPayment);
         return paymentMapper.toPaymentDto(responcePayment);
-
     }
-
-
-
 }
