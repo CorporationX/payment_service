@@ -30,6 +30,7 @@ public class PaymentController {
     private final CurrencyExchangeService currencyExchangeService;
     private final CurrencyExchangeParams currencyExchangeParams;
 
+
     @PostMapping("/exchange")
     public PaymentResponse exchangeCurrency(
             @RequestBody @Validated PaymentRequest dto, @RequestParam Currency toCurrency) {
