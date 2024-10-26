@@ -2,12 +2,14 @@ package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.config.CurrencyExchangeConfig;
 import faang.school.paymentservice.dto.PaymentRequestDto;
+import faang.school.paymentservice.dto.PaymentRequestEvent;
 import faang.school.paymentservice.dto.PaymentResponseDto;
 import faang.school.paymentservice.model.Currency;
 import faang.school.paymentservice.model.PaymentRequest;
 import faang.school.paymentservice.model.PaymentResponse;
 import faang.school.paymentservice.model.PaymentStatus;
 import faang.school.paymentservice.dto.response.CurrencyExchangeResponse;
+import faang.school.paymentservice.publicher.PaymentRequestEventPublisher;
 import faang.school.paymentservice.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import java.util.Random;
 public class PaymentController {
     private final CurrencyService currencyService;
     private final CurrencyExchangeConfig config;
+    private final PaymentRequestEventPublisher eventPublisher;
 
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody PaymentRequest dto) {
@@ -41,6 +44,11 @@ public class PaymentController {
                 dto.currency(),
                 message)
         );
+    }
+
+    @PostMapping("/payment/request")
+    public void requestPayment(@RequestBody PaymentRequestEvent event) {
+        eventPublisher.publish(event);
     }
 
     @GetMapping("/currency")
