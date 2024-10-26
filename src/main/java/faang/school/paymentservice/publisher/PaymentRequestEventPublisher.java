@@ -1,4 +1,4 @@
-package faang.school.paymentservice.publicher;
+package faang.school.paymentservice.publisher;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;

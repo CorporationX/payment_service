@@ -1,5 +1,6 @@
-package faang.school.paymentservice.dto;
+package faang.school.paymentservice.dto.event;
 
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,5 +14,7 @@ import java.math.BigDecimal;
 @Builder
 public class PaymentRequestEvent {
     private long userId;
+
+    @Positive
     private BigDecimal amount;
 }

@@ -1,4 +1,4 @@
-package faang.school.paymentservice.service;
+package faang.school.paymentservice.service.currency;
 
 import faang.school.paymentservice.dto.PaymentRequestDto;
 import faang.school.paymentservice.model.Currency;

@@ -1,16 +1,15 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.config.CurrencyExchangeConfig;
 import faang.school.paymentservice.dto.PaymentRequestDto;
-import faang.school.paymentservice.dto.PaymentRequestEvent;
+import faang.school.paymentservice.dto.event.PaymentRequestEvent;
 import faang.school.paymentservice.dto.PaymentResponseDto;
+import faang.school.paymentservice.dto.response.CurrencyExchangeResponse;
 import faang.school.paymentservice.model.Currency;
 import faang.school.paymentservice.model.PaymentRequest;
 import faang.school.paymentservice.model.PaymentResponse;
 import faang.school.paymentservice.model.PaymentStatus;
-import faang.school.paymentservice.dto.response.CurrencyExchangeResponse;
-import faang.school.paymentservice.publicher.PaymentRequestEventPublisher;
-import faang.school.paymentservice.service.CurrencyService;
+import faang.school.paymentservice.service.currency.CurrencyService;
+import faang.school.paymentservice.service.payment.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +23,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class PaymentController {
     private final CurrencyService currencyService;
-    private final CurrencyExchangeConfig config;
-    private final PaymentRequestEventPublisher eventPublisher;
+    private final PaymentService paymentService;
 
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody PaymentRequest dto) {
@@ -48,7 +46,11 @@ public class PaymentController {
 
     @PostMapping("/payment/request")
     public void requestPayment(@RequestBody PaymentRequestEvent event) {
-        eventPublisher.publish(event);
+        paymentService.requestPayment(event);
+    }
+
+    public void cancelPayment(@RequestBody PaymentRequestEvent event) {
+
     }
 
     @GetMapping("/currency")
