@@ -83,26 +83,27 @@ class PendingOperationServiceTest {
     }
 
     @Test
-    void testConfirmOperation_Success() {
+    void testConfirmOperation_Success_Automatic() {
         when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.PENDING))
                 .thenReturn(Optional.of(operation));
 
-        pendingOperationService.confirmOperation(operationId);
+        pendingOperationService.confirmOperation(operationId, false);
 
         assertEquals(OperationStatus.CONFIRMED, operation.getStatus());
+        verify(pendingOperationValidator, times(1)).validateAutomaticConfirmation(operation);
         verify(pendingOperationRepository, times(1)).save(operation);
     }
 
     @Test
-    void testConfirmOperation_Failure() {
+    void testConfirmOperation_Success_Manual() {
         when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.PENDING))
                 .thenReturn(Optional.of(operation));
-        doThrow(new RuntimeException("Test exception")).when(pendingOperationRepository).save(operation);
 
-        assertThrows(RuntimeException.class, () -> pendingOperationService.confirmOperation(operationId));
+        pendingOperationService.confirmOperation(operationId, true);
 
-        assertEquals(OperationStatus.FAILED, operation.getStatus());
-        verify(pendingOperationRepository, times(2)).save(operation);
+        assertEquals(OperationStatus.CONFIRMED, operation.getStatus());
+        verify(pendingOperationValidator, times(1)).validateManualConfirmation(operation);
+        verify(pendingOperationRepository, times(1)).save(operation);
     }
 
     @Test

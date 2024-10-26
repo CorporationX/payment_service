@@ -55,36 +55,31 @@ class ClearingJobTest {
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 LocalDateTime.now());
-        List<PendingOperation> operations = new ArrayList<>();
-        operations.add(operation);
-        operations.add(operationTwo);
     }
 
     @Test
     void testProcessPendingOperations_Success() {
-        List<PendingOperation> operations = new ArrayList<>();
-        operations.add(operation);
-        operations.add(operationTwo);
+        List<PendingOperation> operations = List.of(operation, operationTwo);
         when(pendingOperationService.getOperationsForClearing(any(LocalDateTime.class))).thenReturn(operations);
 
         clearingJob.processPendingOperations();
 
         verify(pendingOperationService, times(1)).getOperationsForClearing(any(LocalDateTime.class));
-        verify(pendingOperationService, times(1)).confirmOperation(operation.getId());
-        verify(pendingOperationService, times(1)).confirmOperation(operationTwo.getId());
+        verify(pendingOperationService, times(1)).confirmOperation(operation.getId(), false);
+        verify(pendingOperationService, times(1)).confirmOperation(operationTwo.getId(), false);
     }
 
     @Test
     void testProcessPendingOperations_Failure() {
-        List<PendingOperation> operations = new ArrayList<>();
-        operations.add(operation);
-        operations.add(operationTwo);
+        List<PendingOperation> operations = List.of(operation, operationTwo);
         when(pendingOperationService.getOperationsForClearing(any(LocalDateTime.class))).thenReturn(operations);
-        doThrow(new RuntimeException("Test exception")).when(pendingOperationService).confirmOperation(operation.getId());
+        doThrow(new RuntimeException("Test exception")).when(pendingOperationService).confirmOperation(operation.getId(), false);
 
         clearingJob.processPendingOperations();
 
         verify(pendingOperationService, times(1)).getOperationsForClearing(any(LocalDateTime.class));
-        verify(pendingOperationService, times(1)).confirmOperation(operation.getId());
+        verify(pendingOperationService, times(1)).confirmOperation(operation.getId(), false);
+        verify(pendingOperationService, times(1)).sendErrorMessage(operation.getId());
+        verify(pendingOperationService, times(1)).confirmOperation(operationTwo.getId(), false);
     }
 }
