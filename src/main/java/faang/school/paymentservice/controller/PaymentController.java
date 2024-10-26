@@ -18,7 +18,7 @@ import java.text.DecimalFormat;
 import java.util.Random;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class PaymentController {
     private final CurrencyService currencyService;

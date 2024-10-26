@@ -22,8 +22,8 @@ spring:
       port: 6379
       host: localhost
       channels:
-        calculations_channel:
-          name: calculations_channel
+       paymentRequest: paymentRequest-event
+       paymentClear: paymentClear-event
 
 server:
   port: 9080
