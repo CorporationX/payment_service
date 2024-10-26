@@ -22,10 +22,11 @@ public class ClearingJob {
 
         operationsForClearing.forEach(operation -> {
             try {
-                pendingOperationService.confirmOperation(operation.getId());
+                pendingOperationService.confirmOperation(operation.getId(), false);
                 log.info("Operation confirmed by job with ID: {}", operation.getId());
             } catch (Exception e) {
-                log.error("Failed to confirm operation with ID {}: {}", operation.getId(), e.getMessage(), e);
+                pendingOperationService.sendErrorMessage(operation.getId());
+                log.error("Failed to confirm operation with ID {}: {}", operation.getId(), e.getMessage());
             }
         });
     }

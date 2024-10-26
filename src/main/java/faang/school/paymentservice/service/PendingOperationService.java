@@ -49,9 +49,14 @@ public class PendingOperationService {
 
     @SendPendingOperationMessage(OperationType.CLEARING)
     @Transactional
-    public void confirmOperation(UUID operationId) {
+    public void confirmOperation(UUID operationId, boolean isManual) {
         PendingOperation operation = getOperationForProcessing(operationId);
         try {
+            if (isManual) {
+                pendingOperationValidator.validateManualConfirmation(operation);
+            } else {
+                pendingOperationValidator.validateAutomaticConfirmation(operation);
+            }
             updateOperationStatus(operation, OperationStatus.CONFIRMED);
             log.info("Operation confirmed with ID: {}", operationId);
         } catch (Exception e) {

@@ -36,7 +36,7 @@ public class PendingOperationController {
 
     @PostMapping("/confirm/{id}")
     public ResponseEntity<Void> confirmOperation(@PathVariable UUID id) {
-        pendingOperationService.confirmOperation(id);
+        pendingOperationService.confirmOperation(id, true);
         return ResponseEntity.ok().build();
     }
 }
