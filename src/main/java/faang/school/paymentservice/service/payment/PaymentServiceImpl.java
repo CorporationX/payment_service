@@ -8,6 +8,8 @@ import faang.school.paymentservice.service.operation.OperationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
@@ -15,8 +17,13 @@ public class PaymentServiceImpl implements PaymentService {
     private final OperationService operationService;
 
     public void requestPayment(PaymentRequestEvent event) {
+        event.setOperationKey(makeOperationKey(event));
         operationService.savePendingOperation(event);
         eventPublisher.publish(event);
+    }
+
+    private String makeOperationKey(PaymentRequestEvent event) {
+        return LocalDateTime.now().toString() + "_" + event.getUserId() + "_" + event.getAmount();
     }
 
     public void cancelPayment(PaymentCancelEvent event) {

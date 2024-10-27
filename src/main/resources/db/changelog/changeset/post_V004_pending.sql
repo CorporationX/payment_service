@@ -3,5 +3,6 @@ CREATE TABLE pending_operations (
     account_id bigserial NOT NULL,
     amount     numeric(10, 2),
     created_at timestamp,
-    state      varchar(20)
+    state      varchar(20),
+    operation_key varchar(128)
 );

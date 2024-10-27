@@ -23,14 +23,17 @@ public class OperationServiceImpl implements OperationService {
                 .state(OperationState.PENDING)
                 .amount(event.getAmount())
                 .createdAt(LocalDateTime.now())
+
                 .build();
         pendingRepository.save(pendingOperation);
     }
 
+
+
     @Override
     public void updatePendingOperation(PaymentRequestEvent event) {
         var pending = pendingRepository.findById(event.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Entity not found with {} user id", event.getUserId())));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Entity not found with %s user id", event.getUserId())));
 
     }
 }

@@ -17,4 +17,6 @@ public class PaymentRequestEvent {
 
     @Positive
     private BigDecimal amount;
+
+    private String operationKey;
 }
