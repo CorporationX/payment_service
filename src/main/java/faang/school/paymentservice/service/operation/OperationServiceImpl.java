@@ -23,7 +23,7 @@ public class OperationServiceImpl implements OperationService {
                 .state(OperationState.PENDING)
                 .amount(event.getAmount())
                 .createdAt(LocalDateTime.now())
-
+                .operationKey(event.getOperationKey())
                 .build();
         pendingRepository.save(pendingOperation);
     }

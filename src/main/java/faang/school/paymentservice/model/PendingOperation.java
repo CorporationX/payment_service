@@ -34,4 +34,7 @@ public class PendingOperation {
     @Enumerated(EnumType.STRING)
     @Column(name = "state")
     private OperationState state;
+
+    @Column(name = "operation_key")
+    private String operationKey;
 }
