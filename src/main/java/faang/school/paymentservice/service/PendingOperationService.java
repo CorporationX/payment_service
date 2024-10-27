@@ -42,7 +42,7 @@ public class PendingOperationService {
     @SendPendingOperationMessage(OperationType.CANCELLATION)
     @Transactional
     public void cancelOperation(UUID operationId) {
-        PendingOperation operation = getOperationForProcessing(operationId);
+        PendingOperation operation = getOperationForProcessing(operationId, OperationStatus.PENDING);
         updateOperationStatus(operation, OperationStatus.CANCELLED);
         log.info("Operation canceled with ID: {}", operationId);
     }
@@ -50,7 +50,7 @@ public class PendingOperationService {
     @SendPendingOperationMessage(OperationType.CLEARING)
     @Transactional
     public void confirmOperation(UUID operationId, boolean isManual) {
-        PendingOperation operation = getOperationForProcessing(operationId);
+        PendingOperation operation = getOperationForProcessing(operationId, OperationStatus.PENDING);
         try {
             if (isManual) {
                 pendingOperationValidator.validateManualConfirmation(operation);
@@ -81,8 +81,8 @@ public class PendingOperationService {
         return pendingOperationRepository.findByStatusAndClearScheduledAtBefore(OperationStatus.PENDING, currentTime);
     }
 
-    private PendingOperation getOperationForProcessing(UUID operationId) {
-        return pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.PENDING)
+    private PendingOperation getOperationForProcessing(UUID operationId, OperationStatus status) {
+        return pendingOperationRepository.findByIdAndStatus(operationId, status)
                 .orElseThrow(() -> new OperationNotFoundException("Operation not found or in invalid status"));
     }
 }

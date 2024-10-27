@@ -45,6 +45,8 @@ public class PendingOperationMessageAspect {
             log.error("Failed to find operationId in method arguments or return value");
             throw new IllegalArgumentException("Failed to find operationId in method arguments or return value");
         }
+
+        log.info("Publishing message with operation ID: {} and operation type: {}", operationId, operationType);
         operationMessageService.sendOperationMessage(operationId, operationType);
     }
 }

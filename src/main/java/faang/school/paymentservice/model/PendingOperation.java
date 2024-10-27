@@ -30,7 +30,6 @@ import java.util.UUID;
 @Table(name = "pending_operation")
 public class PendingOperation {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @Column(name = "account_id", nullable = false)
@@ -43,6 +42,7 @@ public class PendingOperation {
     private BigDecimal amount;
 
     @Column(nullable = false, length = 3)
+    @Enumerated(EnumType.STRING)
     private Currency currency;
 
     @Column(nullable = false)

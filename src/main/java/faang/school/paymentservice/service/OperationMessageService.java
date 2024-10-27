@@ -3,7 +3,7 @@ package faang.school.paymentservice.service;
 import faang.school.paymentservice.dto.OperationMessage;
 import faang.school.paymentservice.model.OperationType;
 import faang.school.paymentservice.model.PendingOperation;
-import faang.school.paymentservice.publisher.redis.EventPublisher;
+import faang.school.paymentservice.publisher.EventPublisher;
 import faang.school.paymentservice.repository.PendingOperationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

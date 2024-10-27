@@ -1,4 +1,4 @@
-package faang.school.paymentservice.publisher.redis;
+package faang.school.paymentservice.publisher;
 
 public interface EventPublisher<T> {
     void publish(T event);

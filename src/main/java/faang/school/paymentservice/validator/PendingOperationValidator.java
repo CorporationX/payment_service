@@ -23,9 +23,6 @@ public class PendingOperationValidator {
         if (operation.getCurrency() == null) {
             throw new InvalidOperationException("Currency is required");
         }
-        if (operation.getClearScheduledAt() == null || operation.getClearScheduledAt().isBefore(LocalDateTime.now())) {
-            throw new InvalidOperationException("Clear scheduled time must be in the future");
-        }
     }
 
     public void validateManualConfirmation(PendingOperation operation) {

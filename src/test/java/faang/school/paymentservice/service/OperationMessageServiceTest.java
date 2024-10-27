@@ -15,7 +15,7 @@ import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.OperationMessage;
 import faang.school.paymentservice.model.OperationType;
 import faang.school.paymentservice.model.PendingOperation;
-import faang.school.paymentservice.publisher.redis.EventPublisher;
+import faang.school.paymentservice.publisher.EventPublisher;
 import faang.school.paymentservice.repository.PendingOperationRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
