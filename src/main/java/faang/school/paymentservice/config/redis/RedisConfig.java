@@ -25,6 +25,12 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.paymentClear}")
     private String paymentClearChannel;
 
+    @Value("${spring.data.redis.channels.paymentCancel}")
+    private String paymentCancelChannel;
+
+    @Value("${spring.data.redis.channels.paymentApprove}")
+    private String paymentApproveChannel;
+
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
@@ -63,6 +69,16 @@ public class RedisConfig {
     }
 
     @Bean
+    ChannelTopic paymentApproveTopic() {
+        return new ChannelTopic(paymentApproveChannel);
+    }
+
+    @Bean
+    ChannelTopic paymentCancelTopic() {
+        return new ChannelTopic(paymentCancelChannel);
+    }
+
+    @Bean
     public MessageListenerAdapter paymentApprove(PaymentApproveEventListener listener) {
         return new MessageListenerAdapter(listener);
     }
@@ -78,8 +94,8 @@ public class RedisConfig {
                                                                        RedisConnectionFactory redisConnectionFactory) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisConnectionFactory);
-        container.addMessageListener(paymentApprove, paymentClearTopic());
-        container.addMessageListener(paymentCancel, paymentClearTopic());
+        container.addMessageListener(paymentApprove, paymentApproveTopic());
+        container.addMessageListener(paymentCancel, paymentCancelTopic());
         return container;
     }
 }

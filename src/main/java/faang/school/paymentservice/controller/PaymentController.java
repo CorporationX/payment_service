@@ -1,6 +1,7 @@
 package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.PaymentRequestDto;
+import faang.school.paymentservice.dto.event.PaymentCancelEvent;
 import faang.school.paymentservice.dto.event.PaymentRequestEvent;
 import faang.school.paymentservice.dto.PaymentResponseDto;
 import faang.school.paymentservice.dto.response.CurrencyExchangeResponse;
@@ -47,10 +48,6 @@ public class PaymentController {
     @PostMapping("/payment/request")
     public void requestPayment(@RequestBody PaymentRequestEvent event) {
         paymentService.requestPayment(event);
-    }
-
-    public void cancelPayment(@RequestBody PaymentRequestEvent event) {
-
     }
 
     @GetMapping("/currency")

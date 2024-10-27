@@ -11,9 +11,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PaymentApproveEvent {
+public class PaymentClearEvent {
     private long userId;
     private BigDecimal amount;
     private String operationKey;
 }
-

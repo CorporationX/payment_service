@@ -24,6 +24,8 @@ spring:
       channels:
        paymentRequest: paymentRequest-event
        paymentClear: paymentClear-event
+       paymentCancel: paymentCancel-event
+       paymentApprove: paymentApprove-event
 
 server:
   port: 9080

@@ -4,5 +4,6 @@ public enum OperationState  {
     FAILED,
     CANCELED,
     CLEARED,
-    PENDING
+    PENDING,
+    APPROVED
 }
