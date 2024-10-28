@@ -1,5 +1,7 @@
 package faang.school.paymentservice.publisher.kafka;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import faang.school.paymentservice.config.KafkaConfig;
 import faang.school.paymentservice.dto.OperationMessage;
 import faang.school.paymentservice.publisher.EventPublisher;
@@ -21,9 +23,10 @@ public class KafkaEventPublisher implements EventPublisher<OperationMessage> {
     private final String topic;
     private final KafkaAdmin kafkaAdmin;
     private final KafkaConfig kafkaConfig;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public KafkaEventPublisher(KafkaTemplate<String, Object> kafkaTemplate,
+    public KafkaEventPublisher(KafkaTemplate<String, Object> kafkaTemplate, ObjectMapper objectMapper,
                                @Value("${spring.kafka.topic.pending_operation}") String topic,
                                KafkaAdmin kafkaAdmin,
                                KafkaConfig kafkaConfig) {
@@ -31,6 +34,7 @@ public class KafkaEventPublisher implements EventPublisher<OperationMessage> {
         this.topic = topic;
         this.kafkaAdmin = kafkaAdmin;
         this.kafkaConfig = kafkaConfig;
+        this.objectMapper = objectMapper;
         createTopicIfNotExists();
     }
 
@@ -47,7 +51,12 @@ public class KafkaEventPublisher implements EventPublisher<OperationMessage> {
 
     @Override
     public void publish(OperationMessage event) {
-        kafkaTemplate.send(topic, event);
-        log.info("Event published to Kafka topic {}: {}", topic, event);
+        try {
+            String json = objectMapper.writeValueAsString(event);
+            kafkaTemplate.send(topic, json);
+            log.info("Event published to Kafka topic {}: {}", topic, json);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
