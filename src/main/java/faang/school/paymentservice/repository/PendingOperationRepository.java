@@ -13,6 +13,8 @@ import java.util.UUID;
 @Repository
 public interface PendingOperationRepository extends JpaRepository<PendingOperation, UUID> {
     Optional<PendingOperation> findByIdAndStatus(UUID id, OperationStatus status);
+
     List<PendingOperation> findByStatusAndClearScheduledAtBefore(OperationStatus status, LocalDateTime dateTime);
+
     Optional<PendingOperation> findByIdempotencyKey(String idempotencyKey);
 }

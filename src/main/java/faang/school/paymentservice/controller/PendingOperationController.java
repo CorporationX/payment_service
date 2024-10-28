@@ -19,7 +19,7 @@ import java.util.UUID;
 @RestController
 public class PendingOperationController {
     private final PendingOperationService pendingOperationService;
-    final PendingOperationMapper pendingOperationMapper;
+    private final PendingOperationMapper pendingOperationMapper;
 
     @PostMapping("/initiate")
     public ResponseEntity<UUID> initiateOperation(@RequestBody PendingOperationDto operationDto) {
@@ -31,12 +31,12 @@ public class PendingOperationController {
     @PostMapping("/cancel/{id}")
     public ResponseEntity<Void> cancelOperation(@PathVariable UUID id) {
         pendingOperationService.cancelOperation(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/confirm/{id}")
     public ResponseEntity<Void> confirmOperation(@PathVariable UUID id) {
         pendingOperationService.confirmOperation(id, true);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

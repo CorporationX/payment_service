@@ -27,9 +27,8 @@ public class PendingOperationService {
     @SendPendingOperationMessage(OperationType.AUTHORIZATION)
     @Transactional
     public UUID initiateOperation(PendingOperation operation) {
-        pendingOperationValidator.validateInitiateOperation(operation);
-
-        Optional<PendingOperation> existingOperation = pendingOperationRepository.findByIdempotencyKey(operation.getIdempotencyKey());
+        Optional<PendingOperation> existingOperation =
+                pendingOperationRepository.findByIdempotencyKey(operation.getIdempotencyKey());
         if (existingOperation.isPresent()) {
             return existingOperation.get().getId();
         }
