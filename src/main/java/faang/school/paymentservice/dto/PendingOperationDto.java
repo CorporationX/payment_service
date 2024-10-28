@@ -25,7 +25,7 @@ public class PendingOperationDto {
     private String idempotencyKey;
 
     @NotNull(message = "Amount is required")
-    @DecimalMin(value = "0.01", inclusive = true, message = "Amount must be positive")
+    @DecimalMin(value = "0.01", message = "Amount must be positive")
     private BigDecimal amount;
 
     @NotBlank(message = "Currency is required")

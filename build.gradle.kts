@@ -23,6 +23,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework:spring-aspects")

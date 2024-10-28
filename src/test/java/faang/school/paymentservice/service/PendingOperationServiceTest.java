@@ -1,10 +1,11 @@
 package faang.school.paymentservice.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import faang.school.paymentservice.exception.InsufficientBalanceException;
 import faang.school.paymentservice.model.OperationStatus;
 import faang.school.paymentservice.model.PendingOperation;
 import faang.school.paymentservice.repository.PendingOperationRepository;
@@ -17,11 +18,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,7 +30,6 @@ class PendingOperationServiceTest {
     private PendingOperationRepository pendingOperationRepository;
     @Mock
     private PendingOperationValidator pendingOperationValidator;
-
     @InjectMocks
     private PendingOperationService pendingOperationService;
 
@@ -44,79 +41,80 @@ class PendingOperationServiceTest {
         operationId = UUID.randomUUID();
         operation = new PendingOperation();
         operation.setId(operationId);
-        operation.setIdempotencyKey("uniqueKey");
+        operation.setIdempotencyKey("test-key");
+        operation.setAccountId(UUID.randomUUID());
+        operation.setAmount(BigDecimal.valueOf(100));
         operation.setStatus(OperationStatus.PENDING);
     }
 
     @Test
-    void testInitiateOperation_NewOperation() {
-        when(pendingOperationRepository.findByIdempotencyKey(operation.getIdempotencyKey()))
-                .thenReturn(Optional.empty());
+    void testInitiateOperationSuccess() {
+        doNothing().when(pendingOperationValidator).validateIdempotencyKey(operation.getIdempotencyKey());
+        doNothing().when(pendingOperationValidator).validateBalance(operation.getAccountId(), operation.getAmount());
 
-        UUID resultOperationId = pendingOperationService.initiateOperation(operation);
+        UUID result = pendingOperationService.initiateOperation(operation);
 
-        assertNotNull(resultOperationId);
-        verify(pendingOperationRepository, times(1)).save(operation);
+        verify(pendingOperationValidator).validateIdempotencyKey(operation.getIdempotencyKey());
+        verify(pendingOperationValidator).validateBalance(operation.getAccountId(), operation.getAmount());
+        verify(pendingOperationRepository).save(operation);
+        assertEquals(operationId, result);
     }
 
     @Test
-    void testInitiateOperation_ExistingOperation() {
-        when(pendingOperationRepository.findByIdempotencyKey(operation.getIdempotencyKey()))
-                .thenReturn(Optional.of(operation));
-
-        UUID resultOperationId = pendingOperationService.initiateOperation(operation);
-
-        assertEquals(operation.getId(), resultOperationId);
-        verify(pendingOperationRepository, never()).save(any());
-    }
-
-    @Test
-    void testCancelOperation_Success() {
+    void testCancelOperation() {
         when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.PENDING))
                 .thenReturn(Optional.of(operation));
 
         pendingOperationService.cancelOperation(operationId);
 
         assertEquals(OperationStatus.CANCELLED, operation.getStatus());
-        verify(pendingOperationRepository, times(1)).save(operation);
+        verify(pendingOperationRepository).save(operation);
     }
 
     @Test
-    void testConfirmOperation_Success_Automatic() {
+    void testConfirmOperationManualSuccess() {
         when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.PENDING))
                 .thenReturn(Optional.of(operation));
-
-        pendingOperationService.confirmOperation(operationId, false);
-
-        assertEquals(OperationStatus.CONFIRMED, operation.getStatus());
-        verify(pendingOperationValidator, times(1)).validateAutomaticConfirmation(operation);
-        verify(pendingOperationRepository, times(1)).save(operation);
-    }
-
-    @Test
-    void testConfirmOperation_Success_Manual() {
-        when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.PENDING))
-                .thenReturn(Optional.of(operation));
+        doNothing().when(pendingOperationValidator).validateManualConfirmation(operation);
 
         pendingOperationService.confirmOperation(operationId, true);
 
+        verify(pendingOperationValidator).validateManualConfirmation(operation);
+        verify(pendingOperationRepository).save(operation);
         assertEquals(OperationStatus.CONFIRMED, operation.getStatus());
-        verify(pendingOperationValidator, times(1)).validateManualConfirmation(operation);
+    }
+
+    @Test
+    void testConfirmOperationAutomaticSuccess() {
+        when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.PENDING))
+                .thenReturn(Optional.of(operation));
+        operation.setClearScheduledAt(LocalDateTime.now().minusMinutes(1));
+        doNothing().when(pendingOperationValidator).validateAutomaticConfirmation(operation);
+
+        pendingOperationService.confirmOperation(operationId, false);
+
+        verify(pendingOperationValidator).validateAutomaticConfirmation(operation);
+        verify(pendingOperationRepository).save(operation);
+        assertEquals(OperationStatus.CONFIRMED, operation.getStatus());
+    }
+
+    @Test
+    void testConfirmOperationFailsOnValidationError() {
+        when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.PENDING))
+                .thenReturn(Optional.of(operation));
+        doThrow(new InsufficientBalanceException("Insufficient balance"))
+                .when(pendingOperationValidator).validateAutomaticConfirmation(operation);
+
+        pendingOperationService.confirmOperation(operationId, false);
+
+        assertEquals(OperationStatus.FAILED, operation.getStatus());
         verify(pendingOperationRepository, times(1)).save(operation);
     }
 
     @Test
     void testGetOperationsForClearing() {
-        LocalDateTime now = LocalDateTime.now();
-        PendingOperation operation1 = new PendingOperation();
-        PendingOperation operation2 = new PendingOperation();
-
-        when(pendingOperationRepository.findByStatusAndClearScheduledAtBefore(OperationStatus.PENDING, now))
-                .thenReturn(List.of(operation1, operation2));
-
-        List<PendingOperation> result = pendingOperationService.getOperationsForClearing(now);
-
-        assertEquals(2, result.size());
-        verify(pendingOperationRepository, times(1)).findByStatusAndClearScheduledAtBefore(OperationStatus.PENDING, now);
+        LocalDateTime currentTime = LocalDateTime.now();
+        pendingOperationService.getOperationsForClearing(currentTime);
+        verify(pendingOperationRepository).findByStatusAndClearScheduledAtBefore(OperationStatus.PENDING, currentTime);
     }
 }

@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -27,12 +26,8 @@ public class PendingOperationService {
     @SendPendingOperationMessage(OperationType.AUTHORIZATION)
     @Transactional
     public UUID initiateOperation(PendingOperation operation) {
-        Optional<PendingOperation> existingOperation =
-                pendingOperationRepository.findByIdempotencyKey(operation.getIdempotencyKey());
-        if (existingOperation.isPresent()) {
-            return existingOperation.get().getId();
-        }
-
+        pendingOperationValidator.validateIdempotencyKey(operation.getIdempotencyKey());
+        pendingOperationValidator.validateBalance(operation.getAccountId(), operation.getAmount());
         pendingOperationRepository.save(operation);
         log.info("Operation initiated with ID: {}", operation.getId());
         return operation.getId();

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Profile("redis")
 public class RedisEventPublisher implements EventPublisher<OperationMessage> {
-    @Qualifier("redisTemplatewithJackson")
+    @Qualifier("redisTemplateWithJackson")
     private final RedisTemplate<String, Object> redisTemplate;
     private final String topic;
 
