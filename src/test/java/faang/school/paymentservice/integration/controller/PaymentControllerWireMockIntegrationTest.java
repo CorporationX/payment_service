@@ -7,7 +7,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.CurrencyRatesResponse;
 import faang.school.paymentservice.dto.PaymentRequest;
-import faang.school.paymentservice.integration.config.TestContainersConfig;
+import faang.school.paymentservice.integration.config.RedisTestContainer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -39,7 +38,6 @@ import static faang.school.paymentservice.dto.Currency.KZT;
 import static faang.school.paymentservice.dto.Currency.RUB;
 import static faang.school.paymentservice.dto.Currency.USD;
 import static faang.school.paymentservice.dto.PaymentStatus.SUCCESS;
-import static faang.school.paymentservice.integration.config.TestContainersConfig.redisContainer;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -49,8 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Testcontainers
 @ActiveProfiles("test")
-@ContextConfiguration(classes = TestContainersConfig.class)
-public class PaymentControllerWireMockIntegrationTest {
+public class PaymentControllerWireMockIntegrationTest extends RedisTestContainer {
     private static final String CURRENCY_RATES_REDIS_KEY = "currencyRates";
     private static final int PAYMENT_NUMBER = 1234;
     private static final Currency BASE_CURRENCY = EUR;
@@ -73,13 +70,6 @@ public class PaymentControllerWireMockIntegrationTest {
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
-
-    @BeforeAll
-    static void startRedisContainer() {
-        redisContainer.start();
-        System.setProperty("spring.redis.host", redisContainer.getHost());
-        System.setProperty("spring.redis.port", redisContainer.getMappedPort(6379).toString());
-    }
 
     @BeforeAll
     static void startWireMockServer() {
@@ -108,7 +98,6 @@ public class PaymentControllerWireMockIntegrationTest {
 
     @AfterAll
     static void tearDown() {
-        redisContainer.stop();
         wireMockServer.stop();
     }
 
