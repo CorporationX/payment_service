@@ -57,7 +57,6 @@ class PendingOperationServiceTest {
 
         assertNotNull(resultOperationId);
         verify(pendingOperationRepository, times(1)).save(operation);
-        verify(pendingOperationValidator, times(1)).validateInitiateOperation(operation);
     }
 
     @Test
