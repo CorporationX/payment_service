@@ -1,7 +1,6 @@
 package faang.school.paymentservice.scheduler;
 
 import faang.school.paymentservice.dto.event.PaymentClearEvent;
-import faang.school.paymentservice.listener.PaymentCancelEventListener;
 import faang.school.paymentservice.model.OperationState;
 import faang.school.paymentservice.model.PendingOperation;
 import faang.school.paymentservice.publisher.PaymentClearEventPublisher;
@@ -21,7 +20,7 @@ public class PaymentApproveScheduler {
     private final PendingRepository pendingRepository;
     private final PaymentClearEventPublisher paymentClearEventPublisher;
 
-    @Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "*/5 * * * * *")
     public void publishClearEvent() {
         List<PendingOperation> approvedOperations = new ArrayList<>();
         pendingRepository.findAll().forEach(pendingOperation -> {

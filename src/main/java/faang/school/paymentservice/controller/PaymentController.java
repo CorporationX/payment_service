@@ -1,9 +1,8 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.dto.PaymentRequestDto;
-import faang.school.paymentservice.dto.event.PaymentCancelEvent;
+import faang.school.paymentservice.dto.payment.PaymentRequestDto;
+import faang.school.paymentservice.dto.payment.PaymentResponseDto;
 import faang.school.paymentservice.dto.event.PaymentRequestEvent;
-import faang.school.paymentservice.dto.PaymentResponseDto;
 import faang.school.paymentservice.dto.response.CurrencyExchangeResponse;
 import faang.school.paymentservice.model.Currency;
 import faang.school.paymentservice.model.PaymentRequest;

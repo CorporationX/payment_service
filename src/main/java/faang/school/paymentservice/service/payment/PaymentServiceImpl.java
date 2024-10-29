@@ -7,7 +7,6 @@ import faang.school.paymentservice.model.OperationState;
 import faang.school.paymentservice.model.PendingOperation;
 import faang.school.paymentservice.publisher.PaymentRequestEventPublisher;
 import faang.school.paymentservice.repository.PendingRepository;
-import faang.school.paymentservice.scheduler.PaymentApproveScheduler;
 import faang.school.paymentservice.service.operation.OperationService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRequestEventPublisher eventPublisher;
     private final OperationService operationService;
     private final PendingRepository pendingRepository;
-    private final PaymentApproveScheduler paymentApproveScheduler;
 
     public void requestPayment(PaymentRequestEvent event) {
         event.setOperationKey(makeOperationKey(event));
@@ -33,7 +31,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private String makeOperationKey(PaymentRequestEvent event) {
-        return LocalDateTime.now().toString() + "_" + event.getUserId() + "_" + event.getAmount();
+        return LocalDateTime.now() + "_" + event.getUserId() + "_" + event.getAmount();
     }
 
     @Transactional

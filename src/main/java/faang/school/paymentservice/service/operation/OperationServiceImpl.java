@@ -4,7 +4,6 @@ import faang.school.paymentservice.dto.event.PaymentRequestEvent;
 import faang.school.paymentservice.model.OperationState;
 import faang.school.paymentservice.model.PendingOperation;
 import faang.school.paymentservice.repository.PendingRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

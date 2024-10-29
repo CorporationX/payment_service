@@ -39,6 +39,16 @@ public class RedisConfig {
     }
 
     @Bean
+    ChannelTopic paymentRequestTopic() {
+        return new ChannelTopic(paymentRequestChannel);
+    }
+
+    @Bean
+    ChannelTopic paymentClearTopic() {
+        return new ChannelTopic(paymentClearChannel);
+    }
+
+    @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
@@ -56,16 +66,6 @@ public class RedisConfig {
     public PaymentClearEventPublisher paymentClearEventPublisher(RedisTemplate<String, Object> redisTemplate,
                                                                  ChannelTopic paymentClearTopic) {
         return new PaymentClearEventPublisher(redisTemplate, paymentClearTopic);
-    }
-
-    @Bean
-    ChannelTopic paymentRequestTopic() {
-        return new ChannelTopic(paymentRequestChannel);
-    }
-
-    @Bean
-    ChannelTopic paymentClearTopic() {
-        return new ChannelTopic(paymentClearChannel);
     }
 
     @Bean
