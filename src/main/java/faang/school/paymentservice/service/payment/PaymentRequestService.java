@@ -33,9 +33,9 @@ public class PaymentRequestService {
     public RequestDto authorizePayment(RequestDto requestDto) {
         Request request = requestMapper.toRequest(requestDto);
         request.setStatus(RequestStatus.PENDING);
-        publishMessage(request, DmsTypeOperation.AUTHORIZATION);
-
-        return requestMapper.toRequestDto(requestRepository.save(request));
+        Request savedRequest = requestRepository.save(request);
+        publishMessage(savedRequest, DmsTypeOperation.AUTHORIZATION);
+        return requestMapper.toRequestDto(savedRequest);
     }
 
     public RequestDto cancelPayment(long requestId) {

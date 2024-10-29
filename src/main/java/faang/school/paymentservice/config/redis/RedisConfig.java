@@ -18,6 +18,7 @@ public class RedisConfig {
 
     private final ObjectMapper objectMapper;
 
+    @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         return new JedisConnectionFactory();
     }
