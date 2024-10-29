@@ -36,7 +36,7 @@ public class PaymentServiceImpl implements PaymentService {
         return LocalDateTime.now().toString() + "_" + event.getUserId() + "_" + event.getAmount();
     }
 
-
+    @Transactional
     public void cancelPayment(PaymentCancelEvent event) {
         PendingOperation operation = pendingRepository.findByOperationKey(event.getOperationKey())
                 .orElseThrow(() -> new EntityNotFoundException("Operation not found"));
