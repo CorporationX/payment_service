@@ -15,13 +15,15 @@ import reactor.util.retry.Retry;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
-import java.util.Arrays;
+import java.util.List;
 
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class CurrencyService {
+    private static final int CONVERTING_BASE_SCALE = 5;
+
     private final WebClient currencyWebClient;
     private final RedisTemplate<String, Object> redisTemplate;
     private final CurrencyApiProperties currencyApiProperties;
@@ -58,16 +60,19 @@ public class CurrencyService {
     public BigDecimal convertToBaseCurrency(BigDecimal amount, String sourceCurrency) {
         if (isConversionRequired(sourceCurrency)) {
             CurrencyRatesResponse ratesResponse = getCurrencyRatesFromRedis();
-            return amount.divide(getExchangeRate(sourceCurrency, ratesResponse), 5, RoundingMode.HALF_UP);
+            return amount.divide(getExchangeRate(sourceCurrency, ratesResponse), CONVERTING_BASE_SCALE, RoundingMode.HALF_UP);
         }
         return amount;
     }
 
     private BigDecimal getExchangeRate(String sourceCurrency, CurrencyRatesResponse ratesResponse) {
         if (!ratesResponse.getRates().containsKey(sourceCurrency.toUpperCase())) {
+            List<String> availableCurrencies = ratesResponse.getRates().keySet().stream()
+                    .sorted()
+                    .toList();
             throw new CurrencyRateException(
                     String.format("Exchange rate for currency '%s' is not available. Available only following currencies: %s",
-                            sourceCurrency, Arrays.toString(ratesResponse.getRates().keySet().toArray()))
+                            sourceCurrency, availableCurrencies)
             );
         }
         return ratesResponse.getRates().get(sourceCurrency.toUpperCase());
