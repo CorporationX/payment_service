@@ -26,6 +26,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.aspectj:aspectjweaver:1.9.7")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
 
     /**
      * Database

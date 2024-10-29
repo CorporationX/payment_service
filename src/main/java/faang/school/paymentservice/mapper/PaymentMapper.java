@@ -1,24 +1,32 @@
 package faang.school.paymentservice.mapper;
 
-import faang.school.paymentservice.dto.PaymentDto;
+import faang.school.paymentservice.dto.payment.PaymentRequestDto;
+import faang.school.paymentservice.dto.payment.PaymentResponceDto;
 import faang.school.paymentservice.model.Payment;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.ReportingPolicy;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface PaymentMapper {
 
-    @Mapping(target = "amount", source = "amount", qualifiedByName = "amountConverterToNum")
-    Payment toPaymentEntity(PaymentDto paymentDto);
+@Component
+public class PaymentMapper {
+    public Payment toPaymentEntity(PaymentRequestDto request) {
+        return Payment.builder()
+                .amount(new BigDecimal(request.getAmount()))
+                .currency(request.getCurrency())
+                .clearScheduledAt(request.getClearScheduledAt())
+                .build();
+    }
 
-    PaymentDto toPaymentDto(Payment payment);
-
-    @Named("amountConverterToNum")
-    static BigDecimal amountConverter(String amount) {
-        return new BigDecimal(amount);
+    public PaymentResponceDto toPaymentResponceDto(Payment payment) {
+        return PaymentResponceDto.builder()
+                .id(payment.getId())
+                .amount(payment.getAmount().toString())
+                .currency(payment.getCurrency())
+                .accountFromId(payment.getAccountFromId())
+                .accountToId(payment.getAccountToId())
+                .status(payment.getStatus())
+                .clearScheduledAt(payment.getClearScheduledAt())
+                .build();
     }
 }

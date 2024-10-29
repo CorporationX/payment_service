@@ -1,8 +1,8 @@
 package faang.school.paymentservice.publisher.payment;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import faang.school.paymentservice.dto.PaymentDto;
+
+import faang.school.paymentservice.dto.payment.PaymentResponceDto;
+
 import faang.school.paymentservice.mapper.PaymentMapper;
 import faang.school.paymentservice.model.Payment;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +17,13 @@ import org.springframework.stereotype.Component;
 public class PaymentEventPublisherClass {
     private final RedisTemplate<String, Object> redisTemplate;
     private final PaymentMapper paymentMapper;
-    private final ObjectMapper objectMapper;
 
     @Value("${spring.data.redis.channel.payment-event}")
     private String channel;
 
     public void publish(Payment payment) {
-        PaymentDto paymentDto = paymentMapper.toPaymentDto(payment);
-        redisTemplate.convertAndSend(channel, paymentDto);
-        log.info("Send message to broker: {}", paymentDto);
+        PaymentResponceDto paymentResponceDto = paymentMapper.toPaymentResponceDto(payment);
+        redisTemplate.convertAndSend(channel, paymentResponceDto);
+        log.info("Send message to broker: {}", paymentResponceDto);
     }
 }

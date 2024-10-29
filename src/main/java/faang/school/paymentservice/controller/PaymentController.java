@@ -1,15 +1,21 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.dto.PaymentDto;
+import faang.school.paymentservice.dto.payment.PaymentRequestDto;
+import faang.school.paymentservice.dto.payment.PaymentResponceDto;
 import faang.school.paymentservice.mapper.PaymentMapper;
 import faang.school.paymentservice.model.Payment;
-import faang.school.paymentservice.service.currency.PaymentService;
+import faang.school.paymentservice.model.PaymentStatus;
+import faang.school.paymentservice.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/payments")
@@ -18,10 +24,18 @@ public class PaymentController {
     private final PaymentMapper paymentMapper;
     private final PaymentService paymentService;
 
-    @PostMapping("/authorize")
-    public PaymentDto authorizePayment(@RequestBody @Valid PaymentDto paymentDto) {
-        Payment requestPayment = paymentMapper.toPaymentEntity(paymentDto);
-        Payment responcePayment = paymentService.authorizePayment(requestPayment);
-        return paymentMapper.toPaymentDto(responcePayment);
+    @PostMapping
+    public PaymentResponceDto authorizePayment(@RequestBody @Valid PaymentRequestDto paymentRequestDto) {
+        Payment requestPayment = paymentMapper.toPaymentEntity(paymentRequestDto);
+        String accountNumberFrom = paymentRequestDto.getAccountNumberFrom();
+        String accountNumberTo = paymentRequestDto.getAccountNumberTo();
+        Payment responcePayment = paymentService.authorizePayment(requestPayment, accountNumberFrom, accountNumberTo);
+        return paymentMapper.toPaymentResponceDto(responcePayment);
+    }
+
+    @PutMapping
+    public PaymentResponceDto changePaymentStatus(@RequestParam UUID paymentId, @RequestParam PaymentStatus status) {
+        Payment payment = paymentService.changePaymentStatus(paymentId, status);
+        return paymentMapper.toPaymentResponceDto(payment);
     }
 }

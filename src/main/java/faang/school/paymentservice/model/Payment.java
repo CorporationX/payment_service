@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -32,7 +34,7 @@ import java.util.UUID;
 public class Payment {
 
     @Id
-    @GeneratedValue(generator = "UUID")
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
@@ -43,11 +45,11 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
-    @Column(name = "account_number_from", length = 20, updatable = false, nullable = false)
-    private String accountNumberFrom;
+    @Column(name = "account_id_from", length = 20, updatable = false, nullable = false)
+    private UUID accountFromId;
 
-    @Column(name = "account_number_to", length = 20, updatable = false, nullable = false)
-    private String accountNumberTo;
+    @Column(name = "account_id_to", length = 20, updatable = false, nullable = false)
+    private UUID accountToId;
 
     @Column(name = "status", length = 16, nullable = false)
     @Enumerated(EnumType.STRING)
@@ -61,4 +63,9 @@ public class Payment {
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime updatedAt;
 }

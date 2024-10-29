@@ -27,6 +27,10 @@ spring:
 server:
   port: 9080
 
+account-service:
+  host: localhost
+  port: 8090
+
 logging:
   level:
     root: info
