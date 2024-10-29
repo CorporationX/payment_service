@@ -24,12 +24,7 @@ public class PaymentEventPublisherClass {
 
     public void publish(Payment payment) {
         PaymentDto paymentDto = paymentMapper.toPaymentDto(payment);
-        try {
-            String value = objectMapper.writeValueAsString(paymentDto);
-            redisTemplate.convertAndSend(channel, value);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        redisTemplate.convertAndSend(channel, paymentDto);
         log.info("Send message to broker: {}", paymentDto);
     }
 }

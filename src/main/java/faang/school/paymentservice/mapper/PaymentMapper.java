@@ -15,16 +15,10 @@ public interface PaymentMapper {
     @Mapping(target = "amount", source = "amount", qualifiedByName = "amountConverterToNum")
     Payment toPaymentEntity(PaymentDto paymentDto);
 
-//    @Mapping(target = "amount", source = "amount", qualifiedByName = "amountConverterToString")
     PaymentDto toPaymentDto(Payment payment);
 
     @Named("amountConverterToNum")
     static BigDecimal amountConverter(String amount) {
         return new BigDecimal(amount);
     }
-
-//    @Named("amountConverterToString")
-//    static String amountConverter(BigDecimal amount) {
-//        return amount.toString();
-//    }
 }
