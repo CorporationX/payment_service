@@ -24,6 +24,7 @@ public class PaymentEventPublisherClass {
     public void publish(Payment payment) {
         PaymentResponceDto paymentResponceDto = paymentMapper.toPaymentResponceDto(payment);
         redisTemplate.convertAndSend(channel, paymentResponceDto);
+        System.out.println(channel);
         log.info("Send message to broker: {}", paymentResponceDto);
     }
 }

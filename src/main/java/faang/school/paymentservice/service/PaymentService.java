@@ -2,6 +2,7 @@ package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.client.account_service.AccountServiceClient;
 import faang.school.paymentservice.dto.account.AccountDto;
+import faang.school.paymentservice.model.Currency;
 import faang.school.paymentservice.model.Payment;
 import faang.school.paymentservice.model.PaymentStatus;
 import faang.school.paymentservice.publisher.payment.PaymentEventPublisher;
@@ -28,9 +29,12 @@ public class PaymentService {
     @PaymentEventPublisher
     public Payment authorizePayment(Payment payment, String accountNumberFrom, String accountNumberTo) {
         validateAmount(payment.getAmount());
+        AccountDto from = getAccount(accountNumberFrom);
+        AccountDto to = getAccount(accountNumberTo);
+        validatePayment(payment, from, to);
 
-        payment.setAccountFromId(getAccountUUID(accountNumberFrom));
-        payment.setAccountToId(getAccountUUID(accountNumberTo));
+        payment.setAccountFromId(from.getId());
+        payment.setAccountToId(to.getId());
         payment.setStatus(AUTH);
 
         return paymentRepository.save(payment);
@@ -48,6 +52,17 @@ public class PaymentService {
 
         payment.setStatus(status);
         return paymentRepository.save(payment);
+    }
+
+    private void validatePayment(Payment payment, AccountDto from, AccountDto to) {
+        Currency paymentCurrency = payment.getCurrency();
+        Currency fromCurrency = from.getCurrency();
+        Currency toCurrency = to.getCurrency();
+
+        if (!paymentCurrency.equals(fromCurrency) || !paymentCurrency.equals(toCurrency)) {
+            log.error("Currency type must be the same");
+            throw new IllegalArgumentException("Currency type must be the same");
+        }
     }
 
     private void validateAmount(BigDecimal amount) {
@@ -71,10 +86,9 @@ public class PaymentService {
         }
     }
 
-    private UUID getAccountUUID(String accountNumber) {
+    private AccountDto getAccount(String accountNumber) {
         return accountServiceClient.getAccountByNumber(NUMBER, accountNumber).stream()
                 .findFirst()
-                .map(AccountDto::getId)
                 .orElseThrow(() -> new IllegalArgumentException("The account number doesn't exist"));
     }
 }
