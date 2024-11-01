@@ -1,11 +1,14 @@
 package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.PendingOperationDto;
+import faang.school.paymentservice.dto.PendingOperationResponseDto;
 import faang.school.paymentservice.mapper.PendingOperationMapper;
 import faang.school.paymentservice.model.PendingOperation;
 import faang.school.paymentservice.service.PendingOperationService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,5 +41,10 @@ public class PendingOperationController {
     public ResponseEntity<Void> confirmOperation(@PathVariable UUID id) {
         pendingOperationService.confirmOperation(id, true);
         return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<PendingOperationResponseDto> getOperationStatus(@PathVariable UUID id) {
+        PendingOperationResponseDto responseDto = pendingOperationService.getOperationStatuses(id);
+        return ResponseEntity.ok(responseDto);
     }
 }

@@ -38,16 +38,4 @@ public class KafkaConfig {
     public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
-    @Bean
-    public KafkaAdmin kafkaAdmin() {
-        Map<String, Object> configs = new HashMap<>();
-        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        return new KafkaAdmin(configs);
-    }
-    public NewTopic createNewTopic(String topicName, int partitions, short replicas) {
-        return TopicBuilder.name(topicName)
-                .partitions(partitions)
-                .replicas(replicas)
-                .build();
-    }
 }

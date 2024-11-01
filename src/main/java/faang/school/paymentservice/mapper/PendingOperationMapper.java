@@ -16,6 +16,8 @@ public interface PendingOperationMapper {
     @Mapping(target = "currency", expression = "java(convertCurrency(dto.getCurrency()))")
     PendingOperation toEntity(PendingOperationDto dto);
 
+    PendingOperationDto toResponseDto(PendingOperation entity);
+
     default Currency convertCurrency(String currency) {
         try {
             return Currency.valueOf(currency);

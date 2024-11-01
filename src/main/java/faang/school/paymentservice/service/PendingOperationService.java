@@ -1,5 +1,6 @@
 package faang.school.paymentservice.service;
 
+import faang.school.paymentservice.dto.PendingOperationResponseDto;
 import faang.school.paymentservice.exception.OperationNotFoundException;
 import faang.school.paymentservice.model.OperationStatus;
 import faang.school.paymentservice.model.PendingOperation;
@@ -56,6 +57,16 @@ public class PendingOperationService {
             updateOperationStatus(operation, OperationStatus.ERROR);
             operationMessageService.sendOperationMessage(operation);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public PendingOperationResponseDto getOperationStatuses(UUID operationId) {
+        return pendingOperationRepository.findById(operationId)
+                .map(operation -> PendingOperationResponseDto.builder()
+                        .accountBalanceStatus(operation.getAccountBalanceStatus())
+                        .status(operation.getStatus())
+                        .build())
+                .orElseThrow(() -> new OperationNotFoundException("Operation not found"));
     }
 
     private void updateOperationStatus(PendingOperation operation, OperationStatus status) {
