@@ -5,6 +5,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -28,10 +30,14 @@ import java.util.UUID;
 @Table(name = "pending_operation")
 public class PendingOperation {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @Column(name = "account_id", nullable = false)
-    private UUID accountId;
+    private UUID accountFromId;
+
+    @Column(name = "account_id", nullable = false)
+    private UUID accountToId;
 
     @Column(name = "idempotency_key", nullable = false, unique = true)
     private String idempotencyKey;
@@ -46,6 +52,14 @@ public class PendingOperation {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private OperationStatus status;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Category category;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AccountBalanceStatus accountBalanceStatus;
 
     @Column(name = "clear_scheduled_at", nullable = false)
     private LocalDateTime clearScheduledAt;

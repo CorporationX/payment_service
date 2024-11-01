@@ -1,6 +1,7 @@
 package faang.school.paymentservice.dto;
 
-import faang.school.paymentservice.model.OperationType;
+import faang.school.paymentservice.model.Category;
+import faang.school.paymentservice.model.OperationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,9 +16,11 @@ import java.util.UUID;
 @NoArgsConstructor
 public class OperationMessage {
     private UUID operationId;
-    private UUID accountId;
+    private UUID accountFromId;
+    private UUID accountToId;
     private String idempotencyKey;
     private BigDecimal amount;
     private Currency currency;
-    private OperationType operationType;
+    private Category category;
+    private OperationStatus status;
 }

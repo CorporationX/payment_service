@@ -1,9 +1,7 @@
 package faang.school.paymentservice.service;
 
-import faang.school.paymentservice.annotations.SendPendingOperationMessage;
 import faang.school.paymentservice.exception.OperationNotFoundException;
 import faang.school.paymentservice.model.OperationStatus;
-import faang.school.paymentservice.model.OperationType;
 import faang.school.paymentservice.model.PendingOperation;
 import faang.school.paymentservice.repository.PendingOperationRepository;
 import faang.school.paymentservice.validator.PendingOperationValidator;
@@ -22,26 +20,25 @@ import java.util.UUID;
 public class PendingOperationService {
     private final PendingOperationRepository pendingOperationRepository;
     private final PendingOperationValidator pendingOperationValidator;
+    private final OperationMessageService operationMessageService;
 
-    @SendPendingOperationMessage(OperationType.AUTHORIZATION)
     @Transactional
     public UUID initiateOperation(PendingOperation operation) {
         pendingOperationValidator.validateIdempotencyKey(operation.getIdempotencyKey());
-        pendingOperationValidator.validateBalance(operation.getAccountId(), operation.getAmount());
-        pendingOperationRepository.save(operation);
+        pendingOperationRepository.saveAndFlush(operation);
+        operationMessageService.sendOperationMessage(operation);
         log.info("Operation initiated with ID: {}", operation.getId());
         return operation.getId();
     }
 
-    @SendPendingOperationMessage(OperationType.CANCELLATION)
     @Transactional
     public void cancelOperation(UUID operationId) {
         PendingOperation operation = getOperationForProcessing(operationId, OperationStatus.PENDING);
-        updateOperationStatus(operation, OperationStatus.CANCELLED);
+        updateOperationStatus(operation, OperationStatus.CANCELLATION);
+        operationMessageService.sendOperationMessage(operation);
         log.info("Operation canceled with ID: {}", operationId);
     }
 
-    @SendPendingOperationMessage(OperationType.CLEARING)
     @Transactional
     public void confirmOperation(UUID operationId, boolean isManual) {
         PendingOperation operation = getOperationForProcessing(operationId, OperationStatus.PENDING);
@@ -51,18 +48,14 @@ public class PendingOperationService {
             } else {
                 pendingOperationValidator.validateAutomaticConfirmation(operation);
             }
-            updateOperationStatus(operation, OperationStatus.CONFIRMED);
+            updateOperationStatus(operation, OperationStatus.CLEARING);
+            operationMessageService.sendOperationMessage(operation);
             log.info("Operation confirmed with ID: {}", operationId);
         } catch (Exception e) {
             log.error("Error during operation confirmation for ID {}: {}", operationId, e.getMessage(), e);
-            updateOperationStatus(operation, OperationStatus.FAILED);
-            sendErrorMessage(operationId);
+            updateOperationStatus(operation, OperationStatus.ERROR);
+            operationMessageService.sendOperationMessage(operation);
         }
-    }
-
-    @SendPendingOperationMessage(OperationType.ERROR)
-    public void sendErrorMessage(UUID operationId) {
-        log.info("Sending error message for operation ID: {}", operationId);
     }
 
     private void updateOperationStatus(PendingOperation operation, OperationStatus status) {

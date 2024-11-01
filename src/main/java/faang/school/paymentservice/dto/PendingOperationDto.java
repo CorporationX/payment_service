@@ -18,8 +18,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PendingOperationDto {
-    @NotNull(message = "Account ID is required")
-    private UUID accountId;
+    @NotNull(message = "AccountFrom ID is required")
+    private UUID accountFromId;
+
+    @NotNull(message = "AccountTo ID is required")
+    private UUID accountToId;
 
     @NotBlank(message = "Idempotency key is required")
     private String idempotencyKey;
@@ -30,6 +33,9 @@ public class PendingOperationDto {
 
     @NotBlank(message = "Currency is required")
     private String currency;
+
+    @NotBlank(message = "Currency is required")
+    private String category;
 
     @NotNull(message = "Clear scheduled time is required")
     @Future(message = "Clear scheduled time must be in the future")

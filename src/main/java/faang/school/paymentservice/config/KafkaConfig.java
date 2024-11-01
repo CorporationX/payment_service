@@ -1,6 +1,7 @@
 package faang.school.paymentservice.config;
 
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@Profile("kafka")
+@ConditionalOnProperty(prefix = "app", name = "messaging", havingValue = "kafka")
 public class KafkaConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
@@ -34,8 +35,8 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, Object> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+    public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
+        return new KafkaTemplate<>(producerFactory);
     }
     @Bean
     public KafkaAdmin kafkaAdmin() {

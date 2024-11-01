@@ -9,8 +9,8 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PendingOperationMapper {
-    @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
     @Mapping(target = "status", constant = "PENDING")
+    @Mapping(target = "accountBalanceStatus", constant = "BALANCE_NOT_VERIFIED")
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     @Mapping(target = "currency", expression = "java(convertCurrency(dto.getCurrency()))")
