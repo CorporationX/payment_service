@@ -50,6 +50,17 @@ dependencies {
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
 
     /**
+     * Test containers
+     */
+    implementation(platform("org.testcontainers:testcontainers-bom:1.17.6"))
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation("com.redis.testcontainers:testcontainers-redis-junit-jupiter:1.4.6")
+    testImplementation ("org.springframework.boot:spring-boot-starter-data-redis")
+
+    testImplementation("org.wiremock:wiremock-standalone:3.9.2")
+
+    /**
      * Tests
      */
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
@@ -95,7 +106,12 @@ jacoco {
     reportsDirectory.set(layout.buildDirectory.dir("$buildDir/reports/jacoco"))
 }
 tasks.test {
+    exclude("**/faang/school/paymentservice/integration/**")
     finalizedBy(tasks.jacocoTestReport)
+}
+tasks.register<Test>("integrationTest") {
+    group = "verification"
+    include("**/faang/school/paymentservice/integration/**")
 }
 tasks.jacocoTestReport {
     reports {
