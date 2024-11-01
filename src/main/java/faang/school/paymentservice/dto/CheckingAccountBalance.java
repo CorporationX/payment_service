@@ -1,5 +1,6 @@
 package faang.school.paymentservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import faang.school.paymentservice.model.AccountBalanceStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,9 +13,10 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CheckingAccountBalance {
     private UUID operationId;
-    private UUID accountFromId;
+    private UUID sourceAccountId;
     private AccountBalanceStatus status;
 }
 

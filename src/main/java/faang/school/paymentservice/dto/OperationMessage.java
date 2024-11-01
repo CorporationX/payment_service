@@ -16,8 +16,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class OperationMessage {
     private UUID operationId;
-    private UUID accountFromId;
-    private UUID accountToId;
+    private UUID sourceAccountId;
+    private UUID targetAccountId;
     private String idempotencyKey;
     private BigDecimal amount;
     private Currency currency;

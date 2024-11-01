@@ -19,8 +19,8 @@ public class OperationMessageService {
 
         OperationMessage message = OperationMessage.builder()
                 .operationId(pendingOperation.getId())
-                .accountFromId(pendingOperation.getAccountFromId())
-                .accountToId(pendingOperation.getAccountToId())
+                .sourceAccountId(pendingOperation.getSourceAccountId())
+                .targetAccountId(pendingOperation.getTargetAccountId())
                 .idempotencyKey(pendingOperation.getIdempotencyKey())
                 .amount(pendingOperation.getAmount())
                 .currency(pendingOperation.getCurrency())

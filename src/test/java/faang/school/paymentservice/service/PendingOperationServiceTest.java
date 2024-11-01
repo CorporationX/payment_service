@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import faang.school.paymentservice.exception.InsufficientBalanceException;
 import faang.school.paymentservice.model.OperationStatus;
 import faang.school.paymentservice.model.PendingOperation;
 import faang.school.paymentservice.repository.PendingOperationRepository;
@@ -30,6 +29,8 @@ class PendingOperationServiceTest {
     private PendingOperationRepository pendingOperationRepository;
     @Mock
     private PendingOperationValidator pendingOperationValidator;
+    @Mock
+    private OperationMessageService operationMessageService;
     @InjectMocks
     private PendingOperationService pendingOperationService;
 
@@ -39,24 +40,25 @@ class PendingOperationServiceTest {
     @BeforeEach
     void setUp() {
         operationId = UUID.randomUUID();
-        operation = new PendingOperation();
-        operation.setId(operationId);
-        operation.setIdempotencyKey("test-key");
-        operation.setAccountId(UUID.randomUUID());
-        operation.setAmount(BigDecimal.valueOf(100));
-        operation.setStatus(OperationStatus.PENDING);
+        operation = PendingOperation.builder()
+                .id(operationId)
+                .idempotencyKey("test-key")
+                .sourceAccountId(UUID.randomUUID())
+                .targetAccountId(UUID.randomUUID())
+                .amount(BigDecimal.valueOf(100))
+                .status(OperationStatus.PENDING)
+                .build();
     }
 
     @Test
     void testInitiateOperationSuccess() {
         doNothing().when(pendingOperationValidator).validateIdempotencyKey(operation.getIdempotencyKey());
-        doNothing().when(pendingOperationValidator).validateBalance(operation.getAccountId(), operation.getAmount());
 
         UUID result = pendingOperationService.initiateOperation(operation);
 
         verify(pendingOperationValidator).validateIdempotencyKey(operation.getIdempotencyKey());
-        verify(pendingOperationValidator).validateBalance(operation.getAccountId(), operation.getAmount());
-        verify(pendingOperationRepository).save(operation);
+        verify(pendingOperationRepository).saveAndFlush(operation);
+        verify(operationMessageService).sendOperationMessage(operation);
         assertEquals(operationId, result);
     }
 
@@ -67,8 +69,9 @@ class PendingOperationServiceTest {
 
         pendingOperationService.cancelOperation(operationId);
 
-        assertEquals(OperationStatus.CANCELLED, operation.getStatus());
+        assertEquals(OperationStatus.CANCELLATION, operation.getStatus());
         verify(pendingOperationRepository).save(operation);
+        verify(operationMessageService).sendOperationMessage(operation);
     }
 
     @Test
@@ -81,7 +84,8 @@ class PendingOperationServiceTest {
 
         verify(pendingOperationValidator).validateManualConfirmation(operation);
         verify(pendingOperationRepository).save(operation);
-        assertEquals(OperationStatus.CONFIRMED, operation.getStatus());
+        verify(operationMessageService).sendOperationMessage(operation);
+        assertEquals(OperationStatus.CLEARING, operation.getStatus());
     }
 
     @Test
@@ -95,20 +99,22 @@ class PendingOperationServiceTest {
 
         verify(pendingOperationValidator).validateAutomaticConfirmation(operation);
         verify(pendingOperationRepository).save(operation);
-        assertEquals(OperationStatus.CONFIRMED, operation.getStatus());
+        verify(operationMessageService).sendOperationMessage(operation);
+        assertEquals(OperationStatus.CLEARING, operation.getStatus());
     }
 
     @Test
     void testConfirmOperationFailsOnValidationError() {
         when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.PENDING))
                 .thenReturn(Optional.of(operation));
-        doThrow(new InsufficientBalanceException("Insufficient balance"))
+        doThrow(new RuntimeException("Insufficient balance"))
                 .when(pendingOperationValidator).validateAutomaticConfirmation(operation);
 
         pendingOperationService.confirmOperation(operationId, false);
 
-        assertEquals(OperationStatus.FAILED, operation.getStatus());
+        assertEquals(OperationStatus.ERROR, operation.getStatus());
         verify(pendingOperationRepository, times(1)).save(operation);
+        verify(operationMessageService).sendOperationMessage(operation);
     }
 
     @Test

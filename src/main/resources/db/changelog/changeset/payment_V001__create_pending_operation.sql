@@ -1,8 +1,8 @@
 CREATE TABLE pending_operation
 (
     id                     UUID PRIMARY KEY,
-    account_from_id        UUID         NOT NULL,
-    account_to_id          UUID         NOT NULL,
+    source_account_id      UUID         NOT NULL,
+    target_account_id      UUID         NOT NULL,
     idempotency_key        VARCHAR(255) NOT NULL UNIQUE,
     amount                 BIGINT       NOT NULL,
     currency               VARCHAR(3)   NOT NULL,

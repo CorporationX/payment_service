@@ -3,7 +3,6 @@ package faang.school.paymentservice.listener.redis;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import faang.school.paymentservice.dto.CheckingAccountBalance;
 import faang.school.paymentservice.service.CheckingAccountBalanceService;
-import faang.school.paymentservice.service.PendingOperationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.listener.Topic;

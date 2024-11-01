@@ -1,19 +1,14 @@
 package faang.school.paymentservice.config;
 
-import faang.school.paymentservice.listener.redis.EventMessageListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-
-import java.util.List;
 
 @Configuration
 public class RedisConfig {
@@ -50,14 +45,5 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean
-    public RedisMessageListenerContainer redisContainer(RedisConnectionFactory redisConnectionFactory,
-                                                        List<EventMessageListener> listeners) {
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory);
 
-        listeners.forEach(listener -> container.addMessageListener(listener, listener.getTopic()));
-
-        return container;
-    }
 }

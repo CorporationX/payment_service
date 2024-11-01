@@ -33,11 +33,11 @@ public class PendingOperation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(name = "account_id", nullable = false)
-    private UUID accountFromId;
+    @Column(name = "source_account_id", nullable = false)
+    private UUID sourceAccountId;
 
-    @Column(name = "account_id", nullable = false)
-    private UUID accountToId;
+    @Column(name = "target_account_id", nullable = false)
+    private UUID targetAccountId;
 
     @Column(name = "idempotency_key", nullable = false, unique = true)
     private String idempotencyKey;

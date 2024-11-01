@@ -19,10 +19,10 @@ import java.util.UUID;
 @NoArgsConstructor
 public class PendingOperationDto {
     @NotNull(message = "AccountFrom ID is required")
-    private UUID accountFromId;
+    private UUID sourceAccountId;
 
     @NotNull(message = "AccountTo ID is required")
-    private UUID accountToId;
+    private UUID targetAccountId;
 
     @NotBlank(message = "Idempotency key is required")
     private String idempotencyKey;
