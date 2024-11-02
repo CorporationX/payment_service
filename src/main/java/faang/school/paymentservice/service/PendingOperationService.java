@@ -34,7 +34,7 @@ public class PendingOperationService {
 
     @Transactional
     public void cancelOperation(UUID operationId) {
-        PendingOperation operation = getOperationForProcessing(operationId, OperationStatus.PENDING);
+        PendingOperation operation = getOperationForProcessing(operationId, OperationStatus.AUTHORIZATION);
         updateOperationStatus(operation, OperationStatus.CANCELLATION);
         operationMessageService.sendOperationMessage(operation);
         log.info("Operation canceled with ID: {}", operationId);
@@ -42,7 +42,7 @@ public class PendingOperationService {
 
     @Transactional
     public void confirmOperation(UUID operationId, boolean isManual) {
-        PendingOperation operation = getOperationForProcessing(operationId, OperationStatus.PENDING);
+        PendingOperation operation = getOperationForProcessing(operationId, OperationStatus.AUTHORIZATION);
         try {
             if (isManual) {
                 pendingOperationValidator.validateManualConfirmation(operation);
@@ -76,7 +76,7 @@ public class PendingOperationService {
     }
 
     public List<PendingOperation> getOperationsForClearing(LocalDateTime currentTime) {
-        return pendingOperationRepository.findByStatusAndClearScheduledAtBefore(OperationStatus.PENDING, currentTime);
+        return pendingOperationRepository.findByStatusAndClearScheduledAtBefore(OperationStatus.AUTHORIZATION, currentTime);
     }
 
     private PendingOperation getOperationForProcessing(UUID operationId, OperationStatus status) {
