@@ -48,6 +48,7 @@ class PendingOperationServiceTest {
                 .amount(BigDecimal.valueOf(100))
                 .status(OperationStatus.PENDING)
                 .build();
+
     }
 
     @Test
@@ -64,7 +65,7 @@ class PendingOperationServiceTest {
 
     @Test
     void testCancelOperation() {
-        when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.PENDING))
+        when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.AUTHORIZATION))
                 .thenReturn(Optional.of(operation));
 
         pendingOperationService.cancelOperation(operationId);
@@ -76,7 +77,7 @@ class PendingOperationServiceTest {
 
     @Test
     void testConfirmOperationManualSuccess() {
-        when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.PENDING))
+        when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.AUTHORIZATION))
                 .thenReturn(Optional.of(operation));
         doNothing().when(pendingOperationValidator).validateManualConfirmation(operation);
 
@@ -90,7 +91,7 @@ class PendingOperationServiceTest {
 
     @Test
     void testConfirmOperationAutomaticSuccess() {
-        when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.PENDING))
+        when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.AUTHORIZATION))
                 .thenReturn(Optional.of(operation));
         operation.setClearScheduledAt(LocalDateTime.now().minusMinutes(1));
         doNothing().when(pendingOperationValidator).validateAutomaticConfirmation(operation);
@@ -105,7 +106,7 @@ class PendingOperationServiceTest {
 
     @Test
     void testConfirmOperationFailsOnValidationError() {
-        when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.PENDING))
+        when(pendingOperationRepository.findByIdAndStatus(operationId, OperationStatus.AUTHORIZATION))
                 .thenReturn(Optional.of(operation));
         doThrow(new RuntimeException("Insufficient balance"))
                 .when(pendingOperationValidator).validateAutomaticConfirmation(operation);
@@ -121,6 +122,6 @@ class PendingOperationServiceTest {
     void testGetOperationsForClearing() {
         LocalDateTime currentTime = LocalDateTime.now();
         pendingOperationService.getOperationsForClearing(currentTime);
-        verify(pendingOperationRepository).findByStatusAndClearScheduledAtBefore(OperationStatus.PENDING, currentTime);
+        verify(pendingOperationRepository).findByStatusAndClearScheduledAtBefore(OperationStatus.AUTHORIZATION, currentTime);
     }
 }
