@@ -17,7 +17,9 @@ import java.time.LocalDateTime;
 public class OperationServiceImpl implements OperationService {
     private final PendingRepository pendingRepository;
 
+
     @Transactional
+    @Override
     public void savePendingOperation(PaymentRequestEvent event) {
         PendingOperation pendingOperation = new PendingOperation().builder()
                 .accountId(event.getUserId())
