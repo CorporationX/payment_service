@@ -12,4 +12,7 @@ public class RedisProperties {
 
     @Value("${spring.data.redis.host}")
     private String host;
+
+    @Value("${spring.data.redis.channel.payment-event-responce}")
+    private String paymentEventResponceTopic;
 }

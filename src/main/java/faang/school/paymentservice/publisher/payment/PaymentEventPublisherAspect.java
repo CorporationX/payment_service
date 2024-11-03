@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class PaymentEventPublisherAspect {
-    private final PaymentEventPublisherClass publisher;
+    private final PaymentEventPublisher publisher;
 
-    @AfterReturning(pointcut = "@annotation(PaymentEventPublisher)", returning = "payment")
+    @AfterReturning(pointcut = "@annotation(PublishPaymentEvent)", returning = "payment")
     public void afterReturningAdvice(Payment payment) {
         publisher.publish(payment);
     }

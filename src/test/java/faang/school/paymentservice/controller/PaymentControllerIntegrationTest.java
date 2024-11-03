@@ -5,10 +5,8 @@ import faang.school.paymentservice.dto.account.AccountDto;
 import faang.school.paymentservice.dto.payment.PaymentRequestDto;
 import faang.school.paymentservice.model.Currency;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import util.BaseContextTest;
 
@@ -27,9 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PaymentControllerIntegrationTest extends BaseContextTest {
     @MockBean
     private AccountServiceClient accountServiceClient;
-
-    @Autowired
-    private  RedisTemplate<String, Object> redisTemplate;
 
     @Test
     public void createPaymentTest() throws Exception {
@@ -59,7 +54,7 @@ public class PaymentControllerIntegrationTest extends BaseContextTest {
                 .ownerType(AccountDto.OwnerType.PROJECT)
                 .accountType(AccountDto.AccountType.CORPORATE)
                 .currency(Currency.RUB)
-                .accountStatus(AccountDto.AccountStatus.SUSPENDED)
+                .accountStatus(AccountDto.AccountStatus.ACTIVE)
                 .build();
 
         when(accountServiceClient.getAccountByNumber(NUMBER, requestDto.getAccountNumberFrom()))
@@ -73,7 +68,7 @@ public class PaymentControllerIntegrationTest extends BaseContextTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.amount").value(requestDto.getAmount()))
                 .andExpect(jsonPath("$.currency").value("RUB"))
-                .andExpect(jsonPath("$.status").value("AUTH"));
+                .andExpect(jsonPath("$.status").value("AUTH_PENDING"));
     }
 }
 

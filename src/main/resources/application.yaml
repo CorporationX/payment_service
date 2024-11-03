@@ -23,6 +23,7 @@ spring:
       host: localhost
       channel:
         payment-event: payment_event
+        payment-event-responce: payment_event_responce
 
 server:
   port: 9080
@@ -49,3 +50,7 @@ payment:
           backoff:
             delay: 2000       # Начальный интервал между попытками (в миллисекундах)
             multiplier: 2.0      # Интервал между попытками (в миллисекундах)
+
+  clearing:
+    scheduler:
+      cron: "0 * * * * *" # Запуск каждую минуту

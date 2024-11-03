@@ -38,7 +38,7 @@ public class PaymentController {
 
     @PutMapping
     public PaymentResponceDto changePaymentStatus(@RequestParam UUID paymentId, @RequestParam PaymentStatus status) {
-        Payment payment = paymentService.changePaymentStatus(paymentId, status);
+        Payment payment = paymentService.updatePaymentStatus(paymentId, status);
         return paymentMapper.toPaymentResponceDto(payment);
     }
 }

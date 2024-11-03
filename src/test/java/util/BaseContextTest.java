@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redis.testcontainers.RedisContainer;
 
 import faang.school.paymentservice.PaymentApplication;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +15,12 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+
+import java.time.Duration;
 
 @SpringBootTest(
         classes = {
@@ -43,7 +44,9 @@ public class BaseContextTest {
             new PostgreSQLContainer<>("postgres:13.6");
     @Container
     public static final RedisContainer REDIS_CONTAINER =
-            new RedisContainer(DockerImageName.parse("redis/redis-stack:latest"));
+            new RedisContainer(DockerImageName.parse("redis/redis-stack:latest"))
+                    .withStartupTimeout(Duration.ofMinutes(10))
+                    .waitingFor(Wait.forListeningPort());
 
     @DynamicPropertySource
     static void postgresqlProperties(DynamicPropertyRegistry registry) {

@@ -1,5 +1,6 @@
 package faang.school.paymentservice.mapper;
 
+import faang.school.paymentservice.dto.payment.PaymentEventDto;
 import faang.school.paymentservice.dto.payment.PaymentRequestDto;
 import faang.school.paymentservice.dto.payment.PaymentResponceDto;
 import faang.school.paymentservice.model.Payment;
@@ -29,4 +30,13 @@ public class PaymentMapper {
                 .clearScheduledAt(payment.getClearScheduledAt())
                 .build();
     }
-}
+
+    public PaymentEventDto toPaymentEventDto(Payment payment) {
+        return PaymentEventDto.builder()
+                .paymentId(payment.getId())
+                .amount(payment.getAmount().toString())
+                .status(payment.getStatus())
+                .accountFromId(payment.getAccountFromId())
+                .accountToId(payment.getAccountToId())
+                .build();
+    }}
