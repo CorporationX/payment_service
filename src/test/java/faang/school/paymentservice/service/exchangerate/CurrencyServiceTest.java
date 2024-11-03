@@ -4,7 +4,7 @@ import faang.school.paymentservice.client.CurrencyRatesClient;
 import faang.school.paymentservice.client.ExchangeRatesClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ExchangeRateResponseDto;
-import faang.school.paymentservice.validator.ExchangeRateValidator;
+import faang.school.paymentservice.exception.ResponseDtoNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,10 +15,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,13 +39,12 @@ class CurrencyServiceTest {
     private CurrencyRatesClient currencyRatesClient;
 
     @Mock
-    private ExchangeRateValidator exchangeRateValidator;
-
-    @Mock
     private Map<String, Double> currencyRates;
 
     private static final String APP_ID = "appId";
     private static final BigDecimal AMOUNT = BigDecimal.valueOf(500);
+    private static final BigDecimal RESULT_AMOUNT =
+            BigDecimal.valueOf(466.1402500).setScale(7, RoundingMode.DOWN);
     private static final BigDecimal COMMISSION = BigDecimal.valueOf(0.01);
     private static final String DISCLAIMER = "disclaimer";
     private static final String LICENSE = "license";
@@ -49,7 +52,7 @@ class CurrencyServiceTest {
     private static final String BASE = "base";
     private static final Currency FROM_CURRENCY = Currency.USD;
     private static final Currency TO_CURRENCY = Currency.EUR;
-    private static final Double EXCHANGE_RATE = 97.2;
+    private static final Double EXCHANGE_RATE = 0.92305;
     private Map<String, Double> rates = new HashMap<>();
     private ExchangeRateResponseDto responseDto;
 
@@ -69,17 +72,36 @@ class CurrencyServiceTest {
     }
 
     @Test
-    @DisplayName("Успешная конвертация валюты")
+    @DisplayName("Successful currency conversion")
     public void whenConvertCurrencyShouldSuccess() {
         when(exchangeRatesClient.getCurrentExchangeRates(APP_ID, FROM_CURRENCY, TO_CURRENCY))
-                .thenReturn(responseDto);
+                .thenReturn(Optional.of(responseDto));
 
         BigDecimal result = currencyService.convertCurrency(AMOUNT, FROM_CURRENCY, TO_CURRENCY);
 
         assertNotNull(result);
+        assertEquals(RESULT_AMOUNT, result);
         verify(exchangeRatesClient).getCurrentExchangeRates(APP_ID, FROM_CURRENCY, TO_CURRENCY);
-        verify(exchangeRateValidator).validationExchangeRateResponse(responseDto);
-        verify(exchangeRateValidator).validationExchangeRateAmount(BigDecimal.valueOf(
-                responseDto.getRates().get(TO_CURRENCY.name())), TO_CURRENCY);
+    }
+
+    @Test
+    @DisplayName("Exception if ExchangeRateResponseDto is null")
+    public void whenConvertCurrencyWithResponseDtoIsNullThenThrowException() {
+        when(exchangeRatesClient.getCurrentExchangeRates(APP_ID, FROM_CURRENCY, TO_CURRENCY))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ResponseDtoNotFoundException.class,
+                () -> currencyService.convertCurrency(AMOUNT, FROM_CURRENCY, TO_CURRENCY));
+    }
+
+    @Test
+    @DisplayName("Exception if exchangeRate is null")
+    public void whenConvertCurrencyWithExchangeRateIsNullThenThrowException() {
+        responseDto.setRates(new HashMap<>());
+        when(exchangeRatesClient.getCurrentExchangeRates(APP_ID, FROM_CURRENCY, TO_CURRENCY))
+                .thenReturn(Optional.of(responseDto));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> currencyService.convertCurrency(AMOUNT, FROM_CURRENCY, TO_CURRENCY));
     }
 }

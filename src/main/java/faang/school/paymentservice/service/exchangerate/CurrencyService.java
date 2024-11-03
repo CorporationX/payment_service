@@ -4,7 +4,7 @@ import faang.school.paymentservice.client.CurrencyRatesClient;
 import faang.school.paymentservice.client.ExchangeRatesClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ExchangeRateResponseDto;
-import faang.school.paymentservice.validator.ExchangeRateValidator;
+import faang.school.paymentservice.exception.ResponseDtoNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +27,6 @@ public class CurrencyService {
 
     private final ExchangeRatesClient exchangeRatesClient;
     private final CurrencyRatesClient currencyRatesClient;
-    private final ExchangeRateValidator exchangeRateValidator;
     private final Map<String, Double> currencyRates = new ConcurrentHashMap<>();
 
     public void updateCurrencyRates() {
@@ -42,17 +41,23 @@ public class CurrencyService {
         log.info("start convertCurrency with amount: {}, from: {}, to: {}", amount, fromCurrency, toCurrency);
 
         ExchangeRateResponseDto responseDto = exchangeRatesClient
-                .getCurrentExchangeRates(appId, fromCurrency, toCurrency);
-        exchangeRateValidator.validationExchangeRateResponse(responseDto);
-        log.info("ExchangeRateResponseDto: {}", responseDto);
+                .getCurrentExchangeRates(appId, fromCurrency, toCurrency)
+                .orElseThrow(() -> new ResponseDtoNotFoundException("Response from openexchangerates.org not received"));
 
+        validationExchangeRateAmount(responseDto, toCurrency);
         BigDecimal exchangeRate = BigDecimal.valueOf(responseDto.getRates().get(toCurrency.name()));
-        exchangeRateValidator.validationExchangeRateAmount(exchangeRate, toCurrency);
         log.info("exchangeRate: {}", exchangeRate);
 
         BigDecimal resultExchangeRate = amount.multiply(exchangeRate).multiply(BigDecimal.ONE.add(commission));
         log.info("finish convertCurrency with: {}", resultExchangeRate);
 
         return resultExchangeRate;
+    }
+
+    private void validationExchangeRateAmount(ExchangeRateResponseDto responseDto, Currency toCurrency) {
+        if (responseDto.getRates().get(toCurrency.name()) == null) {
+            log.error("ExchangeRate is null!");
+            throw new IllegalArgumentException("Exchange rate not found for currency: " + toCurrency.name());
+        }
     }
 }
