@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResponseDtoNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handlerEntityResponseDtoNotFoundException(ResponseDtoNotFoundException e) {
+    public ErrorResponse handlerResponseDtoNotFoundException(ResponseDtoNotFoundException e) {
         log.error("ResponseDtoNotFoundException occurred: {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
