@@ -15,3 +15,11 @@ currency:
     fetch-cron: "0 0 0 * * *"
     base: "USD"
     symbols: "GBP,JPY,EUR"
+  openexchangerates:
+    appId: 5e598dec046041949f35f8bbc05df98f
+  baseCurrencyPayment: EUR
+  commission: 0.01
+
+exchange:
+  rates:
+    url: openexchangerates.org/api
