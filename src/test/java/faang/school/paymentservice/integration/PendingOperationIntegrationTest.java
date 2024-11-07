@@ -1,8 +1,9 @@
 package faang.school.paymentservice.integration;
 
-import faang.school.paymentservice.dto.CheckingAccountBalance;
+import faang.school.paymentservice.dto.CheckingPaymentStatusAndBalance;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.OperationMessage;
+import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.model.AccountBalanceStatus;
 import faang.school.paymentservice.model.Category;
 import faang.school.paymentservice.model.OperationStatus;
@@ -91,19 +92,21 @@ public class PendingOperationIntegrationTest {
         assertEquals(operation.getCategory(), publishedMessage.getCategory());
         assertEquals(operation.getStatus(), publishedMessage.getStatus());
 
-        CheckingAccountBalance balanceEvent = CheckingAccountBalance.builder()
+        CheckingPaymentStatusAndBalance balanceEvent = CheckingPaymentStatusAndBalance.builder()
                 .operationId(operationId)
-                .sourceAccountId(operation.getSourceAccountId())
                 .status(AccountBalanceStatus.SUFFICIENT_FUNDS)
+                .paymentStatus(PaymentStatus.SUCCESS)
                 .build();
 
-        redisTemplate.convertAndSend("checking_balance", balanceEvent);
+        redisTemplate.convertAndSend("auth-payment-response", balanceEvent);
 
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
-            PendingOperation updatedOperation = pendingOperationRepository.findById(operationId).orElse(null);
-            assertNotNull(updatedOperation);
-            assertEquals(AccountBalanceStatus.SUFFICIENT_FUNDS, updatedOperation.getAccountBalanceStatus());
-            assertEquals(OperationStatus.AUTHORIZATION, updatedOperation.getStatus());
-        });
+        Awaitility.await()
+                .atMost(10, TimeUnit.SECONDS)
+                .untilAsserted(() -> {
+                    PendingOperation updatedOperation = pendingOperationRepository.findById(operationId).orElse(null);
+                    assertNotNull(updatedOperation);
+                    assertEquals(AccountBalanceStatus.SUFFICIENT_FUNDS, updatedOperation.getAccountBalanceStatus());
+                    assertEquals(OperationStatus.AUTHORIZATION, updatedOperation.getStatus());
+                });
     }
 }

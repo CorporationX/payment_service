@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -18,21 +19,24 @@ public class ClearingJob {
     private final PendingOperationService pendingOperationService;
     private final OperationMessageService operationMessageService;
 
-    @Async
     @Scheduled(fixedDelayString = "${app.clearing.job.interval}")
     public void processPendingOperations() {
         LocalDateTime now = LocalDateTime.now();
         List<PendingOperation> operationsForClearing = pendingOperationService.getOperationsForClearing(now);
 
-        operationsForClearing.forEach(operation -> {
-            try {
-                pendingOperationService.confirmOperation(operation.getId(), false);
-                log.info("Operation confirmed by job with ID: {}", operation.getId());
-            } catch (Exception e) {
-                operation.setStatus(OperationStatus.ERROR);
-                operationMessageService.sendOperationMessage(operation);
-                log.error("Failed to confirm operation with ID {}: {}", operation.getId(), e.getMessage());
-            }
-        });
+        List<CompletableFuture<Void>> futures = operationsForClearing.stream()
+                .map(operation -> CompletableFuture.runAsync(() -> {
+                    try {
+                        pendingOperationService.confirmOperation(operation.getId(), false);
+                        log.info("Operation confirmed by job with ID: {}", operation.getId());
+                    } catch (Exception e) {
+                        operation.setStatus(OperationStatus.ERROR);
+                        operationMessageService.sendOperationMessage(operation);
+                        log.error("Failed to confirm operation with ID {}: {}", operation.getId(), e.getMessage());
+                    }
+                }))
+                .toList();
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
 }

@@ -13,6 +13,3 @@ CREATE TABLE pending_operation
     created_at             TIMESTAMPTZ  NOT NULL DEFAULT current_timestamp,
     updated_at             TIMESTAMPTZ           DEFAULT current_timestamp
 );
-
-CREATE INDEX index_pending_operation_status ON pending_operation (status);
-CREATE INDEX index_pending_operation_status_clear_scheduled_at ON pending_operation (status, clear_scheduled_at);

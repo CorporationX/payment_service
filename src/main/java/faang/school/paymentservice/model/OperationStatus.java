@@ -5,5 +5,8 @@ public enum OperationStatus {
     AUTHORIZATION,
     CANCELLATION,
     CLEARING,
-    ERROR
+    ERROR,
+    FINISHED_CLEARING,
+    FINISHED_CANCELLATION,
+    FINISHED_ERROR
 }
