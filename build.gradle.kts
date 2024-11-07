@@ -44,6 +44,7 @@ dependencies {
      */
     implementation("org.liquibase:liquibase-core")
     runtimeOnly("org.postgresql:postgresql")
+    implementation("org.springframework.kafka:spring-kafka")
 }
 
 tasks.withType<Test> {
