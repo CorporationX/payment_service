@@ -24,6 +24,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final OperationService operationService;
     private final PendingRepository pendingRepository;
 
+    @Override
     public void requestPayment(PaymentRequestEvent event) {
         event.setOperationKey(makeOperationKey(event));
         operationService.savePendingOperation(event);
@@ -35,6 +36,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Transactional
+    @Override
     public void cancelPayment(PaymentCancelEvent event) {
         PendingOperation operation = pendingRepository.findByOperationKey(event.getOperationKey())
                 .orElseThrow(() -> new EntityNotFoundException("Operation not found"));
@@ -43,6 +45,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Transactional
+    @Override
     public void approvePayment(PaymentApproveEvent event) {
         PendingOperation operation = pendingRepository.findByOperationKey(event.getOperationKey())
                 .orElseThrow(() -> new EntityNotFoundException("Operation not found"));

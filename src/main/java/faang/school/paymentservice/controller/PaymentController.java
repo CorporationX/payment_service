@@ -10,8 +10,10 @@ import faang.school.paymentservice.model.PaymentResponse;
 import faang.school.paymentservice.model.PaymentStatus;
 import faang.school.paymentservice.service.currency.CurrencyService;
 import faang.school.paymentservice.service.payment.PaymentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -21,6 +23,7 @@ import java.util.Random;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@Validated
 public class PaymentController {
     private final CurrencyService currencyService;
     private final PaymentService paymentService;
@@ -45,7 +48,7 @@ public class PaymentController {
     }
 
     @PostMapping("/payment/request")
-    public void requestPayment(@RequestBody PaymentRequestEvent event) {
+    public void requestPayment(@Valid @RequestBody PaymentRequestEvent event) {
         paymentService.requestPayment(event);
     }
 

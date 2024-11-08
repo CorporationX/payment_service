@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -31,11 +33,28 @@ public class RedisConfig {
     @Value("${spring.data.redis.channels.paymentApprove}")
     private String paymentApproveChannel;
 
+    @Value("${spring.data.redis.host}")
+    String host;
+    @Value("${spring.data.redis.port}")
+    Integer port;
+
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         return mapper;
+    }
+
+    @Bean
+    public JedisConnectionFactory jedisConnectionFactory1() {
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(host, port);
+        return new JedisConnectionFactory(redisStandaloneConfiguration);
+    }
+
+    @Bean
+    public JedisConnectionFactory jedisConnectionFactory2() {
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(host, port);
+        return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 
     @Bean
@@ -49,9 +68,9 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+    public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(factory);
+        template.setConnectionFactory(jedisConnectionFactory1());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper()));
         return template;
     }
@@ -90,10 +109,9 @@ public class RedisConfig {
 
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(MessageListenerAdapter paymentApprove,
-                                                                       MessageListenerAdapter paymentCancel,
-                                                                       RedisConnectionFactory redisConnectionFactory) {
+                                                                       MessageListenerAdapter paymentCancel) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory);
+        container.setConnectionFactory(jedisConnectionFactory2());
         container.addMessageListener(paymentApprove, paymentApproveTopic());
         container.addMessageListener(paymentCancel, paymentCancelTopic());
         return container;

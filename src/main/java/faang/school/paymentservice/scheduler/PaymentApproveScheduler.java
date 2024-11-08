@@ -7,11 +7,9 @@ import faang.school.paymentservice.publisher.PaymentClearEventPublisher;
 import faang.school.paymentservice.repository.PendingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -26,7 +24,7 @@ public class PaymentApproveScheduler {
     public void publishClearEvent() {
         List<PendingOperation> approvedOperations = pendingRepository.findByState(OperationState.APPROVED);
         approvedOperations.forEach(pendingOperation -> {
-            paymentClearEventPublisher.publish(new PaymentClearEvent().builder()
+            paymentClearEventPublisher.publish(PaymentClearEvent.builder()
                     .userId(pendingOperation.getAccountId())
                     .amount(pendingOperation.getAmount())
                     .operationKey(pendingOperation.getOperationKey())
