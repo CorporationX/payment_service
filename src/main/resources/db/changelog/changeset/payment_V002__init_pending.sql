@@ -1,0 +1,9 @@
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+ALTER TABLE pending
+DROP COLUMN balance_id,
+DROP COLUMN clear_scheduled_at;
+
+ALTER TABLE pending
+    ADD COLUMN IF NOT EXISTS token UUID NOT NULL;
+

@@ -20,6 +20,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     /**
      * Utils & Logging
@@ -44,6 +45,7 @@ dependencies {
      */
     implementation("org.liquibase:liquibase-core")
     runtimeOnly("org.postgresql:postgresql")
+    implementation("org.springframework.kafka:spring-kafka")
 }
 
 tasks.withType<Test> {
