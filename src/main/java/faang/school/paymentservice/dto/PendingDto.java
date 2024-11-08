@@ -1,6 +1,7 @@
 package faang.school.paymentservice.dto;
 
 import faang.school.paymentservice.entity.PendingStatus;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
@@ -11,12 +12,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class PendingDto {
+
+    @Id
+    private Long id;
+
+    @NotNull
+    private UUID token;
 
     @NotNull(message = "Amount is required")
     @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be positive")
@@ -36,4 +44,3 @@ public class PendingDto {
 
     private PendingStatus status;
 }
-

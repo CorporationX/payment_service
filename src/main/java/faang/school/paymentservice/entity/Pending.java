@@ -2,12 +2,13 @@ package faang.school.paymentservice.entity;
 
 import faang.school.paymentservice.dto.Currency;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "pending")
@@ -21,6 +22,9 @@ public class Pending {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "token", nullable = false)
+    private UUID token;
+
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "status", nullable = false)
     private PendingStatus status;
@@ -32,16 +36,10 @@ public class Pending {
     @Column(name = "currency", nullable = false)
     private Currency currency;
 
-    @Column(name = "balance_id", nullable = false)
-    private Long balanceId;
-
     @Column(name = "from_account_id", nullable = false)
     private Long fromAccountId;
 
     @Column(name = "to_account_id", nullable = false)
     private Long toAccountId;
-
-    @Column(name = "clear_scheduled_at", nullable = false)
-    private LocalDateTime clearScheduledAt;
 }
 
