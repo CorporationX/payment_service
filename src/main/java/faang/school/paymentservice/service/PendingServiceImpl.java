@@ -25,6 +25,15 @@ public class PendingServiceImpl implements PendingService {
 
     @Override
     @Transactional
+    public void resetStatus(PendingDto pendingDto) {
+        Pending pending = pendingRepository.findById(pendingDto.getId()).orElseThrow(
+                () -> new EntityNotFoundException("No pending found with %d".formatted(pendingDto.getId())));
+
+        pending.setStatus(pendingDto.getStatus());
+    }
+
+    @Override
+    @Transactional
     public Long initAndSaving(PendingDto pendingDto, UUID uuid) {
         return pendingRepository.findByToken(uuid)
                 .map(Pending::getId)
@@ -64,15 +73,6 @@ public class PendingServiceImpl implements PendingService {
     public PendingDto getPending(Long id) {
         return mapper.toDto(pendingRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("No pending found with %d".formatted(id))));
-    }
-
-    @Override
-    @Transactional
-    public void resetStatus(PendingDto pendingDto) {
-        Pending pending = pendingRepository.findById(pendingDto.getId()).orElseThrow(
-                () -> new EntityNotFoundException("No pending found with %d".formatted(pendingDto.getId())));
-
-        pending.setStatus(pendingDto.getStatus());
     }
 
     private PendingDto checkingIdempotency(Pending pending, UUID token, PendingStatus pendingStatus, String url) {

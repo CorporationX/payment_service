@@ -209,4 +209,18 @@ public class PendingServiceTest {
         verify(pendingRepository).findById(pendingId);
         verify(mapper, never()).toDto(any(Pending.class));
     }
+
+    @Test
+    void resetStatus_shouldUpdatePendingStatus_whenPendingExists() {
+        pendingDto.setStatus(PendingStatus.CANCELED);
+        pending.setStatus(PendingStatus.INITIALIZATION);
+
+        when(pendingRepository.findById(pendingDto.getId())).thenReturn(Optional.of(pending));
+
+        pendingService.resetStatus(pendingDto);
+
+        assertEquals(PendingStatus.CANCELED, pending.getStatus());
+        verify(pendingRepository).findById(pendingDto.getId());
+        verify(pendingRepository, never()).save(any(Pending.class));
+    }
 }
