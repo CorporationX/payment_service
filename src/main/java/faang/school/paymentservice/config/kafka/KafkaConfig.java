@@ -87,9 +87,4 @@ public class KafkaConfig {
     public ConsumerFactory<String, String> consumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfig());
     }
-
-    @Bean
-    public KafkaTransactionManager<String, String> kafkaTransactionManager(ProducerFactory<String, String> producerFactory) {
-        return new KafkaTransactionManager<>(producerFactory);
-    }
 }
