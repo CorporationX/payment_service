@@ -35,20 +35,6 @@ public class KafkaConfig {
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConcurrency(3);
-        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
-        return factory;
-    }
-
-    @Bean
-    public NewTopic paymentStatusResetTopic() {
-        Topic topic = properties.getTopics().get("payment-status-reset");
-        return new NewTopic(topic.getName(), topic.getNumPartitions(), topic.getReplicationFactor());
-    }
-
     private Map<String, Object> producerConfig() {
         Producer producer = properties.getProducer();
         Map<String, Object> configProps = new HashMap<>();
