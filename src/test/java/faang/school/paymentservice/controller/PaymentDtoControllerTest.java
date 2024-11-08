@@ -50,7 +50,7 @@ class PaymentDtoControllerTest {
 
     @Test
     void sendPayment() throws Exception {
-        Long paymentNumber = 23L;
+        long paymentNumber = 23L;
         BigDecimal expectedAmount = new BigDecimal(1000);
         Currency currency = Currency.RUB;
         Currency currencyUsd = Currency.USD;
