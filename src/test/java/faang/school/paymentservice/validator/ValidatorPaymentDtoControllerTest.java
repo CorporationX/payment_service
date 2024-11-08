@@ -4,7 +4,7 @@ import faang.school.paymentservice.model.enums.Currency;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class ValidatorPaymentControllerTest {
+class ValidatorPaymentDtoControllerTest {
     private ValidatorPaymentController validatorPaymentController = new ValidatorPaymentController();
 
     @Test

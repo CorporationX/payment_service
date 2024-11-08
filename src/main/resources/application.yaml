@@ -9,3 +9,30 @@ services:
   openexchange:
     url: https://openexchangerates.org/
     appId: f3c37613244e47979f50c0451a24291d
+
+spring:
+  data:
+    jdbc:
+      repositories:
+        enabled: false
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+account-service:
+  host: localhost
+  port: 8090

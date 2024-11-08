@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 @RequiredArgsConstructor
-class PaymentControllerTest {
+class PaymentDtoControllerTest {
 
     @Mock
     private ValidatorPaymentController validator;
@@ -64,7 +64,7 @@ class PaymentControllerTest {
                         .content("{ \"amount\": 1000, \"currency\": \"" + currencyUsd + "\", " +
                                 "\"paymentNumber\": \"" + paymentNumber + "\" }"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.status").value("COMPLETED"))
                 .andExpect(jsonPath("$.paymentNumber").value(paymentNumber))
                 .andExpect(jsonPath("$.amount").value(expectedAmount))
                 .andExpect(jsonPath("$.currency").value("RUB"))

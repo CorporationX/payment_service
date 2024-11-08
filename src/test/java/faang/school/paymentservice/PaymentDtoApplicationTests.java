@@ -3,7 +3,7 @@ package faang.school.paymentservice;
 import org.junit.jupiter.api.Test;
 
 
-class PaymentApplicationTests {
+class PaymentDtoApplicationTests {
     @Test
     void contextLoads() { }
 }

@@ -1,5 +1,9 @@
 package faang.school.paymentservice.model.enums;
 
 public enum PaymentStatus {
-    SUCCESS
+    PENDING,
+    FAILED,
+    IN_PROGRESS,
+    CANCELED,
+    COMPLETED
 }
