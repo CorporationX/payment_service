@@ -1,4 +1,4 @@
-package faang.school.paymentservice.service;
+package faang.school.paymentservice.service.payment;
 
 import faang.school.paymentservice.client.account_service.AccountServiceClient;
 import faang.school.paymentservice.dto.account.AccountDto;

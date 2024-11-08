@@ -2,7 +2,7 @@ package faang.school.paymentservice.scheduler;
 
 
 import faang.school.paymentservice.model.Payment;
-import faang.school.paymentservice.service.PaymentService;
+import faang.school.paymentservice.service.payment.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

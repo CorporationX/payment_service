@@ -1,7 +1,10 @@
 package faang.school.paymentservice.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import faang.school.paymentservice.listener.PaymentEventResponceListener;
+import faang.school.paymentservice.listener.payment.AuthEventResponseListener;
+import faang.school.paymentservice.listener.payment.CancelEventResponseListener;
+import faang.school.paymentservice.listener.payment.ForcedEventResponseListener;
+import faang.school.paymentservice.listener.payment.ScheduledEventResponseListener;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,9 +24,11 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @RequiredArgsConstructor
 public class RedisConfig {
     private final RedisProperties redisProperties;
-    private final PaymentEventResponceListener paymentEventResponceListener;
+    private final AuthEventResponseListener authEventResponseListener;
+    private final CancelEventResponseListener cancelEventResponseListener;
+    private final ForcedEventResponseListener forcedEventResponseListener;
+    private final ScheduledEventResponseListener scheduledEventResponseListener;
     private final ObjectMapper objectMapper;
-
 
 
     @Bean
@@ -40,19 +45,52 @@ public class RedisConfig {
         RedisMessageListenerContainer redisContainer = new RedisMessageListenerContainer();
         redisContainer.setConnectionFactory(redisConnectionFactory());
 
-        redisContainer.addMessageListener(paymentEventResponceAdapter(), paymentEventResponceTopic());
+        redisContainer.addMessageListener(authEventResponceAdapter(), authEventResponceTopic());
+        redisContainer.addMessageListener(scheduledEventResponceAdapter(), scheduledEventResponceTopic());
+        redisContainer.addMessageListener(cancelEventResponceAdapter(), cancelEventResponceTopic());
+        redisContainer.addMessageListener(forcedEventResponceAdapter(), forcedEventResponceTopic());
 
         return redisContainer;
     }
 
     @Bean
-    public MessageListener paymentEventResponceAdapter() {
-        return new MessageListenerAdapter(paymentEventResponceListener);
+    public MessageListener authEventResponceAdapter() {
+        return new MessageListenerAdapter(authEventResponseListener);
     }
 
     @Bean
-    public Topic paymentEventResponceTopic() {
-        return new ChannelTopic(redisProperties.getPaymentEventResponceTopic());
+    public MessageListener scheduledEventResponceAdapter() {
+        return new MessageListenerAdapter(scheduledEventResponseListener);
+    }
+
+    @Bean
+    public MessageListener cancelEventResponceAdapter() {
+        return new MessageListenerAdapter(cancelEventResponseListener);
+    }
+
+    @Bean
+    public MessageListener forcedEventResponceAdapter() {
+        return new MessageListenerAdapter(forcedEventResponseListener);
+    }
+
+    @Bean
+    public Topic authEventResponceTopic() {
+        return new ChannelTopic(redisProperties.getAuthEventResponseTopic());
+    }
+
+    @Bean
+    public Topic scheduledEventResponceTopic() {
+        return new ChannelTopic(redisProperties.getScheduledEventResponseTopic());
+    }
+
+    @Bean
+    public Topic cancelEventResponceTopic() {
+        return new ChannelTopic(redisProperties.getCancelEventResponseTopic());
+    }
+
+    @Bean
+    public Topic forcedEventResponceTopic() {
+        return new ChannelTopic(redisProperties.getForcedEventResponseTopic());
     }
 
     @Bean

@@ -5,7 +5,7 @@ import faang.school.paymentservice.dto.payment.PaymentResponceDto;
 import faang.school.paymentservice.mapper.PaymentMapper;
 import faang.school.paymentservice.model.Payment;
 import faang.school.paymentservice.model.PaymentStatus;
-import faang.school.paymentservice.service.PaymentService;
+import faang.school.paymentservice.service.payment.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

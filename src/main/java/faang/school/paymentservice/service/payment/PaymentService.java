@@ -1,19 +1,22 @@
-package faang.school.paymentservice.service;
+package faang.school.paymentservice.service.payment;
 
+import faang.school.paymentservice.aspect.PublishPaymentEvent;
 import faang.school.paymentservice.client.account_service.AccountServiceClient;
 import faang.school.paymentservice.dto.account.AccountDto;
 import faang.school.paymentservice.model.Currency;
 import faang.school.paymentservice.model.Payment;
 import faang.school.paymentservice.model.PaymentStatus;
-import faang.school.paymentservice.publisher.payment.PublishPaymentEvent;
 import faang.school.paymentservice.repository.PaymentRepository;
+import faang.school.paymentservice.service.payment.tools.IdempotenceKeyGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static faang.school.paymentservice.dto.account.QueryType.NUMBER;
@@ -33,11 +36,15 @@ import static faang.school.paymentservice.model.PaymentStatus.SCHEDULED_SUCCESS;
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final AccountServiceClient accountServiceClient;
+    private final IdempotenceKeyGenerator generator;
 
     @Transactional
     @PublishPaymentEvent
     public Payment authorizePayment(Payment payment, String accountNumberFrom, String accountNumberTo) {
         validateAmount(payment.getAmount());
+
+        String idempotencyKey = validateIdempotence(payment, accountNumberFrom, accountNumberTo);
+
         AccountDto from = getAccount(accountNumberFrom);
         AccountDto to = getAccount(accountNumberTo);
         validateAccountStatus(from);
@@ -47,6 +54,7 @@ public class PaymentService {
         payment.setAccountFromId(from.getId());
         payment.setAccountToId(to.getId());
         payment.setStatus(AUTH_PENDING);
+        payment.setIdempotencyKey(idempotencyKey);
 
         return paymentRepository.save(payment);
     }
@@ -67,7 +75,6 @@ public class PaymentService {
         validateResponceStatusForUpdate(status);
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found for id: " + paymentId));
-        validateCurrentPaymentResponceStatus(status, payment);
         payment.setStatus(status);
     }
 
@@ -76,26 +83,39 @@ public class PaymentService {
         return paymentRepository.getPaymentsForClearing();
     }
 
+    private String validateIdempotence(Payment payment, String accountNumberFrom, String accountNumberTo) {
+        String idempotencyKey = generator.generateIdempotenceKey(
+                payment.getAmount().toString(),
+                payment.getCurrency().toString(),
+                accountNumberFrom,
+                accountNumberTo,
+                payment.getClearScheduledAt().toString());
+
+        Optional<Payment> paymentOptional = paymentRepository.findByIdempotencyKey(idempotencyKey);
+        if (paymentOptional.isPresent()) {
+            Payment currentPayment = paymentOptional.get();
+            if (isProcessedWithinOneMinute(currentPayment)) {
+                throw new IllegalStateException("This payment has already been processed");
+            } else {
+                String oldIdempotencyKey = currentPayment.getIdempotencyKey();
+                String newIdempotencyKey = generator.generateIdempotenceKey(oldIdempotencyKey, LocalDateTime.now().toString());
+                currentPayment.setIdempotencyKey(newIdempotencyKey);
+                paymentRepository.save(currentPayment);
+            }
+        }
+        return idempotencyKey;
+    }
+
+    private boolean isProcessedWithinOneMinute(Payment currentPayment) {
+        return LocalDateTime.now().isBefore(currentPayment.getCreatedAt().plusMinutes(1));
+    }
+
     private void validateResponceStatusForUpdate(PaymentStatus status) {
         List<PaymentStatus> correctUpdateStatus =
                 List.of(AUTH_ERROR, AUTH_SUCCESS, SCHEDULED_SUCCESS, CANCEL_SUCCESS, FORCED_SUCCESS);
         if (!correctUpdateStatus.contains(status)) {
             log.error("Incorrect status for update");
             throw new IllegalArgumentException("Incorrect status for update");
-        }
-    }
-
-    private void validateCurrentPaymentResponceStatus(PaymentStatus status, Payment payment) {
-        boolean correctStatus = switch (status) {
-            case AUTH_ERROR, AUTH_SUCCESS -> payment.getStatus().equals(AUTH_PENDING);
-            case SCHEDULED_SUCCESS -> payment.getStatus().equals(SCHEDULED_PENDING);
-            case CANCEL_SUCCESS -> payment.getStatus().equals(CANCEL_PENDING);
-            case FORCED_SUCCESS -> payment.getStatus().equals(FORCED_PENDING);
-            default -> false;
-        };
-
-        if (!correctStatus) {
-            throw new IllegalStateException("Incorrect update status for current payment status");
         }
     }
 

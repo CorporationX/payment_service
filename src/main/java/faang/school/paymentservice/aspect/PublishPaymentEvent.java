@@ -1,4 +1,4 @@
-package faang.school.paymentservice.publisher.payment;
+package faang.school.paymentservice.aspect;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -8,4 +8,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface PublishPaymentEvent {
+
 }

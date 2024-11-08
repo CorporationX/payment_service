@@ -53,6 +53,9 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
+    @Column(name = "idempotency_key", length = 64, nullable = false)
+    private String idempotencyKey;
+
     @Column(name = "clear_scheduled_at", updatable = false, nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime clearScheduledAt;
