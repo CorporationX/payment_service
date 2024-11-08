@@ -22,11 +22,16 @@ spring:
       enable-idempotence: true
       retries: 2147483647 # Integer.MAX_VALUE
       max-in-flight-requests-per-connection: 1
+    consumer:
+      group-id: "group"
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      isolation-level: read_committed
     topics:
       payment-authorization:
         name: payment-authorization-topic
         num-partitions: 5
-        replication-factor: 2
+        replication-factor: 1
       payment-clear:
         name: payment-clear-topic
         num-partitions: 3

@@ -13,4 +13,6 @@ public interface PendingService {
     PendingDto forcedPaymentConfirmation(Long id, UUID uuid);
 
     PendingDto getPending(Long id);
+
+    void resetStatus(PendingDto pendingDto);
 }

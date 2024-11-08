@@ -5,6 +5,7 @@ import faang.school.paymentservice.dto.PendingDto;
 import faang.school.paymentservice.entity.Pending;
 import faang.school.paymentservice.entity.PendingStatus;
 import faang.school.paymentservice.mapper.PendingDtoMapper;
+import faang.school.paymentservice.publisher.PublishEvent;
 import faang.school.paymentservice.repository.PendingRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class PendingServiceImpl implements PendingService {
     private final PendingDtoMapper mapper;
     private final PendingRepository pendingRepository;
     private final WebClientForAccountService webClient;
+    private final PublishEvent publishEvent;
 
     @Override
     @Transactional
@@ -31,11 +33,13 @@ public class PendingServiceImpl implements PendingService {
                     pending.setToken(uuid);
                     pending.setStatus(PendingStatus.INITIALIZATION);
                     pending = pendingRepository.save(pending);
+                    publishEvent.publishMessageAuthorization(mapper.toDto(pending));
                     return pending.getId();
                 });
     }
 
     @Override
+    @Transactional
     public PendingDto cancelPending(Long id, UUID token) {
         Pending pending = pendingRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("No pending found with %d".formatted(id)));
@@ -46,6 +50,7 @@ public class PendingServiceImpl implements PendingService {
     }
 
     @Override
+    @Transactional
     public PendingDto forcedPaymentConfirmation(Long id, UUID token) {
         Pending pending = pendingRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("No pending found with %d".formatted(id)));
@@ -59,6 +64,15 @@ public class PendingServiceImpl implements PendingService {
     public PendingDto getPending(Long id) {
         return mapper.toDto(pendingRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("No pending found with %d".formatted(id))));
+    }
+
+    @Override
+    @Transactional
+    public void resetStatus(PendingDto pendingDto) {
+        Pending pending = pendingRepository.findById(pendingDto.getId()).orElseThrow(
+                () -> new EntityNotFoundException("No pending found with %d".formatted(pendingDto.getId())));
+
+        pending.setStatus(pendingDto.getStatus());
     }
 
     private PendingDto checkingIdempotency(Pending pending, UUID token, PendingStatus pendingStatus, String url) {
