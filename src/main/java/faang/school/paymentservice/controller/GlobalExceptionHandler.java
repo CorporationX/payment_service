@@ -1,6 +1,6 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.model.Currency;
 import faang.school.paymentservice.dto.ErrorResponse;
 import java.util.Arrays;
 import java.util.Map;

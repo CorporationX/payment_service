@@ -1,37 +1,44 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.dto.PaymentRequest;
-import java.text.DecimalFormat;
-import java.util.Random;
-import faang.school.paymentservice.dto.PaymentResponse;
-import faang.school.paymentservice.dto.PaymentStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+import faang.school.paymentservice.dto.payment.PaymentRequestDto;
+import faang.school.paymentservice.dto.payment.PaymentResponceDto;
+import faang.school.paymentservice.mapper.PaymentMapper;
+import faang.school.paymentservice.model.Payment;
+import faang.school.paymentservice.model.PaymentStatus;
+import faang.school.paymentservice.service.payment.PaymentService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/payments")
+@RequiredArgsConstructor
 public class PaymentController {
+    private final PaymentMapper paymentMapper;
+    private final PaymentService paymentService;
 
-    @PostMapping("/payment")
-    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00");
-        String formattedSum = decimalFormat.format(dto.amount());
-        int verificationCode = new Random().nextInt(1000, 10000);
-        String message = String.format("Dear friend! Thank you for your purchase! " +
-                        "Your payment on %s %s was accepted.",
-                formattedSum, dto.currency().name());
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public PaymentResponceDto authorizePayment(@RequestBody @Valid PaymentRequestDto paymentRequestDto) {
+        Payment requestPayment = paymentMapper.toPaymentEntity(paymentRequestDto);
+        String accountNumberFrom = paymentRequestDto.getAccountNumberFrom();
+        String accountNumberTo = paymentRequestDto.getAccountNumberTo();
+        Payment responcePayment = paymentService.authorizePayment(requestPayment, accountNumberFrom, accountNumberTo);
+        return paymentMapper.toPaymentResponceDto(responcePayment);
+    }
 
-        return ResponseEntity.ok(new PaymentResponse(
-                PaymentStatus.SUCCESS,
-                verificationCode,
-                dto.paymentNumber(),
-                dto.amount(),
-                dto.currency(),
-                message)
-        );
+    @PutMapping
+    public PaymentResponceDto changePaymentStatus(@RequestParam UUID paymentId, @RequestParam PaymentStatus status) {
+        Payment payment = paymentService.updatePaymentStatus(paymentId, status);
+        return paymentMapper.toPaymentResponceDto(payment);
     }
 }

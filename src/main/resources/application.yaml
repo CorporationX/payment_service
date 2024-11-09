@@ -1,11 +1,44 @@
 spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
   data:
     redis:
       port: 6379
       host: localhost
+      channel:
+        payment-auth-event: payment_auth_event
+        payment-scheduled-event: payment_scheduled_event
+        payment-cancel-event: payment_cancel_event
+        payment-forced-event: payment_forced_event
+        response:
+          auth-event-response: auth_event_response
+          scheduled-event-response: scheduled_event_response
+          cancel-event-response: cancel_event_response
+          forced-event-response: forced_event_response
+
 
 server:
   port: 9080
+
+account-service:
+  host: localhost
+  port: 8090
 
 logging:
   level:
@@ -25,3 +58,10 @@ payment:
           backoff:
             delay: 2000       # Начальный интервал между попытками (в миллисекундах)
             multiplier: 2.0      # Интервал между попытками (в миллисекундах)
+
+  clearing:
+    scheduler:
+      cron: "0 * * * * *" # Запуск каждую минуту
+
+  idempotency:
+    algorithm: SHA-256
