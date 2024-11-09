@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentRequestController {
     private final PaymentRequestService requestService;
 
-    @PostMapping("/authorisation")
+    @PostMapping("/authorization")
     public RequestDto authorizePayment(@RequestBody RequestDto requestDto) {
         return requestService.authorizePayment(requestDto);
     }
@@ -39,10 +39,5 @@ public class PaymentRequestController {
     @GetMapping("/{requestId}")
     public RequestDto getRequest(@Positive @PathVariable("requestId") long requestId) {
         return requestService.getRequest(requestId);
-    }
-
-    @Scheduled(cron = "${payment-request.cron}")
-    public void pushPaymentConfirmation() {
-        requestService.pushPaymentConfirmation();
     }
 }

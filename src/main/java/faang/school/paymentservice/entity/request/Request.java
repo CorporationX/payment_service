@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Version;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -47,6 +48,10 @@ public class Request {
     @Column(name = "clear_scheduled_at")
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime clearScheduledAt;
+
+    @Column(name = "version", nullable = false)
+    @Version
+    private Long version;
 
     @CreationTimestamp
     @Column(name = "created_at")

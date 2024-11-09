@@ -24,9 +24,6 @@ public record RequestDto(
     Currency currency,
 
     @NotNull
-    RequestStatus status,
-
-    @NotNull
     LocalDateTime clearScheduledAt,
     LocalDateTime createdAt,
     LocalDateTime updatedAt

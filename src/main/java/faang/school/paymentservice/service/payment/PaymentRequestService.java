@@ -5,6 +5,7 @@ import faang.school.paymentservice.dto.request.RequestDto;
 import faang.school.paymentservice.dto.event.dmsevent.DmsEventDto;
 import faang.school.paymentservice.entity.request.Request;
 import faang.school.paymentservice.entity.request.RequestStatus;
+import faang.school.paymentservice.exception.PaymentRequestException;
 import faang.school.paymentservice.mapper.EventMapper;
 import faang.school.paymentservice.mapper.RequestMapper;
 import faang.school.paymentservice.publisher.AbstractEventPublisher;
@@ -40,12 +41,7 @@ public class PaymentRequestService {
 
     public RequestDto cancelPayment(long requestId) {
         Request request = findRequest(requestId);
-        if (request.getStatus() != RequestStatus.PENDING) {
-            String message = "The payment request with id %d has already been cancelled or completed"
-                .formatted(requestId);
-            log.error(message);
-            throw new RuntimeException(message);
-        }
+        checkRequestAbleToCancelOrConfirm(request);
         publishMessage(request, DmsTypeOperation.CANCELING);
         request.setStatus(RequestStatus.CANCELING);
         return requestMapper.toRequestDto(requestRepository.save(request));
@@ -53,12 +49,7 @@ public class PaymentRequestService {
 
     public RequestDto forciblyConfirmPayment(long requestId) {
         Request request = findRequest(requestId);
-        if (request.getStatus() != RequestStatus.PENDING) {
-            String message = "The payment request with id %d has already been completed or cancelled"
-                .formatted(requestId);
-            log.error(message);
-            throw new RuntimeException(message);
-        }
+        checkRequestAbleToCancelOrConfirm(request);
         publishMessage(request, DmsTypeOperation.CONFIRMATION);
         request.setStatus(RequestStatus.COMPLETED);
         return requestMapper.toRequestDto(requestRepository.save(request));
@@ -72,7 +63,7 @@ public class PaymentRequestService {
                     publishMessage(request, DmsTypeOperation.CONFIRMATION);
                     request.setStatus(RequestStatus.COMPLETED);
                     requestRepository.save(request);
-                } catch (RuntimeException e) {
+                } catch (PaymentRequestException e) {
                     log.warn("Confirmation for the request with id {} could not be sent", request.getId(), e);
                 }
             }
@@ -86,12 +77,17 @@ public class PaymentRequestService {
     }
 
     private Request findRequest(long requestId) {
-        Optional<Request> requestOpt = requestRepository.findById(requestId);
-        if (requestOpt.isEmpty()) {
+        return requestRepository.findById(requestId).orElseThrow(() -> {
             String message = "Request with id = %d not found".formatted(requestId);
-            log.error(message);
-            throw new RuntimeException(message);
+            return new PaymentRequestException(message);
+        });
+    }
+
+    private void checkRequestAbleToCancelOrConfirm(Request request) {
+        if (request.getStatus() != RequestStatus.PENDING) {
+            String message = "The payment request with id %d has already been cancelled or completed"
+                .formatted(request.getId());
+            throw new PaymentRequestException(message);
         }
-        return  requestOpt.get();
     }
 }

@@ -2,6 +2,7 @@ package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ErrorResponse;
+import faang.school.paymentservice.exception.PaymentRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -38,6 +39,13 @@ public class GlobalExceptionHandler {
                 : e.getMessage();
         log.error(e.getMessage(), e);
         return new ErrorResponse(message);
+    }
+
+    @ExceptionHandler(PaymentRequestException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handlePaymentRequestException(PaymentRequestException e) {
+        log.error(e.getMessage(), e);
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler(RuntimeException.class)
