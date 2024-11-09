@@ -9,4 +9,6 @@ CREATE TABLE payments(
     clear_scheduled_at  TIMESTAMP                               NOT NULL,
     created_at          TIMESTAMP DEFAULT current_timestamp     NOT NULL,
     updated_at          TIMESTAMP DEFAULT current_timestamp     NOT NULL
-)
+);
+
+CREATE INDEX idempotency_key_index ON payments(idempotency_key);
