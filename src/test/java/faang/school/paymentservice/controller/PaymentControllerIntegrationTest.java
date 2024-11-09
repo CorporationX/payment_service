@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static faang.school.paymentservice.dto.account.QueryType.NUMBER;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -27,7 +28,7 @@ public class PaymentControllerIntegrationTest extends BaseContextTest {
     private AccountServiceClient accountServiceClient;
 
     @Test
-    public void createPaymentTest() throws Exception {
+    public void checkIdempotenceTest() throws Exception {
 
         PaymentRequestDto requestDto = PaymentRequestDto.builder()
                 .amount("1000.00")
@@ -62,6 +63,22 @@ public class PaymentControllerIntegrationTest extends BaseContextTest {
         when(accountServiceClient.getAccountByNumber(NUMBER, requestDto.getAccountNumberTo()))
                 .thenReturn(List.of(accountTo));
 
+        mockMvc.perform(post("/payments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.amount").value(requestDto.getAmount()))
+                .andExpect(jsonPath("$.currency").value("RUB"))
+                .andExpect(jsonPath("$.status").value("AUTH_PENDING"));
+
+        SECONDS.sleep(30);
+        mockMvc.perform(post("/payments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().is5xxServerError())
+                .andExpect(jsonPath("$.message").value("This payment has already been processed"));
+
+        SECONDS.sleep(40);
         mockMvc.perform(post("/payments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
