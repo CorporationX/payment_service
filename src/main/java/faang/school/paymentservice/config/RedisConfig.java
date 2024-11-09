@@ -1,4 +1,4 @@
-package faang.school.paymentservice.config.context;
+package faang.school.paymentservice.config;
 
 import faang.school.paymentservice.listener.PaymentStatusEventListener;
 import org.springframework.beans.factory.annotation.Value;

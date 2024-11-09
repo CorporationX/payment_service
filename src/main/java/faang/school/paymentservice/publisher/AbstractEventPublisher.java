@@ -2,7 +2,7 @@ package faang.school.paymentservice.publisher;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import faang.school.paymentservice.config.context.RedisConfig;
+import faang.school.paymentservice.config.RedisConfig;
 import faang.school.paymentservice.exception.EventPublishingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

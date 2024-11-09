@@ -1,5 +1,8 @@
 package faang.school.paymentservice.controller;
 
+import faang.school.paymentservice.exception.DataValidationException;
+import faang.school.paymentservice.exception.EventProcessingException;
+import faang.school.paymentservice.exception.EventPublishingException;
 import faang.school.paymentservice.exception.NotFoundException;
 import faang.school.paymentservice.exception.OperationNotPermittedException;
 import faang.school.paymentservice.model.dto.ErrorResponse;
@@ -17,6 +20,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -66,5 +70,26 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleOperationNotPermittedException(OperationNotPermittedException e) {
         log.error("Illegal argument exception occurred", e);
         return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(DataValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDataValidationException(DataValidationException ex) {
+        log.error("Data Validation Error", ex);
+        return new ErrorResponse(ex.getMessage());
+    }
+
+    @ExceptionHandler(EventProcessingException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleEventProcessingException(EventProcessingException ex) {
+        log.error("Event Processing Exception", ex);
+        return new ErrorResponse(ex.getMessage());
+    }
+
+    @ExceptionHandler(EventPublishingException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleEventPublishingException(EventPublishingException ex) {
+        log.error("Event Publishing Exception", ex);
+        return new ErrorResponse(ex.getMessage());
     }
 }
