@@ -1,37 +1,34 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.dto.PaymentRequest;
-import java.text.DecimalFormat;
-import java.util.Random;
-import faang.school.paymentservice.dto.PaymentResponse;
-import faang.school.paymentservice.dto.PaymentStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import faang.school.paymentservice.dto.payment.PaymentUpdateDto;
+import faang.school.paymentservice.dto.payment.PaymentCreateDto;
+import faang.school.paymentservice.dto.payment.PaymentDto;
+import faang.school.paymentservice.service.payment.PaymentService;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/payments")
+@AllArgsConstructor
 public class PaymentController {
 
-    @PostMapping("/payment")
-    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00");
-        String formattedSum = decimalFormat.format(dto.amount());
-        int verificationCode = new Random().nextInt(1000, 10000);
-        String message = String.format("Dear friend! Thank you for your purchase! " +
-                        "Your payment on %s %s was accepted.",
-                formattedSum, dto.currency().name());
+    private final PaymentService paymentService;
 
-        return ResponseEntity.ok(new PaymentResponse(
-                PaymentStatus.SUCCESS,
-                verificationCode,
-                dto.paymentNumber(),
-                dto.amount(),
-                dto.currency(),
-                message)
-        );
+    @PostMapping
+    public PaymentDto sendPayment(@RequestBody @Valid PaymentCreateDto dto) {
+        return paymentService.sendPayment(dto);
+    }
+
+    @PatchMapping("/{paymentId}")
+    public PaymentDto updatePayment(@PathVariable @NonNull UUID paymentId,
+                                    @RequestBody @Valid PaymentUpdateDto paymentUpdateRequestDto) {
+        return switch (paymentUpdateRequestDto.getAction()) {
+            case CONFIRM -> paymentService.confirmPayment(paymentId);
+            case CANCEL -> paymentService.cancelPayment(paymentId);
+        };
     }
 }
