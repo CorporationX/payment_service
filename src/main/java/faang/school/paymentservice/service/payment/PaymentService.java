@@ -8,14 +8,16 @@ import faang.school.paymentservice.model.PaymentStatus;
 import faang.school.paymentservice.repository.PaymentRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@AllArgsConstructor
+@Slf4j
 @Service
+@AllArgsConstructor
 public class PaymentService {
 
     private final PaymentMapper paymentMapper;
@@ -33,7 +35,6 @@ public class PaymentService {
     @Transactional
     public Payment createAndPersistPayment(PaymentCreateDto dto) {
         Payment payment = paymentMapper.toEntity(dto);
-//        payment.setIdempotencyKey(dto.getIdempotencyKey());
         payment.setStatus(PaymentStatus.AUTH_PENDING);
         payment.setCreatedAt(LocalDateTime.now());
         payment.setUpdatedAt(LocalDateTime.now());

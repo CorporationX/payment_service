@@ -13,7 +13,7 @@ import java.util.UUID;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "payment_request")
+@Table(name = "payments")
 public class Payment {
 
         @Id
