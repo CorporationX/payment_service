@@ -1,3 +1,27 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      publisher:
+        delay: 3000
+      channels:
+        dms-channel:
+          name: dms_channel
+
 server:
   port: 9080
 
@@ -16,3 +40,6 @@ currency:
     url: https://openexchangerates.org/api/latest.json
     appId: 5ef8acd7b3fd427796212f3971abf5d8
     commission: 0.01
+
+payment-request:
+  cron: 0/5 * * * * * # каждые 5 секунд
