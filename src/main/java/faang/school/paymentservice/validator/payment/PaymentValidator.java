@@ -3,7 +3,7 @@ package faang.school.paymentservice.validator.payment;
 import faang.school.paymentservice.model.PaymentStatus;
 import faang.school.paymentservice.model.Payment;
 import faang.school.paymentservice.exception.DataValidationException;
-import faang.school.paymentservice.repository.PaymentRepository;
+import faang.school.paymentservice.repository.payment.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

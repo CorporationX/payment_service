@@ -85,7 +85,7 @@ public class PaymentOperationService {
 
     private void adjustCurrencyToBase(PaymentCreateDto dto) {
         Currency currency = Currency.valueOf(dto.getCurrency());
-        if (currency != baseCurrencyPayment) {
+        if (baseCurrencyPayment != null && currency != baseCurrencyPayment) {
             BigDecimal amount = currencyService.convertCurrency(dto.getAmount(), currency, baseCurrencyPayment);
             dto.setAmount(amount);
             dto.setCurrency(baseCurrencyPayment.name());

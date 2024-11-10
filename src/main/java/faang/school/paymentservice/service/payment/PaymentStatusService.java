@@ -2,7 +2,7 @@ package faang.school.paymentservice.service.payment;
 
 import faang.school.paymentservice.model.Payment;
 import faang.school.paymentservice.model.PaymentStatus;
-import faang.school.paymentservice.repository.PaymentRepository;
+import faang.school.paymentservice.repository.payment.PaymentRepository;
 import faang.school.paymentservice.validator.payment.PaymentValidator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;

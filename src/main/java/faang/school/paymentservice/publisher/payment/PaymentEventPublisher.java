@@ -3,6 +3,7 @@ package faang.school.paymentservice.publisher.payment;
 import faang.school.paymentservice.event.payment.PaymentEvent;
 import faang.school.paymentservice.model.Payment;
 import faang.school.paymentservice.publisher.MessagePublisher;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -38,14 +39,16 @@ public class PaymentEventPublisher implements MessagePublisher<PaymentEvent> {
                 .clearScheduledAt(payment.getClearScheduledAt())
                 .build();
 
-        ChannelTopic topic = switch (payment.getStatus()) {
-            case AUTH_PENDING -> paymentAuthPendingTopic;
-            case CONFIRM_PENDING -> paymentConfirmPendingTopic;
-            case CANCEL_PENDING -> paymentCancelPendingTopic;
-            case CLEAR_PENDING -> paymentClearPendingTopic;
-            default -> throw new IllegalArgumentException("Unsupported payment status");
-        };
+        publish(event, getTopicName(payment));
+    }
 
-        publish(event, topic.getTopic());
+    private String getTopicName(Payment payment) {
+        return switch (payment.getStatus()) {
+            case AUTH_PENDING -> paymentAuthPendingTopic.getTopic();
+            case CONFIRM_PENDING -> paymentConfirmPendingTopic.getTopic();
+            case CANCEL_PENDING -> paymentCancelPendingTopic.getTopic();
+            case CLEAR_PENDING -> paymentClearPendingTopic.getTopic();
+            default -> throw new IllegalArgumentException("Unsupported payment status: " + payment.getStatus());
+        };
     }
 }

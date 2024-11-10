@@ -5,7 +5,7 @@ import faang.school.paymentservice.exception.DataValidationException;
 import faang.school.paymentservice.mapper.PaymentMapper;
 import faang.school.paymentservice.model.Payment;
 import faang.school.paymentservice.model.PaymentStatus;
-import faang.school.paymentservice.repository.PaymentRepository;
+import faang.school.paymentservice.repository.payment.PaymentRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

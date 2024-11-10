@@ -1,4 +1,4 @@
-package faang.school.paymentservice.controller;
+package faang.school.paymentservice.controller.payment;
 
 import faang.school.paymentservice.dto.payment.PaymentUpdateDto;
 import faang.school.paymentservice.dto.payment.PaymentCreateDto;

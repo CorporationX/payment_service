@@ -1,4 +1,4 @@
-package faang.school.paymentservice.repository;
+package faang.school.paymentservice.repository.payment;
 
 import faang.school.paymentservice.model.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;

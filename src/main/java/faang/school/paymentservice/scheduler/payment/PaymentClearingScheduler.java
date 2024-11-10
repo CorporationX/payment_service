@@ -1,4 +1,4 @@
-package faang.school.paymentservice.scheduler;
+package faang.school.paymentservice.scheduler.payment;
 
 import faang.school.paymentservice.service.payment.PaymentOperationService;
 import lombok.RequiredArgsConstructor;
