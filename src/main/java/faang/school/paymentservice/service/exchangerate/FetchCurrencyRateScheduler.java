@@ -13,7 +13,7 @@ import java.util.concurrent.TimeoutException;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class FetchCurrenctRateScheduler {
+public class FetchCurrencyRateScheduler {
 
     private final CurrencyService currencyService;
 
