@@ -15,7 +15,8 @@ public class IdempotencyKeyGenerator {
                 operation.getTargetAccountId().toString(),
                 operation.getAmount().toString(),
                 operation.getCurrency(),
-                operation.getCategory()
+                operation.getCategory(),
+                operation.getClearScheduledAt().toString()
         );
 
         return hashToBase64(rawKey);
