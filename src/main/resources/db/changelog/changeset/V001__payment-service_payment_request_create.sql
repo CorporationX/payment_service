@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS payment_request
+CREATE TABLE IF NOT EXISTS payments
 (
     id                     UUID PRIMARY KEY,
     idempotency_key        VARCHAR(64)  NOT NULL,

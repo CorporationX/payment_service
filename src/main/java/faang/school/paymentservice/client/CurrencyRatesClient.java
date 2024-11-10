@@ -2,6 +2,8 @@ package faang.school.paymentservice.client;
 
 import faang.school.paymentservice.dto.ApiResponse;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,9 +13,8 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 import java.util.Map;
 
-@Component
-@AllArgsConstructor
 @Slf4j
+@Component
 public class CurrencyRatesClient {
 
     private final WebClient webClient;
@@ -27,6 +28,9 @@ public class CurrencyRatesClient {
     @Value("${currency.rate.symbols}")
     private String symbolsCurrency;
 
+    public CurrencyRatesClient(WebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public Mono<Map<String, Double>> fetchRates() {
         return webClient

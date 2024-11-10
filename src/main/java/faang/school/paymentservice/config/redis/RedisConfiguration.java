@@ -88,9 +88,9 @@ public class RedisConfiguration {
     }
 
     @Bean
-    public RedisMessageListenerContainer redisContainer() {
+    public RedisMessageListenerContainer redisContainer(JedisConnectionFactory jedisConnectionFactory) {
         RedisMessageListenerContainer redisContainer = new RedisMessageListenerContainer();
-        redisContainer.setConnectionFactory(jedisConnectionFactory());
+        redisContainer.setConnectionFactory(jedisConnectionFactory);
 
         redisContainer.addMessageListener(paymentEventMessageListener(), paymentAuthSuccessTopic());
         redisContainer.addMessageListener(paymentEventMessageListener(), paymentAuthErrorTopic());
@@ -110,9 +110,9 @@ public class RedisConfiguration {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
+    public RedisTemplate<String, Object> redisTemplate(JedisConnectionFactory jedisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(jedisConnectionFactory());
+        redisTemplate.setConnectionFactory(jedisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
 

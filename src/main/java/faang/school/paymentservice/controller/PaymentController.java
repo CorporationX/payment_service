@@ -3,7 +3,7 @@ package faang.school.paymentservice.controller;
 import faang.school.paymentservice.dto.payment.PaymentUpdateDto;
 import faang.school.paymentservice.dto.payment.PaymentCreateDto;
 import faang.school.paymentservice.dto.payment.PaymentDto;
-import faang.school.paymentservice.service.payment.PaymentService;
+import faang.school.paymentservice.service.payment.PaymentOperationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -16,19 +16,19 @@ import java.util.UUID;
 @AllArgsConstructor
 public class PaymentController {
 
-    private final PaymentService paymentService;
+    private final PaymentOperationService paymentOperationService;
 
     @PostMapping
     public PaymentDto sendPayment(@RequestBody @Valid PaymentCreateDto dto) {
-        return paymentService.sendPayment(dto);
+        return paymentOperationService.sendPayment(dto);
     }
 
     @PatchMapping("/{paymentId}")
     public PaymentDto updatePayment(@PathVariable @NonNull UUID paymentId,
                                     @RequestBody @Valid PaymentUpdateDto paymentUpdateRequestDto) {
         return switch (paymentUpdateRequestDto.getAction()) {
-            case CONFIRM -> paymentService.confirmPayment(paymentId);
-            case CANCEL -> paymentService.cancelPayment(paymentId);
+            case CONFIRM -> paymentOperationService.confirmPayment(paymentId);
+            case CANCEL -> paymentOperationService.cancelPayment(paymentId);
         };
     }
 }
