@@ -24,21 +24,14 @@ public class PaymentStatusEventListener extends AbstractEventListener<PaymentSta
     @Override
     public void onMessage(Message message, byte[] pattern) {
         handleEvent(message, PaymentStatusEvent.class, event -> {
-            //если отработало без ошибок
-            if (event.getStatusDetails() == null) {
-                switch (event.getStatus()) {
-                    case IN_PROGRESS -> paymentStatusService.processInProgressStatus(event);
-                    case COMPLETED -> paymentStatusService.processCompletedStatus(event);
-                    case CANCELLED -> paymentStatusService.processCancelledStatus(event);
-                    case FAILED -> paymentStatusService.processFailedStatus(event);
-                        default -> throw new DataValidationException(String.format("Unknown request status: %s", event.getStatus()));
-                }
-                //если не прошло валидации, надо сохранить что-то в pending_operation и сообщить пользователю в чем проблема
-            } else {
-                //TODO update pending_operation
+            switch (event.getStatus()) {
+                case IN_PROGRESS -> paymentStatusService.processInProgressStatus(event);
+                case COMPLETED -> paymentStatusService.processCompletedStatus(event);
+                case CANCELLED -> paymentStatusService.processCancelledStatus(event);
+                case FAILED -> paymentStatusService.processFailedStatus(event);
+                default ->
+                        throw new DataValidationException(String.format("Unknown request status: %s", event.getStatus()));
             }
-            //TODO отправить в notification-service event через redis канал
-
         });
     }
 }
