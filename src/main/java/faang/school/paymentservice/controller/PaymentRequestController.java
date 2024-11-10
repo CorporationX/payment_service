@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping("/api/payment")
+@RequestMapping("/api/payment/request")
 public class PaymentRequestController {
     private final PaymentRequestService requestService;
 
@@ -26,12 +26,12 @@ public class PaymentRequestController {
         return requestService.authorizePayment(requestDto);
     }
 
-    @PutMapping("/cancel/{requestId}")
+    @PutMapping("/{requestId}/cancel")
     public RequestDto cancelPayment(@Positive @PathVariable("requestId") long requestId) {
         return requestService.cancelPayment(requestId);
     }
 
-    @PutMapping("/forciblyConfirm/{requestId}")
+    @PutMapping("/{requestId}//confirm")
     public RequestDto forciblyConfirmPayment(@Positive @PathVariable("requestId") long requestId) {
         return requestService.forciblyConfirmPayment(requestId);
     }

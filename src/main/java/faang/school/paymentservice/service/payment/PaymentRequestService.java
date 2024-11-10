@@ -13,6 +13,7 @@ import faang.school.paymentservice.repository.RequestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.List;
@@ -39,30 +40,24 @@ public class PaymentRequestService {
         return requestMapper.toRequestDto(savedRequest);
     }
 
+    @Transactional
     public RequestDto cancelPayment(long requestId) {
-        Request request = findRequest(requestId);
-        checkRequestAbleToCancelOrConfirm(request);
-        publishMessage(request, DmsTypeOperation.CANCELING);
-        request.setStatus(RequestStatus.CANCELING);
-        return requestMapper.toRequestDto(requestRepository.save(request));
+        return processPayment(requestId, RequestStatus.CANCELING, DmsTypeOperation.CANCELING);
     }
 
     public RequestDto forciblyConfirmPayment(long requestId) {
-        Request request = findRequest(requestId);
-        checkRequestAbleToCancelOrConfirm(request);
-        publishMessage(request, DmsTypeOperation.CONFIRMATION);
-        request.setStatus(RequestStatus.COMPLETED);
-        return requestMapper.toRequestDto(requestRepository.save(request));
+        return processPayment(requestId, RequestStatus.COMPLETED, DmsTypeOperation.CONFIRMATION);
     }
 
+    @Transactional
     public void pushPaymentConfirmation() {
-        List<Request> requests = requestRepository.findToPushing();
+        List<Request> requests = requestRepository.findToPushing(RequestStatus.PENDING.name());
         requests.forEach(
             request -> {
                 try {
-                    publishMessage(request, DmsTypeOperation.CONFIRMATION);
                     request.setStatus(RequestStatus.COMPLETED);
                     requestRepository.save(request);
+                    publishMessage(request, DmsTypeOperation.CONFIRMATION);
                 } catch (PaymentRequestException e) {
                     log.warn("Confirmation for the request with id {} could not be sent", request.getId(), e);
                 }
@@ -89,5 +84,15 @@ public class PaymentRequestService {
                 .formatted(request.getId());
             throw new PaymentRequestException(message);
         }
+    }
+
+    private RequestDto processPayment(long requestId, RequestStatus status, DmsTypeOperation typeOperation) {
+        Request request = findRequest(requestId);
+        checkRequestAbleToCancelOrConfirm(request);
+        request.setStatus(status);
+        Request returnedRequest = requestRepository.save(request);
+        RequestDto requestDto = requestMapper.toRequestDto(returnedRequest);
+        publishMessage(returnedRequest, typeOperation);
+        return requestDto;
     }
 }

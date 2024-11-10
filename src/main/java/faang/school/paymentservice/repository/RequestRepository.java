@@ -14,8 +14,8 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     @Query(nativeQuery = true, value = """
         select * from request
         where now() >= clear_scheduled_at
-            and status = 'PENDING'
+            and status = ?1
         """
     )
-    List<Request> findToPushing();
+    List<Request> findToPushing(String status);
 }

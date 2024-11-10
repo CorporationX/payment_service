@@ -10,7 +10,7 @@ import org.springframework.retry.annotation.Retryable;
 
 @RequiredArgsConstructor
 @Slf4j
-public class AbstractEventPublisher<T> {
+public abstract class AbstractEventPublisher<T> {
     private final ChannelTopic topic;
     private final RedisTemplate<String, T> redisTemplate;
 

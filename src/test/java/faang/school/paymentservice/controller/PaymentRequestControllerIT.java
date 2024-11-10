@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Testcontainers
 @Sql("/payment_request_controller/create_table_request.sql")
-public class PaymentRequestControllerIT {
+public class PaymentRequestControllerIT extends BasicIT {
     @Autowired
     private PaymentRequestController controller;
 
@@ -65,31 +65,6 @@ public class PaymentRequestControllerIT {
     private DmsEventDto expectedDmsEventDto;
     private String requestBody;
 
-    @Container
-    protected static final PostgreSQLContainer<?> POSTGRESQL_CONTAINER =
-        new PostgreSQLContainer<>("postgres:latest")
-            .withReuse(true);
-
-    @Container
-    protected static final RedisContainer REDIS_CONTAINER =
-        new RedisContainer(DockerImageName.parse("redis/redis-stack:latest"))
-            .withReuse(true);
-
-    @DynamicPropertySource
-    protected static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", POSTGRESQL_CONTAINER::getJdbcUrl);
-        registry.add("spring.datasource.username", POSTGRESQL_CONTAINER::getUsername);
-        registry.add("spring.datasource.password", POSTGRESQL_CONTAINER::getPassword);
-
-        registry.add("spring.data.redis.port", () -> REDIS_CONTAINER.getMappedPort(6379));
-        registry.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 
     protected static void beforeEach() {
@@ -178,7 +153,7 @@ public class PaymentRequestControllerIT {
 
     public void performPostAuthorization() {
         try {
-            mockMvc.perform(MockMvcRequestBuilders.post("/api/payment/authorization")
+            mockMvc.perform(MockMvcRequestBuilders.post("/api/payment/request/authorization")
                     .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isOk());
         } catch (Exception e) {

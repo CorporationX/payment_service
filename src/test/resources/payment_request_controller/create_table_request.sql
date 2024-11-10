@@ -7,6 +7,7 @@ create table public.request (
    currency varchar(64) not null,
    status varchar(64) not null,
    clear_scheduled_at timestamp not null,
+   version bigint not null,
    created_at timestamp default now(),
    updated_at timestamp default now()
 );

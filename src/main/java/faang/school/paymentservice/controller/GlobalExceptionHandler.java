@@ -41,13 +41,6 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(message);
     }
 
-    @ExceptionHandler(PaymentRequestException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handlePaymentRequestException(PaymentRequestException e) {
-        log.error(e.getMessage(), e);
-        return new ErrorResponse(e.getMessage());
-    }
-
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleRuntimeException(RuntimeException e) {

@@ -16,18 +16,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class BasicIT {
-    protected final RequestRepository requestRepository;
-    protected final RequestMapper requestMapper;
-
-    protected final ObjectMapper objectMapper;
-
-    public BasicIT(RequestRepository requestRepository, RequestMapper requestMapper) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        this.objectMapper = objectMapper;
-        this.requestRepository = requestRepository;
-        this.requestMapper = requestMapper;
-    }
 
     @Container
     protected static final PostgreSQLContainer<?> POSTGRESQL_CONTAINER =
@@ -55,7 +43,6 @@ public class BasicIT {
         }
     }
 
-    @Sql("/db/changelog/changeset")
     protected static void beforeEach() {
         POSTGRESQL_CONTAINER.start();
         REDIS_CONTAINER.start();
