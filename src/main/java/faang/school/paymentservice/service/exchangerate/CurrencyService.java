@@ -2,9 +2,9 @@ package faang.school.paymentservice.service.exchangerate;
 
 import faang.school.paymentservice.client.CurrencyRatesClient;
 import faang.school.paymentservice.client.ExchangeRatesClient;
-import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ExchangeRateResponseDto;
 import faang.school.paymentservice.exception.ResponseDtoNotFoundException;
+import faang.school.paymentservice.model.Currency;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

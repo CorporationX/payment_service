@@ -1,6 +1,55 @@
 spring:
-  profiles:
-    active: local
+  data:
+    redis:
+      port: 6379
+      host: localhost
+      channels:
+        paymentAuthPendingChannel:
+          name: payment_auth_pending_channel
+        paymentAuthErrorChannel:
+          name: payment_auth_error_channel
+        paymentAuthSuccessChannel:
+          name: payment_auth_success_channel
+
+        paymentConfirmPendingChannel:
+          name: payment_confirm_pending_channel
+        paymentConfirmErrorChannel:
+          name: payment_confirm_error_channel
+        paymentConfirmSuccessChannel:
+          name: payment_confirm_success_channel
+
+        paymentCancelPendingChannel:
+          name: payment_cancel_pending_channel
+        paymentCancelErrorChannel:
+          name: payment_cancel_error_channel
+        paymentCancelSuccessChannel:
+          name: payment_cancel_success_channel
+
+        paymentClearPendingChannel:
+          name: payment_clear_pending_channel
+        paymentClearErrorChannel:
+          name: payment_clear_error_channel
+        paymentClearSuccessChannel:
+          name: payment_clear_success_channel
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
 server:
   port: 9080
 
@@ -23,3 +72,6 @@ currency:
 exchange:
   rates:
     url: openexchangerates.org/api
+
+payment-clearing-scheduler:
+  cron: "0 */10 * * * *" # every 5 minute
