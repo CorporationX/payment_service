@@ -3,6 +3,65 @@ spring:
     redis:
       host: localhost
       port: 6379
+      channel:
+        auth-payment-request: auth-payment-request
+        auth-payment-response: auth-payment-response
+        cancel-payment-request: cancel-payment-request
+        cancel-payment-response: cancel-payment-response
+        clearing-payment-request: clearing-payment-request
+        clearing-payment-response: clearing-payment-response
+        error-payment-request: error-payment-request
+        error-payment-response: error-payment-response
+
+  kafka:
+    bootstrap-servers: host.docker.internal:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: pending-operation-group
+      auto-offset-reset: earliest
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: '*'
+    topic:
+      auth-payment-request: auth-payment-request
+      auth-payment-response: auth-payment-response
+      cancel-payment-request: cancel-payment-request
+      cancel-payment-response: cancel-payment-response
+      clearing-payment-request: clearing-payment-request
+      clearing-payment-response: clearing-payment-response
+      error-payment-request: error-payment-request
+      error-payment-response: error-payment-response
+
+
+  datasource:
+      driver-class-name: org.postgresql.Driver
+      url: jdbc:postgresql://localhost:5432/postgres
+      username: user
+      password: password
+
+  jpa:
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+      hibernate:
+        ddl-auto: none
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
+
+  liquibase:
+      change-log: classpath:db/changelog/db.changelog-master.yaml
+
+app:
+  clearing:
+    job:
+      interval: 100000
+  messaging: redis
 
 server:
   port: 9080
@@ -14,6 +73,8 @@ logging:
 retry:
   retry: 5
   delay: 3000
+
+
 
 currency-api:
   url: https://api.exchangeratesapi.io/v1/
