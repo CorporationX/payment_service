@@ -22,6 +22,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     /**
+    * Spring
+    */
+    implementation("org.springframework.retry:spring-retry:2.0.9")
+
+    /**
      * Utils & Logging
      */
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
