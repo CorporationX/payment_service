@@ -1,6 +1,8 @@
 package faang.school.paymentservice.service;
 
+import org.springframework.data.domain.Pageable;
+
 public interface PendingService {
 
-    void cleaningPendings();
+    boolean cleanBatch(Pageable pageable);
 }
