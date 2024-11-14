@@ -1,4 +1,4 @@
-package faang.school.paymentservice.config;
+package faang.school.paymentservice.config.currency;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

@@ -1,8 +1,8 @@
-package faang.school.paymentservice.service;
+package faang.school.paymentservice.service.currency;
 
-import faang.school.paymentservice.config.CurrencyExchangeConfig;
+import faang.school.paymentservice.config.currency.CurrencyExchangeConfig;
 import faang.school.paymentservice.client.CurrencyConverterClient;
-import faang.school.paymentservice.dto.PaymentRequestDto;
+import faang.school.paymentservice.dto.payment.PaymentRequestDto;
 import faang.school.paymentservice.model.Currency;
 import faang.school.paymentservice.dto.response.CurrencyExchangeResponse;
 import lombok.RequiredArgsConstructor;

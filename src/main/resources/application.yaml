@@ -22,8 +22,10 @@ spring:
       port: 6379
       host: localhost
       channels:
-        calculations_channel:
-          name: calculations_channel
+       paymentRequest: paymentRequest-event
+       paymentClear: paymentClear-event
+       paymentCancel: paymentCancel-event
+       paymentApprove: paymentApprove-event
 
 server:
   port: 9080
@@ -37,3 +39,7 @@ currency:
     url: https://openexchangerates.org
     appId: 54c9101b6a0f419f97fb26f11d02955d
     commission: 1
+
+
+scheduled:
+  cron: '*/5 * * * * *'
