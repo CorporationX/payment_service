@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 
 public record PaymentRequest(
         @NotNull
-        long paymentNumber,
+        long userId,
 
         @Min(1)
         @NotNull
