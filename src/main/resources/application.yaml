@@ -1,6 +1,5 @@
 server:
   port: 9080
 
-logging:
-  level:
-    root: info
+  profiles:
+    active: local
