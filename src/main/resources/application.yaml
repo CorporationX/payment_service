@@ -1,6 +1,24 @@
+spring:
+  mvc:
+    servlet:
+      path: /api/v1
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+services:
+  exchange:
+    url: "http://api.exchangeratesapi.io"
+    endpoint: "/v1/latest?access_key="
+    key: "deedb8baaf85a02ad06dbc36401db940"
+
 server:
   port: 9080
 
 logging:
   level:
     root: info
+
+cron:
+  update-rates: "0 0 0 * * ?"
