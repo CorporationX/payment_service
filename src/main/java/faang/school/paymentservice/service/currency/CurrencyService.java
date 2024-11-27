@@ -3,6 +3,7 @@ package faang.school.paymentservice.service.currency;
 import faang.school.paymentservice.Mapper.CourseMapper;
 import faang.school.paymentservice.dto.CourseDto;
 import faang.school.paymentservice.dto.RatesDto;
+import faang.school.paymentservice.exception.NotFoundException;
 import faang.school.paymentservice.service.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,7 @@ public class CurrencyService {
         String key = "EUR/" + currency;
         Double rate = redisService.get(key);
         if (rate == null) {
-            throw new IllegalArgumentException("Currency rate for " + key + "not found");
+            throw new NotFoundException("Currency rate for " + key + "not found");
         }
         return rate * sum;
     }
