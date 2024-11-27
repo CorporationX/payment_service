@@ -4,3 +4,15 @@ server:
 logging:
   level:
     root: debug
+
+scheduler:
+  cron: "0 0 0 * * *"
+  zone: "Europe/Moscow"
+
+data:
+  redis:
+    port: 6379
+    host: localhost
+
+api:
+  key: "15d17291994ae3b6dd05e8868e2f907d"
