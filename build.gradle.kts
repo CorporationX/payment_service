@@ -19,6 +19,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    implementation("org.springframework.boot:spring-boot-starter-webflux:3.2.5")
+    implementation ("org.springframework.retry:spring-retry:2.0.6")
+    implementation ("org.springframework.boot:spring-boot-starter-aop:3.3.3")
 
     /**
      * Utils & Logging

@@ -4,3 +4,10 @@ server:
 logging:
   level:
     root: info
+
+currency:
+  rate:
+    baseUrl: https://api.exchangeratesapi.io/v1/
+    api-key: 1dda85c0189d2ce7178b8f902e8c1221
+    fetch-cron: "0 0 * * * *"
+    symbols: "EUR,AUD,CAD,PLN,MXN"
