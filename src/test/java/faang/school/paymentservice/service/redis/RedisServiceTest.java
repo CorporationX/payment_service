@@ -36,7 +36,7 @@ public class RedisServiceTest {
     }
 
     @Test
-    void get_shouldReturnValueFromRedis() {
+    void getValueFromRedisTest() {
         String key = "EUR/RUB";
         Double value = 100.0;
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);

@@ -30,7 +30,7 @@ public class CurrencyRateJobTest {
     }
 
    @Test
-    void scheduledAnnotation_ShouldHaveCorrectCronExpression() throws NoSuchMethodException {
+   void scheduledAnnotationTest() throws NoSuchMethodException {
         String cron = currencyRateJob.getClass()
                 .getMethod("updateCurrencyRates")
                 .getAnnotation(Scheduled.class)

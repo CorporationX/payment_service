@@ -40,7 +40,7 @@ class CurrencyRateFetcherTest {
     String key;
 
     @Test
-    void testFetchData() {
+    void fetchDataTest() {
         Map<String, Double> rates = new HashMap<>();
         rates.put("RUB", 100.0);
         RatesDto mockRatesDto = new RatesDto();
