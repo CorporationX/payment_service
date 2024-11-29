@@ -19,12 +19,11 @@ import reactor.core.publisher.Mono;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-
 @Slf4j
 @Service
 public class ExchangeRatesService {
 
-    @Value("${api.key}")
+    @Value("${currency-api.key}")
     private String apiKey;
 
     private final WebClient webClient;

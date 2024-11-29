@@ -14,5 +14,6 @@ data:
     port: 6379
     host: localhost
 
-api:
+currency-api:
+  baseUrl: "http://api.exchangeratesapi.io/v1/"
   key: "15d17291994ae3b6dd05e8868e2f907d"
