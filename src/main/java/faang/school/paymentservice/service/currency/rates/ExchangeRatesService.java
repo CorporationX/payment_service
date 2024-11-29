@@ -16,7 +16,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -29,19 +28,17 @@ public class ExchangeRatesService {
     private String apiKey;
 
     private final WebClient webClient;
-    private final RedisTemplate<String, BigDecimal> redisTemplate;
+    private final RedisTemplate<String, Double> redisTemplate;
 
     @Autowired
-    public ExchangeRatesService(WebClient.Builder webClientBuilder,
-                                RedisTemplate<String, BigDecimal> redisTemplate) {
-        this.webClient = webClientBuilder.baseUrl("http://api.exchangeratesapi.io/v1/").build();
+    public ExchangeRatesService(WebClient webClient, RedisTemplate<String, Double> redisTemplate) {
+        this.webClient = webClient;
         this.redisTemplate = redisTemplate;
     }
 
     @Retryable(retryFor = {WebClientResponseException.class, ResourceAccessException.class},
-            maxAttempts = 5,
             backoff = @Backoff(delay = 1000, multiplier = 2))
-    public void getExchangeRates() {
+    public Mono<String> getExchangeRates() {
         String currencies = Arrays.stream(Currency.values())
                 .map(Enum::name)
                 .collect(Collectors.joining(","));
@@ -56,6 +53,9 @@ public class ExchangeRatesService {
                 .bodyToMono(String.class);
 
         cacheExchangeRates(currencyRates);
+
+        log.debug("Exchange rates updated and cached");
+        return currencyRates;
     }
 
     private void cacheExchangeRates(Mono<String> currencyRatesMono) {
@@ -67,7 +67,7 @@ public class ExchangeRatesService {
 
                 ratesNode.fields().forEachRemaining(entry -> {
                     String currency = entry.getKey();
-                    BigDecimal rate = BigDecimal.valueOf(entry.getValue().asDouble());
+                    Double rate = entry.getValue().asDouble();
                     redisTemplate.opsForValue().set(currency, rate);
                 });
             } catch (JsonProcessingException e) {

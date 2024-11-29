@@ -8,18 +8,16 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.math.BigDecimal;
-
 @Configuration
 @EnableCaching
 public class RedisConfig {
 
     @Bean
-    public RedisTemplate<String, BigDecimal> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, BigDecimal> template = new RedisTemplate<>();
+    public RedisTemplate<String, Double> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Double> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new GenericToStringSerializer<>(BigDecimal.class));
+        template.setValueSerializer(new GenericToStringSerializer<>(Double.class));
         return template;
     }
 }
