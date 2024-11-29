@@ -1,6 +1,6 @@
 package faang.school.paymentservice.service.currency;
 
-import faang.school.paymentservice.Mapper.CourseMapper;
+import faang.school.paymentservice.mapper.CourseMapper;
 import faang.school.paymentservice.dto.CourseDto;
 import faang.school.paymentservice.dto.RatesDto;
 import faang.school.paymentservice.service.redis.RedisService;

@@ -1,4 +1,4 @@
-package faang.school.paymentservice.Mapper;
+package faang.school.paymentservice.mapper;
 
 import faang.school.paymentservice.dto.CourseDto;
 import faang.school.paymentservice.dto.RatesDto;
