@@ -6,7 +6,7 @@ logging:
     root: debug
 
 scheduler:
-  cron: "0 0 0 * * *"
+  cron: "0 53 15 * * *"
   zone: "Europe/Moscow"
 
 data:
@@ -17,3 +17,6 @@ data:
 currency-api:
   baseUrl: "http://api.exchangeratesapi.io/v1/"
   key: "15d17291994ae3b6dd05e8868e2f907d"
+  commission: 0.01
+  minimum-amount: 10
+  baseCurrency: EUR

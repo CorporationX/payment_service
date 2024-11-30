@@ -1,6 +1,7 @@
 package faang.school.paymentservice.service.currency.rates;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import faang.school.paymentservice.dto.Currency;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -54,6 +56,7 @@ public class ExchangeRatesServiceTest {
     void testSuccessfulAttemptToGetExchangeRates() throws Exception {
         String mockCurrency = getMockedResponse().toString();
         ObjectMapper objectMapper = new ObjectMapper();
+        ReflectionTestUtils.setField(exchangeRatesService, "baseCurrency", Currency.EUR);
 
         mockWebServer.enqueue(new MockResponse()
                 .setBody(objectMapper.writeValueAsString(mockCurrency))

@@ -17,7 +17,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,6 +24,9 @@ public class ExchangeRatesService {
 
     @Value("${currency-api.key}")
     private String apiKey;
+
+    @Value("${currency-api.baseCurrency}")
+    private Currency baseCurrency;
 
     private final WebClient webClient;
     private final RedisTemplate<String, Double> redisTemplate;
@@ -38,14 +40,13 @@ public class ExchangeRatesService {
     @Retryable(retryFor = {WebClientResponseException.class, ResourceAccessException.class},
             backoff = @Backoff(delay = 1000, multiplier = 2))
     public Mono<String> getExchangeRates() {
-        String currencies = Arrays.stream(Currency.values())
-                .map(Enum::name)
-                .collect(Collectors.joining(","));
+        String currencies = Arrays.toString(Currency.values());
 
         Mono<String> currencyRates = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("latest")
                         .queryParam("access_key", apiKey)
+                        .queryParam("base", baseCurrency.name())
                         .queryParam("symbols", currencies)
                         .build())
                 .retrieve()
