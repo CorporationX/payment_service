@@ -4,3 +4,22 @@ server:
 logging:
   level:
     root: info
+
+thirdparty:
+  exchangerates:
+    requesturl: http://api.exchangeratesapi.io/v1/latest?access_key=
+    apikey: 9080e7404e2237082053b8daa45c290f
+
+spring:
+  task:
+    scheduling:
+      pool:
+        size: 5
+
+  redis:
+    host: localhost
+    port: 6379
+
+scheduled:
+  exchangerates:
+    cron: 0 0 0 * * ?
