@@ -26,10 +26,10 @@ public class CurrencyServiceTest {
     @Test
     void testSuccessfulAttemptToGetExchangeRates() {
         Mono<String> expectedResult = Mono.just("USD: 1.23");
-        when(exchangeRatesService.getExchangeRates()).thenReturn(Mono.just("USD: 1.23"));
+        when(exchangeRatesService.getExchangeRates()).thenReturn("USD: 1.23");
 
-        Mono<String> actualResult = currencyService.getExchangeRates();
+        String actualResult = currencyService.getExchangeRates();
 
-        assertEquals(expectedResult.block(), actualResult.block());
+        assertEquals(expectedResult.block(), actualResult);
     }
 }

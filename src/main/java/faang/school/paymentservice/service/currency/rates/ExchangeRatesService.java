@@ -37,19 +37,20 @@ public class ExchangeRatesService {
 
     @Retryable(retryFor = {WebClientResponseException.class, ResourceAccessException.class},
             backoff = @Backoff(delay = 1000, multiplier = 2))
-    public Mono<String> getExchangeRates() {
+    public String getExchangeRates() {
         String currencies = Arrays.stream(Currency.values())
                 .map(Enum::name)
                 .collect(Collectors.joining(","));
 
-        Mono<String> currencyRates = webClient.get()
+        String currencyRates = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("latest")
                         .queryParam("access_key", apiKey)
                         .queryParam("symbols", currencies)
                         .build())
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(String.class)
+                .block();
 
         cacheExchangeRates(currencyRates);
 
@@ -57,22 +58,20 @@ public class ExchangeRatesService {
         return currencyRates;
     }
 
-    private void cacheExchangeRates(Mono<String> currencyRatesMono) {
-        currencyRatesMono.subscribe(jsonString -> {
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode rootNode = objectMapper.readTree(jsonString);
-                JsonNode ratesNode = rootNode.path("rates");
+    private void cacheExchangeRates(String jsonString) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(jsonString);
+            JsonNode ratesNode = rootNode.path("rates");
 
-                ratesNode.fields().forEachRemaining(entry -> {
-                    String currency = entry.getKey();
-                    Double rate = entry.getValue().asDouble();
-                    redisTemplate.opsForValue().set(currency, rate);
-                });
-            } catch (JsonProcessingException e) {
-                log.error("JSON processing error: ", e);
-                throw new RuntimeException(e);
-            }
-        });
+            ratesNode.fields().forEachRemaining(entry -> {
+                String currency = entry.getKey();
+                Double rate = entry.getValue().asDouble();
+                redisTemplate.opsForValue().set(currency, rate);
+            });
+        } catch (JsonProcessingException e) {
+            log.error("JSON processing error: ", e);
+            throw new RuntimeException(e);
+        }
     }
 }

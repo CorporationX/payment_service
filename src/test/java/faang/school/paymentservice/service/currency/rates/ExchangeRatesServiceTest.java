@@ -59,15 +59,9 @@ public class ExchangeRatesServiceTest {
                 .setBody(objectMapper.writeValueAsString(mockCurrency))
                 .addHeader("Content-Type", "application/json"));
 
-        Mono<String> currencyMono = exchangeRatesService.getExchangeRates();
+        String currencyMono = exchangeRatesService.getExchangeRates();
 
-        StepVerifier.create(currencyMono)
-                .assertNext(currency -> {
-                    assertNotNull(currency);
-                    assertEquals(mockCurrency, currency.replace("\"", ""));
-                })
-                .thenCancel()
-                .verify(Duration.ofSeconds(5));
+        assertEquals(mockCurrency, currencyMono.replace("\"", ""));
     }
 
     private static HashMap<String, String> getMockedResponse() {

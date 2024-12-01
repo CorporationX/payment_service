@@ -13,7 +13,7 @@ public class CurrencyService {
     private final RedisTemplate<String, Double> redisTemplate;
     private final ExchangeRatesService exchangeRatesService;
 
-    public Mono<String> getExchangeRates() {
+    public String getExchangeRates() {
         return exchangeRatesService.getExchangeRates();
     }
 }
