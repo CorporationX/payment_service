@@ -6,7 +6,7 @@ logging:
     root: debug
 
 scheduler:
-  cron: "0 53 15 * * *"
+  cron: "0 0 0 * * *"
   zone: "Europe/Moscow"
 
 data:

@@ -26,12 +26,11 @@ public class CurrencyService {
     @Value("${currency-api.baseCurrency}")
     private Currency baseCurrency;
 
-
     private final RedisTemplate<String, Double> redisTemplate;
     private final ExchangeRatesService exchangeRatesService;
     private final CurrencyValidator currencyValidator;
 
-    public Mono<String> getExchangeRates() {
+    public String getExchangeRates() {
         return exchangeRatesService.getExchangeRates();
     }
 
