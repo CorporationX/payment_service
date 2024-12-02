@@ -1,4 +1,4 @@
-package faang.school.paymentservice.service.rates;
+package faang.school.paymentservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

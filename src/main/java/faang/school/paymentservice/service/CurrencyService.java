@@ -1,16 +1,12 @@
 package faang.school.paymentservice.service;
 
-import faang.school.paymentservice.service.rates.ExchangeRatesService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
 public class CurrencyService {
-
-    private final RedisTemplate<String, Double> redisTemplate;
     private final ExchangeRatesService exchangeRatesService;
 
     public Mono<String> getExchangeRates() {

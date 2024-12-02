@@ -6,7 +6,8 @@ logging:
     root: info
 
 scheduler:
-  cron: "0 3 13 * * *"
+  cron: "0 21 12 * * *"
+  zone: "Europe/Moscow"
 
 data:
   redis:
