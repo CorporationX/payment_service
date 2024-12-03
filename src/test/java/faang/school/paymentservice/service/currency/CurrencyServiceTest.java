@@ -28,6 +28,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import static reactor.core.publisher.Mono.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CurrencyServiceTest {
