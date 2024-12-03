@@ -3,6 +3,7 @@ package faang.school.paymentservice.service.exchangerate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import faang.school.paymentservice.exception.CurrencyRateException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +49,9 @@ public class CurrencyService {
             JsonNode rates = baseNode.get("rates");
             rates.fields().forEachRemaining(entry -> CURRENCIES.put(entry.getKey(), entry.getValue().asDouble()));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new CurrencyRateException("Error processing currency rates", e);
+        } catch (Exception e) {
+            throw new CurrencyRateException("Unexpected error fetching currency rates", e);
         }
     }
 }
