@@ -26,6 +26,9 @@ public class ExchangeRatesService {
     @Value("${currency-api.key}")
     private String apiKey;
 
+    @Value("${currency-api.baseCurrency}")
+    private Currency baseCurrency;
+
     private final WebClient webClient;
     private final RedisTemplate<String, Double> redisTemplate;
 
@@ -38,14 +41,13 @@ public class ExchangeRatesService {
     @Retryable(retryFor = {WebClientResponseException.class, ResourceAccessException.class},
             backoff = @Backoff(delay = 1000, multiplier = 2))
     public String getExchangeRates() {
-        String currencies = Arrays.stream(Currency.values())
-                .map(Enum::name)
-                .collect(Collectors.joining(","));
+        String currencies = Arrays.toString(Currency.values());
 
         String currencyRates = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("latest")
                         .queryParam("access_key", apiKey)
+                        .queryParam("base", baseCurrency.name())
                         .queryParam("symbols", currencies)
                         .build())
                 .retrieve()
