@@ -17,8 +17,21 @@ dependencies {
      * Spring boot starters
      */
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    implementation("org.springframework.retry:spring-retry:2.0.10")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    /**
+     * Database
+     */
+    implementation("org.liquibase:liquibase-core")
+    implementation("redis.clients:jedis:4.3.2")
+    runtimeOnly("org.postgresql:postgresql")
+    testImplementation("com.h2database:h2")
 
     /**
      * Utils & Logging
@@ -37,6 +50,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    testImplementation("io.projectreactor:reactor-test:3.7.0")
 }
 
 tasks.withType<Test> {
