@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import faang.school.paymentservice.dto.Currency;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ExchangeRatesService {
 
     @Value("${currency-api.key}")
@@ -28,12 +30,6 @@ public class ExchangeRatesService {
 
     private final WebClient webClient;
     private final RedisTemplate<String, Double> redisTemplate;
-
-    @Autowired
-    public ExchangeRatesService(WebClient webClient, RedisTemplate<String, Double> redisTemplate) {
-        this.webClient = webClient;
-        this.redisTemplate = redisTemplate;
-    }
 
     @Retryable(retryFor = {WebClientResponseException.class, ResourceAccessException.class},
             backoff = @Backoff(delay = 1000, multiplier = 2))

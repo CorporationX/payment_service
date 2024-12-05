@@ -12,7 +12,7 @@ public class WebClientConfig {
     private String baseUrl;
 
     @Bean
-    public WebClient webClient() {
+    public WebClient exchangeRatesWebClient() {
         return WebClient.builder()
                 .baseUrl(baseUrl)
                 .build();

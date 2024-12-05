@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CurrencyRatesFetcher {
+public class CurrencyRatesFetcherScheduled {
     private final CurrencyService currencyService;
 
     @Scheduled(cron = "${scheduler.cron}", zone = "${scheduler.zone}")
