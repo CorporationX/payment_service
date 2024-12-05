@@ -4,3 +4,16 @@ server:
 logging:
   level:
     root: info
+
+scheduler:
+  cron: "0 21 12 * * *"
+  zone: "Europe/Moscow"
+
+data:
+  redis:
+    port: 6379
+    host: localhost
+
+currency-api:
+  baseUrl: "http://api.exchangeratesapi.io/v1/"
+  key: "5f007739f6184c765fe4dc0cf07d0984"
