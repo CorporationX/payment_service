@@ -10,6 +10,7 @@ thirdparty:
     requesturl: http://api.exchangeratesapi.io/v1/latest?access_key=
     apikey: 9080e7404e2237082053b8daa45c290f
 
+
 spring:
   task:
     scheduling:
@@ -23,3 +24,13 @@ spring:
 scheduled:
   exchangerates:
     cron: 0 0 0 * * ?
+
+currency:
+  baseCurrencyPayment: "USD"
+  commission: 0.01
+
+api:
+  openexchangerates:
+    base-url: https://openexchangerates.org
+    app-id: bd867967b1d043c8bbef8e218fd51eac
+
