@@ -8,16 +8,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -38,11 +39,12 @@ public class ExchangeRatesService {
         this.redisTemplate = redisTemplate;
     }
 
-    @Retryable(retryFor = {WebClientResponseException.class, ResourceAccessException.class},
+    @Retryable(retryFor = {WebClientResponseException.class, WebClientRequestException.class},
+            maxAttempts = 5,
             backoff = @Backoff(delay = 1000, multiplier = 2))
     public String getExchangeRates() {
         String currencies = Arrays.toString(Currency.values());
-
+        log.info("Attempting to fetch exchange rates...");
         String currencyRates = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("latest")
@@ -58,6 +60,18 @@ public class ExchangeRatesService {
 
         log.debug("Exchange rates updated and cached");
         return currencyRates;
+    }
+
+    @Recover
+    public String recover(WebClientResponseException ex) {
+        log.error("Failed to retrieve exchange rates after retries: {}", ex.getMessage());
+        return "{\"success\": false, \"message\": \"Unable to retrieve exchange rates.\"}";
+    }
+
+    @Recover
+    public String recover(WebClientRequestException ex) {
+        log.error("Failed to retrieve exchange rates due to a request issue: {}", ex.getMessage());
+        return "{\"success\": false, \"message\": \"Request error while retrieving exchange rates.\"}";
     }
 
     private void cacheExchangeRates(String jsonString) {
