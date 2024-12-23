@@ -6,12 +6,35 @@ logging:
     root: info
 
 spring:
-    data:
-      redis:
-        port: 6379
-        host: localhost
-        channels:
-          mentorship-channel:
-            name: mentorship_channel
-          follower-event-channel:
-            name: follower_event
+  data:
+    redis:
+      port: 6379
+      host: localhost
+      channels:
+        mentorship-channel:
+          name: mentorship_channel
+        follower-event-channel:
+          name: follower_event
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+services:
+  account-service:
+    host: http://localhost:8090
+    port: 8090
