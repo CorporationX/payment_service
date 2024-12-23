@@ -38,3 +38,4 @@ services:
   account-service:
     host: http://localhost:8090
     port: 8090
+

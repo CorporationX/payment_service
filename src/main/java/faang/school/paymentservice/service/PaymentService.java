@@ -12,6 +12,7 @@ import faang.school.paymentservice.model.Request;
 import faang.school.paymentservice.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,7 +23,7 @@ import java.util.Random;
 @Slf4j
 public class PaymentService {
     private final PaymentRepository paymentRepository;
-    private final KafkaProducer kafkaProducer;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final AccountClient accountClient;
 
     public AuthorizationResponse authorizePayment(AuthorizationMessage message) {
@@ -52,7 +53,7 @@ public class PaymentService {
                 .build();
 
         // публикуем сообщение
-        kafkaProducer.send("authorization-topic", authorizationEvent);
+        kafkaTemplate.send("authorization-topic", authorizationEvent);
 
         return AuthorizationResponse.builder()
                 .requestId(createdRequest.getId())
