@@ -45,7 +45,6 @@ public class PaymentController {
     @PostMapping
     public AuthorizationResponse getAuthorization(@Validated @RequestBody AuthorizationMessage message) {
         log.info("getAuthorization");
-        userContext.setUserId(1L);
         return paymentService.authorizePayment(message);
     }
 }
