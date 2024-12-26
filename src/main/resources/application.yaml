@@ -16,6 +16,12 @@ spring:
         follower-event-channel:
           name: follower_event
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: my_consumer_group
+      auto-offset-reset: earliest
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres

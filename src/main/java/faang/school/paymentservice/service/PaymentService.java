@@ -32,7 +32,7 @@ public class PaymentService {
         validateCurrency(recipientAccountDto, message.getCurrency());
 
         // верификационный код
-        String verificationCode = String.valueOf(new Random().nextInt(1000, 10000));
+        String verificationCode = String.valueOf(new Random().nextLong(1000, 1000000000000L));
 
         // сохранить в реквест в бд
         Request request = Request.builder()
@@ -45,12 +45,17 @@ public class PaymentService {
                 .status(PaymentStatus.PENDING)
                 .build();
 
+        //сохроняем в бд request
         Request createdRequest = paymentRepository.save(request);
 
         AuthorizationEvent authorizationEvent = AuthorizationEvent.builder()
+                .verificationCode(verificationCode)
+                .senderId(message.getSenderId())
                 .recipientId(recipientAccountDto.getId())
                 .amount(message.getAmount())
                 .build();
+
+        log.warn("authorizationEvent  -------------------------: {}", authorizationEvent);
 
         // публикуем сообщение
         kafkaTemplate.send("authorization-topic", authorizationEvent);

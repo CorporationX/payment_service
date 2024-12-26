@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 public class AuthorizationMessage {
+    private Long senderId;
     @NotNull
     private String senderNumber;
     @NotNull
