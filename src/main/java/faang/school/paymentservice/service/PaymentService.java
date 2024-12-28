@@ -1,13 +1,13 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.client.AccountClient;
-import faang.school.paymentservice.config.kafka.KafkaProducer;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.dto.account.AccountDto;
 import faang.school.paymentservice.dto.payment.AuthorizationEvent;
 import faang.school.paymentservice.dto.payment.AuthorizationMessage;
 import faang.school.paymentservice.dto.payment.AuthorizationResponse;
+import faang.school.paymentservice.dto.payment.ClearingPaymentResponse;
 import faang.school.paymentservice.model.Request;
 import faang.school.paymentservice.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +28,8 @@ public class PaymentService {
 
     public AuthorizationResponse authorizePayment(AuthorizationMessage message) {
         // валидация сообщения
-        AccountDto recipientAccountDto = accountClient.getAccount(message.getRecipientNumber());
-        validateCurrency(recipientAccountDto, message.getCurrency());
+        AccountDto senderAccountDto = accountClient.getAccount(message.getSenderNumber());
+        validateCurrency(senderAccountDto, message.getCurrency());
 
         // верификационный код
         String verificationCode = String.valueOf(new Random().nextLong(1000, 1000000000000L));
@@ -37,7 +37,7 @@ public class PaymentService {
         // сохранить в реквест в бд
         Request request = Request.builder()
                 .senderNumber(message.getSenderNumber())
-                .recipientNumber(message.getRecipientNumber())
+                .recipientNumber(message.getRecipientAccountNumber())
                 .currency(message.getCurrency())
                 .amount(message.getAmount())
                 .verificationCode(verificationCode)
@@ -50,8 +50,9 @@ public class PaymentService {
 
         AuthorizationEvent authorizationEvent = AuthorizationEvent.builder()
                 .verificationCode(verificationCode)
-                .senderId(message.getSenderId())
-                .recipientId(recipientAccountDto.getId())
+                .recipientAccountId(message.getRecipientAccountId())
+                .senderAccountId(message.getSenderAccountId())
+                .recipientAccountId(message.getRecipientAccountId())
                 .amount(message.getAmount())
                 .build();
 
