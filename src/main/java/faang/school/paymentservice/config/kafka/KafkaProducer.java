@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 public class KafkaProducer {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-
     public String send(String topic, Object message) {
         kafkaTemplate.send(topic, message);
         return "Message sent";

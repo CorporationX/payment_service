@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class KafkaConfig {
+public class KafkaProducerConfig {
 
     @Bean
     public <V> ProducerFactory<String, V> producerFactory(KafkaProperties kafkaProperties) {
@@ -41,11 +41,15 @@ public class KafkaConfig {
 
     @Bean
     public NewTopic clearingTopic() {
-        return new NewTopic("clearing-topic", 1, (short) 1);
+        return new NewTopic("clearing-payment-topic", 1, (short) 1);
     }
-
-    @Bean
-    public NewTopic cancelTopic() {
-        return new NewTopic("cancel-topic", 1, (short) 1);
-    }
+//    @Bean
+//    public NewTopic clearingTopic() {
+//        return new NewTopic("clearing-topic", 1, (short) 1);
+//    }
+//
+//    @Bean
+//    public NewTopic cancelTopic() {
+//        return new NewTopic("cancel-topic", 1, (short) 1);
+//    }
 }
