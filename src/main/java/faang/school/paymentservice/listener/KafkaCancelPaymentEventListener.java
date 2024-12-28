@@ -19,6 +19,7 @@ public class KafkaCancelPaymentEventListener {
         // Обработка полученного события
         System.out.println("Received canceled payment event: " + event);
         // Здесь можно добавить логику какую либо
+        // добавит handler для обработки отмененных платежей
 
     }
 }
