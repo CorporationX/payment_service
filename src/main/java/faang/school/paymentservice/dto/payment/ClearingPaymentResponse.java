@@ -1,19 +1,17 @@
 package faang.school.paymentservice.dto.payment;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
-@Data
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthorizationEvent {
-    private Long recipientAccountId;
-    private BigDecimal amount;
-    private Long senderAccountId;
-    private String verificationCode;
+public class ClearingPaymentResponse {
+
+    @NotNull
+    private String message;
 }
