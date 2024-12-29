@@ -43,13 +43,4 @@ public class KafkaProducerConfig {
     public NewTopic clearingTopic() {
         return new NewTopic("clearing-payment-topic", 1, (short) 1);
     }
-//    @Bean
-//    public NewTopic clearingTopic() {
-//        return new NewTopic("clearing-topic", 1, (short) 1);
-//    }
-//
-//    @Bean
-//    public NewTopic cancelTopic() {
-//        return new NewTopic("cancel-topic", 1, (short) 1);
-//    }
 }

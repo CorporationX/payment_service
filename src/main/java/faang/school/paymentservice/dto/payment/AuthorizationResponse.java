@@ -8,4 +8,5 @@ import lombok.Data;
 public class AuthorizationResponse {
     private Long requestId;
     private String verificationCode;
+    private String message;
 }

@@ -8,14 +8,18 @@ import faang.school.paymentservice.dto.payment.AuthorizationEvent;
 import faang.school.paymentservice.dto.payment.AuthorizationMessage;
 import faang.school.paymentservice.dto.payment.AuthorizationResponse;
 import faang.school.paymentservice.dto.payment.ClearingPaymentResponse;
+import faang.school.paymentservice.enums.ResponseMessageStatus;
 import faang.school.paymentservice.model.Request;
 import faang.school.paymentservice.repository.PaymentRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -28,7 +32,7 @@ public class PaymentService {
 
     public AuthorizationResponse authorizePayment(AuthorizationMessage message) {
         // валидация сообщения
-        AccountDto senderAccountDto = accountClient.getAccount(message.getSenderNumber());
+        AccountDto senderAccountDto = accountClient.getAccount(message.getSenderAccountId());
         validateCurrency(senderAccountDto, message.getCurrency());
 
         // верификационный код
@@ -41,7 +45,7 @@ public class PaymentService {
                 .currency(message.getCurrency())
                 .amount(message.getAmount())
                 .verificationCode(verificationCode)
-                .clearScheduledAt(LocalDateTime.now().plusMinutes(5))
+                .clearScheduledAt(LocalDateTime.now().plusMinutes(1))
                 .status(PaymentStatus.PENDING)
                 .build();
 
@@ -67,9 +71,24 @@ public class PaymentService {
                 .build();
     }
 
+    public void updateRequest(Request request) {
+        paymentRepository.save(request);
+    }
+
+
     private void validateCurrency(AccountDto accountDto, Currency currency) {
         if (!accountDto.getCurrency().equals(currency)) {
             throw new IllegalArgumentException("Currency does not match");
         }
+    }
+
+    @Scheduled(fixedDelay = 10000) // Задержка в 10 секунд
+    public List<Request> clearExpiredAuthorizations() {
+        List<Request> statusPending = paymentRepository.findByStatus(PaymentStatus.PENDING, LocalDateTime.now());
+        List<Request> statusCancelled = statusPending.stream()
+                .peek(request -> request.setStatus(PaymentStatus.CANCELLED))
+                .toList();
+        paymentRepository.saveAll(statusCancelled);
+        return statusCancelled;
     }
 }

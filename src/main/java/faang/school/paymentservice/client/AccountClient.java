@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @FeignClient(name = "account-client", url = "${services.account-service.host}")
 public interface AccountClient {
-    @PostMapping("/accounts/number/{number}")
-    AccountDto getAccount(@PathVariable String number);
+    @PostMapping("/accounts/{accountId}")
+    AccountDto getAccount(@PathVariable Long accountId);
 }
