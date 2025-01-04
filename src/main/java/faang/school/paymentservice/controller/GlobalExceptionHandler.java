@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import faang.school.paymentservice.exeption.GetAuthorizationBadRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -40,5 +42,11 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleRuntimeException(RuntimeException e) {
         return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(GetAuthorizationBadRequest.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleGetAuthorizationBadRequest(GetAuthorizationBadRequest ex) {
+        return new ErrorResponse(ex.getMessage());
     }
 }

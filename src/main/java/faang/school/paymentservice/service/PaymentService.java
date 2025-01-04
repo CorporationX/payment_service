@@ -9,6 +9,7 @@ import faang.school.paymentservice.dto.payment.AuthorizationMessage;
 import faang.school.paymentservice.dto.payment.AuthorizationResponse;
 import faang.school.paymentservice.dto.payment.ClearingPaymentResponse;
 import faang.school.paymentservice.enums.ResponseMessageStatus;
+import faang.school.paymentservice.exeption.GetAuthorizationBadRequest;
 import faang.school.paymentservice.model.Request;
 import faang.school.paymentservice.repository.PaymentRepository;
 import jakarta.transaction.Transactional;
@@ -31,6 +32,11 @@ public class PaymentService {
     private final AccountClient accountClient;
 
     public AuthorizationResponse authorizePayment(AuthorizationMessage message) {
+
+        if (message.getRecipientAccountId().equals(message.getSenderAccountId())) {
+            throw new GetAuthorizationBadRequest("Sender and recipient cannot be the same");
+        }
+
         // валидация сообщения
         AccountDto senderAccountDto = accountClient.getAccount(message.getSenderAccountId());
         validateCurrency(senderAccountDto, message.getCurrency());
