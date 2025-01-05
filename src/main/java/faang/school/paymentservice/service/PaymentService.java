@@ -1,18 +1,12 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.client.AccountClient;
-import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentStatus;
-import faang.school.paymentservice.dto.account.AccountDto;
 import faang.school.paymentservice.dto.payment.AuthorizationEvent;
 import faang.school.paymentservice.dto.payment.AuthorizationMessage;
 import faang.school.paymentservice.dto.payment.AuthorizationResponse;
-import faang.school.paymentservice.dto.payment.ClearingPaymentResponse;
-import faang.school.paymentservice.enums.ResponseMessageStatus;
-import faang.school.paymentservice.exeption.GetAuthorizationBadRequest;
 import faang.school.paymentservice.model.Request;
 import faang.school.paymentservice.repository.PaymentRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -33,10 +27,8 @@ public class PaymentService {
 
     public AuthorizationResponse authorizePayment(AuthorizationMessage message) {
 
-        // верификационный код
         String verificationCode = String.valueOf(new Random().nextLong(1000, 1000000000000L));
 
-        // сохранить в реквест в бд
         Request request = Request.builder()
                 .senderNumber(message.getSenderNumber())
                 .recipientNumber(message.getRecipientAccountNumber())
@@ -47,7 +39,6 @@ public class PaymentService {
                 .status(PaymentStatus.PENDING)
                 .build();
 
-        //сохроняем в бд request
         Request createdRequest = paymentRepository.save(request);
 
         AuthorizationEvent authorizationEvent = AuthorizationEvent.builder()
@@ -74,7 +65,7 @@ public class PaymentService {
     }
 
 
-    @Scheduled(fixedDelay = 10000) // Задержка в 10 секунд
+    @Scheduled(fixedDelay = 10000)
     public List<Request> clearExpiredAuthorizations() {
         List<Request> statusPending = paymentRepository.findByStatus(PaymentStatus.PENDING, LocalDateTime.now());
         List<Request> statusCancelled = statusPending.stream()

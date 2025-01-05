@@ -1,6 +1,5 @@
 package faang.school.paymentservice.message;
 
-import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.dto.payment.AuthorizationEvent;
 import faang.school.paymentservice.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;

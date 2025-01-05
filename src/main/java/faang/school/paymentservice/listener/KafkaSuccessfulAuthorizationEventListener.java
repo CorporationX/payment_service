@@ -20,12 +20,8 @@ public class KafkaSuccessfulAuthorizationEventListener {
 
     @KafkaListener(topics = "successful-payment-auth-topic", groupId = "my_consumer_group")
     public void consume(ConsumerRecord<String, String> record) throws JsonProcessingException {
-        // Извлечение значения из ConsumerRecord
-        // Обработка полученного события
         System.out.println("Received successful payment authorization event: " + record.value());
         AuthorizationEvent event = kafkaRecordConverter.convertRecordToObject(record, AuthorizationEvent.class);
-        // Здесь можно добавить логику какую либо
-        // добавит handler для обработки успешных платежей
         ResponseMessageStatus responseMessageStatus = ResponseMessageStatus.OK;
         successAuthEventHandler.handle(event);
         log.info("Successfully processed clearing payment event: {}", event);

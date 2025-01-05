@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClearingPaymentResponse {
-
     @NotNull
     private String message;
 }

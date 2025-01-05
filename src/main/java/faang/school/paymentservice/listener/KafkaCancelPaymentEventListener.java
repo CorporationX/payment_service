@@ -1,7 +1,6 @@
 package faang.school.paymentservice.listener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import faang.school.paymentservice.dto.payment.AuthorizationEvent;
 import faang.school.paymentservice.enums.ResponseMessageStatus;
 import faang.school.paymentservice.message.CancelPaymentEventHandler;
@@ -28,12 +27,8 @@ public class KafkaCancelPaymentEventListener {
             return;
         }
 
-        // Извлечение значения из ConsumerRecord
-
         AuthorizationEvent event = kafkaRecordConverter.convertRecordToObject(record, AuthorizationEvent.class);
 
-        // Здесь можно добавить логику какую либо
-        // добавит handler для обработки отмененных платежей
         ResponseMessageStatus responseMessageStatus = ResponseMessageStatus.CANCELLED;
         cancelPaymentEventHandler.handle(event);
 

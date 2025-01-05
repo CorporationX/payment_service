@@ -56,7 +56,6 @@ public class PaymentControllerTest {
                 .andExpect(status().isOk());
     }
 
-
     @Test
     void getAuthorizationInvalid() throws Exception {
         when(userContext.getUserId()).thenReturn(1L);

@@ -26,9 +26,7 @@ public class KafkaSuccessClearingEventListener {
             return;
         }
 
-        // Извлечение значения из ConsumerRecord
         AuthorizationEvent event = kafkaRecordConverter.convertRecordToObject(record, AuthorizationEvent.class);
-        // Здесь можно добавить логику какую либо
         successClearingEventHandler.handle(event);
     }
 }
