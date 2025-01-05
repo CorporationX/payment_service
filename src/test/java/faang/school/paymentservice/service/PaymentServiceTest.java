@@ -9,31 +9,41 @@ import faang.school.paymentservice.dto.payment.AuthorizationResponse;
 import faang.school.paymentservice.exeption.GetAuthorizationBadRequest;
 import faang.school.paymentservice.model.Request;
 import faang.school.paymentservice.repository.PaymentRepository;
+import faang.school.paymentservice.service.AOP.ErrorChecking;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class PaymentServiceTest {
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
+@Import(ErrorChecking.class)
+public class PaymentServiceTest {
 
-    @Mock
+    @MockBean
     private PaymentRepository paymentRepository;
 
-    @Mock
+    @MockBean
     private KafkaTemplate<String, Object> kafkaTemplate;
 
-    @Mock
+    @MockBean
     private AccountClient accountClient;
 
-    @InjectMocks
+    @Autowired
     private PaymentService paymentService;
 
     @BeforeEach
@@ -102,7 +112,7 @@ class PaymentServiceTest {
 
         when(accountClient.getAccount(1L)).thenReturn(senderAccountDto);
 
-        assertThrows(IllegalArgumentException.class, () -> paymentService.authorizePayment(message));
+        assertThrows(IllegalArgumentException.class, () -> paymentService.authorizePayment(message), "Currency does not match");
     }
 
     @Test
@@ -116,6 +126,6 @@ class PaymentServiceTest {
                 .recipientAccountNumber("0987654321")
                 .build();
 
-        assertThrows(GetAuthorizationBadRequest.class, () -> paymentService.authorizePayment(message));
+        assertThrows(GetAuthorizationBadRequest.class, () -> paymentService.authorizePayment(message), "Sender and recipient cannot be the same");
     }
 }

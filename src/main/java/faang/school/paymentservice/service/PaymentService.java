@@ -33,14 +33,6 @@ public class PaymentService {
 
     public AuthorizationResponse authorizePayment(AuthorizationMessage message) {
 
-        if (message.getRecipientAccountId().equals(message.getSenderAccountId())) {
-            throw new GetAuthorizationBadRequest("Sender and recipient cannot be the same");
-        }
-
-        // валидация сообщения
-        AccountDto senderAccountDto = accountClient.getAccount(message.getSenderAccountId());
-        validateCurrency(senderAccountDto, message.getCurrency());
-
         // верификационный код
         String verificationCode = String.valueOf(new Random().nextLong(1000, 1000000000000L));
 
@@ -81,12 +73,6 @@ public class PaymentService {
         paymentRepository.save(request);
     }
 
-
-    private void validateCurrency(AccountDto accountDto, Currency currency) {
-        if (!accountDto.getCurrency().equals(currency)) {
-            throw new IllegalArgumentException("Currency does not match");
-        }
-    }
 
     @Scheduled(fixedDelay = 10000) // Задержка в 10 секунд
     public List<Request> clearExpiredAuthorizations() {
