@@ -18,31 +18,31 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @EnableCaching
 public class RedisConfig {
-//    @Value("${data.redis.host}")
-//    private String host;
-//
-//    @Value("${data.redis.port}")
-//    private int port;
-//    @Value("${data.redis.channels.payment}")
-//    private String paymentChannel;
-//
-//    @Bean
-//    public ObjectMapper objectMapper() {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        objectMapper.registerModule(new JavaTimeModule());
-//        return objectMapper;
-//    }
-//
-//    @Bean
-//    public JedisConnectionFactory connectionFactory() {
-//        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(host, port);
-//        return new JedisConnectionFactory(configuration);
-//    }
-//
-//    @Bean
-//    public ChannelTopic paymentChannel (){
-//        return new ChannelTopic(paymentChannel);
-//    }
+    @Value("${data.redis.host}")
+    private String host;
+
+    @Value("${data.redis.port}")
+    private int port;
+    @Value("${data.redis.channels.payment}")
+    private String paymentChannel;
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        return objectMapper;
+    }
+
+    @Bean
+    public JedisConnectionFactory connectionFactory() {
+        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(host, port);
+        return new JedisConnectionFactory(configuration);
+    }
+
+    @Bean
+    public ChannelTopic paymentChannel (){
+        return new ChannelTopic(paymentChannel);
+    }
 
     @Bean
     public RedisTemplate<String, Double> redisTemplate(RedisConnectionFactory connectionFactory) {

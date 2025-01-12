@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PendingRepository extends JpaRepository<Pending, Long> {
     boolean existsByIdempotencyToken(@Param("token") String idempotencyToken);
+
+    Pending findByIdempotencyToken(@Param("token") String idempotencyToken);
 }

@@ -48,6 +48,12 @@ dependencies {
     implementation("org.liquibase:liquibase-core")
     implementation("redis.clients:jedis:4.3.2")
     runtimeOnly("org.postgresql:postgresql")
+
+    implementation("com.atomikos:transactions-jta:5.0.8")
+    implementation("com.atomikos:transactions-jdbc:5.0.8")
+    implementation("org.postgresql:postgresql:42.2.20") // Убедитесь, что используете актуальную версию
+    implementation("javax.transaction:jta:1.1")
+
 }
 
 tasks.withType<Test> {

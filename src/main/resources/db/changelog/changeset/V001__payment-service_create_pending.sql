@@ -1,5 +1,5 @@
 CREATE TABLE pending (
-    id bigint PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     receiver_account_number VARCHAR(255) NOT NULL,
     owner_account_number VARCHAR(255) NOT NULL,
     idempotency_token VARCHAR(255) NOT NULL,
