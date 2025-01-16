@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changeset/order_V001__initial.sql
+  - include:
+      file: db/changelog/changeset/order_V002__insert_premium_types.sql
+  - include:
+      file: db/changelog/changeset/order_V003__insert_premium_plans.sql
