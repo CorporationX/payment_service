@@ -27,10 +27,9 @@ public class PaymentService {
 
     public void paymentPromotion(ConsumerRecord<String, String> record) {
         PromotionRequest request = deserializeMessage(record.value());
-        kafkaTemplate.send(KafkaConfig.PROMOTION_BOUGHT_TOPIC, record.key(), record.value());
 
         try {
-            Thread.sleep(3000);
+            Thread.sleep(3000); //имитация платежа
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -51,6 +50,7 @@ public class PaymentService {
                 .currency(Currency.USD)
                 .build();
 
+        kafkaTemplate.send(KafkaConfig.PROMOTION_BOUGHT_TOPIC, record.key(), record.value());
         kafkaTemplate.send(KafkaConfig.NOTIFICATION_TOPIC, String.valueOf(request.userId()), convertToJson(paymentResponse));
     }
 
