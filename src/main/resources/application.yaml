@@ -16,8 +16,9 @@ spring:
       max-in-flight-requests-per-connection: 5
     listener:
       ack-mode: manual
+
 server:
-  port: 9080
+  port: ${SERVER_PORT:9080}
 
 logging:
   level:
