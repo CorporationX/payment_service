@@ -28,12 +28,6 @@ public class PaymentService {
     public void paymentPromotion(ConsumerRecord<String, String> record) {
         PromotionRequest request = deserializeMessage(record.value());
 
-        try {
-            Thread.sleep(3000); //имитация платежа
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
         BigDecimal amount = BigDecimal.valueOf(request.budgetInDay() * request.countDays());
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         String formattedSum = decimalFormat.format(amount);

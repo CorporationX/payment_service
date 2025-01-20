@@ -7,7 +7,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Controller;
 
-import static faang.school.paymentservice.config.KafkaConfig.PAYMENT_PROCESSING_GROUP;
 import static faang.school.paymentservice.config.KafkaConfig.PAYMENT_PROMOTION_TOPIC;
 
 @Controller
@@ -16,7 +15,7 @@ public class KafkaController {
 
     private final PaymentService paymentService;
 
-    @KafkaListener(topics = PAYMENT_PROMOTION_TOPIC, groupId = PAYMENT_PROCESSING_GROUP)
+    @KafkaListener(topics = PAYMENT_PROMOTION_TOPIC)
     public void processPaymentPromotionTopic(ConsumerRecord<String, String> record, Acknowledgment ack) {
         paymentService.paymentPromotion(record);
         ack.acknowledge();
