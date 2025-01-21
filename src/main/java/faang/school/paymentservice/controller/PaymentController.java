@@ -1,7 +1,6 @@
 package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.payment.PaymentRequest;
-import faang.school.paymentservice.service.OrderService;
 import faang.school.paymentservice.service.payment.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/payment")
 @RequiredArgsConstructor
 public class PaymentController {
     private final Map<String, PaymentService> paymentServices;
 
-    @PostMapping("/stripe/payment")
+    @PostMapping("/stripe")
     public void retrieveStripePayment(
             @Valid @RequestBody PaymentRequest dto,
             @RequestHeader("x-secret") String secretKey
@@ -27,7 +26,7 @@ public class PaymentController {
         paymentServices.get("stripe").processPayment(dto, secretKey);
     }
 
-    @PostMapping("/crypto/payment")
+    @PostMapping("/crypto")
     public void retrieveCryptoPayment(
             @Valid @RequestBody PaymentRequest dto,
             @RequestHeader("x-secret") String secretKey

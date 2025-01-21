@@ -8,9 +8,8 @@ import java.util.Optional;
 
 public interface ServicePlanRepository extends JpaRepository<ServicePlan, Long> {
     @Query(nativeQuery = true, value = """
-            SELECT sp.* FROM service_plans sp
-            JOIN service_types st ON sp.service_type_id = st.id
-            WHERE sp.name = ?1
+            SELECT * FROM service_plans
+            WHERE service_plans.name = ?1
             """)
     Optional<ServicePlan> getPlanByName(String name);
 }

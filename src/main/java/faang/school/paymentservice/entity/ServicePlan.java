@@ -1,47 +1,27 @@
 package faang.school.paymentservice.entity;
 
+import faang.school.paymentservice.dto.order.ServiceType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name = "service_plans")
 @Data
-public class ServicePlan {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@EqualsAndHashCode(callSuper = true)
+public class ServicePlan extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 64)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "service_type_id", nullable = false)
+    @Column(name = "service_type", nullable = false)
+    @Enumerated(EnumType.STRING)
     private ServiceType serviceType;
 
     @Column(name = "cost", nullable = false)
     private long cost;
-
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 }

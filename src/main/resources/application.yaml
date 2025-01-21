@@ -1,5 +1,7 @@
 server:
   port: 9080
+  servlet:
+    context-path: /payment/api/v1
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -19,7 +21,7 @@ spring:
       client:
         config:
           userService:
-            url: http://localhost:8080/api
+            url: http://localhost:8080/users/api
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 

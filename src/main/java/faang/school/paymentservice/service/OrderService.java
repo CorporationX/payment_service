@@ -3,6 +3,7 @@ package faang.school.paymentservice.service;
 import faang.school.paymentservice.client.UserServiceClient;
 import faang.school.paymentservice.dto.order.CreateOrderDto;
 import faang.school.paymentservice.dto.order.OrderDto;
+import faang.school.paymentservice.dto.order.ServiceType;
 import faang.school.paymentservice.dto.payment.PaymentStatus;
 import faang.school.paymentservice.entity.Order;
 import faang.school.paymentservice.entity.ServicePlan;
@@ -24,8 +25,9 @@ public class OrderService {
     private final ServicePlanRepository servicePlanRepository;
     private final OrderMapper orderMapper;
 
-    public OrderDto createOrder(CreateOrderDto dto, long userId) {
+    public OrderDto createOrder(CreateOrderDto dto) {
         ServicePlan servicePlan = getServicePlan(dto.plan(), dto.serviceType());
+        var userId = dto.userId();
 
         if (!userServiceClient.isUserExist(userId).success()) {
             throw new EntityNotFoundException("Пользователь не найден");
@@ -57,11 +59,11 @@ public class OrderService {
         return orderMapper.toDto(order);
     }
 
-    private ServicePlan getServicePlan(String planName, String serviceTypeName) {
+    private ServicePlan getServicePlan(String planName, ServiceType serviceType) {
         ServicePlan servicePlan = servicePlanRepository.getPlanByName(planName.toLowerCase())
                 .orElseThrow(() -> new EntityNotFoundException("Тарифный план не найден"));
 
-        if (!servicePlan.getServiceType().getName().equalsIgnoreCase(serviceTypeName)) {
+        if (!servicePlan.getServiceType().equals(serviceType)) {
             throw new BusinessException("Тип услуги не соответствует тарифному плану");
         }
 

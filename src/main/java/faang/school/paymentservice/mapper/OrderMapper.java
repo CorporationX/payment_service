@@ -10,6 +10,6 @@ import org.mapstruct.ReportingPolicy;
 public interface OrderMapper {
 
     @Mapping(source = "servicePlan.name", target = "servicePlan")
-    @Mapping(source = "servicePlan.serviceType.name", target = "serviceType")
+    @Mapping(source = "servicePlan.serviceType", target = "serviceType")
     OrderDto toDto(Order order);
 }

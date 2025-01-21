@@ -11,26 +11,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/order")
+@RequestMapping("/order")
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
     private final Map<String, PaymentService> paymentServicesMap;
 
     @PostMapping
-    public OrderDto createOrder(
-            @RequestBody @Valid CreateOrderDto dto,
-            @RequestHeader(value = "x-user-id") Long userId
-    ) {
+    public OrderDto createOrder(@RequestBody @Valid CreateOrderDto dto) {
         PaymentService paymentService = getPaymentMethod(dto.paymentMethod());
-        OrderDto orderDto = orderService.createOrder(dto, userId);
+        OrderDto orderDto = orderService.createOrder(dto);
         String paymentLink = paymentService.createPaymentLink(orderDto.getId());
         orderDto.setPaymentLink(paymentLink);
         return orderDto;

@@ -19,7 +19,7 @@ public class OrderDto {
     private String paymentMethod;
     private String paymentLink;
     private String servicePlan;
-    private String serviceType;
+    private ServiceType serviceType;
     private PaymentStatus paymentStatus;
     private LocalDateTime createdAt;
 }

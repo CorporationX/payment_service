@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient("userService")
 public interface UserServiceClient {
 
-    @GetMapping("/v1/user/exist")
+    @GetMapping("/v1/users/is-user-exists")
     BooleanResponse isUserExist(@RequestParam(name = "user_id") long userId);
 
-    @PostMapping("/v1/premium/activate")
+    @PostMapping("/v1/premium/activation")
     void activatePremiumForUser(@RequestParam Long orderId);
 }
