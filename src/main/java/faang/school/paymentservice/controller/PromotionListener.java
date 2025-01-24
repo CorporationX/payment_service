@@ -5,13 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Component;
 
 import static faang.school.paymentservice.config.KafkaConfig.PAYMENT_PROMOTION_TOPIC;
 
-@Controller
+@Component
 @RequiredArgsConstructor
-public class KafkaController {
+public class PromotionListener {
 
     private final PaymentService paymentService;
 
