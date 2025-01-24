@@ -1,6 +1,11 @@
 package faang.school.paymentservice.dto;
 
+import lombok.Builder;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
+
+@Builder
 public record PaymentResponse(
         PaymentStatus status,
         int verificationCode,
@@ -8,5 +13,5 @@ public record PaymentResponse(
         BigDecimal amount,
         Currency currency,
         String message
-) {
+) implements Serializable {
 }
