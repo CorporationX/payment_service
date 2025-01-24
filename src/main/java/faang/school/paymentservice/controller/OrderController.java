@@ -25,7 +25,7 @@ public class OrderController {
 
     @PostMapping
     public OrderDto createOrder(@RequestBody @Valid CreateOrderDto dto) {
-        PaymentService paymentService = getPaymentMethod(dto.paymentMethod());
+        PaymentService paymentService = getPaymentMethod(dto.getPaymentMethod());
         OrderDto orderDto = orderService.createOrder(dto);
         String paymentLink = paymentService.createPaymentLink(orderDto.getId());
         orderDto.setPaymentLink(paymentLink);

@@ -26,8 +26,8 @@ public class OrderService {
     private final OrderMapper orderMapper;
 
     public OrderDto createOrder(CreateOrderDto dto) {
-        ServicePlan servicePlan = getServicePlan(dto.plan(), dto.serviceType());
-        var userId = dto.userId();
+        ServicePlan servicePlan = getServicePlan(dto.getPlan(), dto.getServiceType());
+        var userId = dto.getUserId();
 
         if (!userServiceClient.isUserExist(userId).success()) {
             throw new EntityNotFoundException("Пользователь не найден");
@@ -35,7 +35,7 @@ public class OrderService {
 
         Order order = Order.builder()
                 .servicePlan(servicePlan)
-                .paymentMethod(dto.paymentMethod())
+                .paymentMethod(dto.getPaymentMethod())
                 .paymentStatus(PaymentStatus.PENDING)
                 .userId(userId)
                 .cost(servicePlan.getCost())

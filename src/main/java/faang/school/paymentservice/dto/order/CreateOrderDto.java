@@ -3,16 +3,23 @@ package faang.school.paymentservice.dto.order;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public record CreateOrderDto(
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class CreateOrderDto {
         @NotNull
-        ServiceType serviceType,
+        private ServiceType serviceType;
         @NotBlank
-        String plan,
+        private String plan;
         @NotBlank
-        String paymentMethod,
+        private String paymentMethod;
         @NotNull
         @Positive
-        Long userId
-) {
+        private Long userId;
 }

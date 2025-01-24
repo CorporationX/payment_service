@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "orders")
 @EqualsAndHashCode(callSuper = true)
-public class Order extends BaseEntity {
+public class Order extends BaseEntity{
 
     @ManyToOne
     @JoinColumn(name = "service_plan_id")
