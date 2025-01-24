@@ -1,8 +1,6 @@
 package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.PaymentRequest;
-import java.text.DecimalFormat;
-import java.util.Random;
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.text.DecimalFormat;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/api")
@@ -23,9 +24,10 @@ public class PaymentController {
         int verificationCode = new Random().nextInt(1000, 10000);
         String message = String.format("Dear friend! Thank you for your purchase! " +
                         "Your payment on %s %s was accepted.",
-                formattedSum, dto.currency().name());
+                formattedSum, dto.currency());
 
         return ResponseEntity.ok(new PaymentResponse(
+                new Random().nextLong(),
                 PaymentStatus.SUCCESS,
                 verificationCode,
                 dto.paymentNumber(),
