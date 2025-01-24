@@ -1,4 +1,4 @@
-package faang.school.paymentservice.controller;
+package faang.school.paymentservice.listener;
 
 import faang.school.paymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
