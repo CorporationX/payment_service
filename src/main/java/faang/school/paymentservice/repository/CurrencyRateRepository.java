@@ -1,55 +1,74 @@
 package faang.school.paymentservice.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.CurrencyRate;
 import faang.school.paymentservice.exception.CurrencyRateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Repository
 public class CurrencyRateRepository {
     public static final String REDIS_KEY_CURRENCY_RATE = "currency_rate";
+    public static final String TIMESTAMP = "timestamp";
 
-    private final StringRedisTemplate redisTemplate;
-    private final ObjectMapper objectMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Value("${currency.rate.updateExchangeRatesMillis}")
     private long updateExchangeRatesMillis;
 
-    public CurrencyRateRepository(
-            @Qualifier("currencyRatesRedisTemplate") StringRedisTemplate redisTemplate,
-            ObjectMapper objectMapper) {
+    public CurrencyRateRepository(@Qualifier("currencyRatesRedisTemplate") RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
-        this.objectMapper = objectMapper;
     }
 
-    public void saveCurrencyRate(CurrencyRate currencyRateDto) {
+    public void saveCurrencyRate(CurrencyRate currencyRate) {
         try {
-            String currencyRateJson = objectMapper.writeValueAsString(currencyRateDto);
-            redisTemplate.opsForValue()
-                    .set(REDIS_KEY_CURRENCY_RATE, currencyRateJson, updateExchangeRatesMillis, TimeUnit.MILLISECONDS);
+            Map<String, Object> hash = new HashMap<>();
+            hash.put(TIMESTAMP, currencyRate.getTimestamp().toString());
 
-        } catch (RuntimeException | JsonProcessingException e) {
+            currencyRate.getRates().forEach((currency, rate) -> hash.put(currency.toString(), rate));
+            redisTemplate.opsForHash()
+                    .putAll(REDIS_KEY_CURRENCY_RATE, hash);
+            redisTemplate.expire(REDIS_KEY_CURRENCY_RATE, updateExchangeRatesMillis, TimeUnit.MILLISECONDS);
+
+        } catch (RuntimeException e) {
             log.error("Error while saving to Redis", e);
             throw new CurrencyRateException(e.getMessage());
         }
     }
 
-    public CurrencyRate getCurrencyRate() {
+    public Map<Currency, Double> getCurrencyRates(Currency first, Currency second) {
         try {
-            String currencyRateJson = redisTemplate.opsForValue().get(REDIS_KEY_CURRENCY_RATE);
-            return objectMapper.readValue(currencyRateJson, CurrencyRate.class);
+            List<Object> values = redisTemplate.opsForHash()
+                    .multiGet(REDIS_KEY_CURRENCY_RATE, List.of(first.toString(), second.toString()));
 
-        } catch (RuntimeException | JsonProcessingException e) {
+            return Map.of(
+                    first, (Double) values.get(0),
+                    second, (Double) values.get(1));
+
+        } catch (RuntimeException e) {
             log.error("Error while saving to Redis", e);
             throw new CurrencyRateException("Fail to get currency rates, try again later");
+        }
+    }
+
+    public LocalDateTime getCreatedTime() {
+        try {
+            String timestamp = (String) redisTemplate.opsForHash()
+                    .get(REDIS_KEY_CURRENCY_RATE, TIMESTAMP);
+            return LocalDateTime.parse(timestamp);
+        } catch (RuntimeException e) {
+            log.error("Error while getting timestamp from Redis", e);
+            throw new CurrencyRateException("Fail to get timestamp, try again later");
         }
     }
 }

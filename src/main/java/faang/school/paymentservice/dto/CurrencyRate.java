@@ -16,6 +16,5 @@ import java.util.Map;
 @AllArgsConstructor
 public class CurrencyRate {
     private LocalDateTime timestamp;
-    private Currency base;
     private Map<Currency, Double> rates;
 }

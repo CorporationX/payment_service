@@ -53,9 +53,9 @@ class CurrencyRateRepositoryTest {
     }
 
     @Test
-    void testGetCurrencyRateThrowsRuntimeException() {
+    void testGetCreatedTimeThrowsRuntimeException() {
         when(redisTemplate.opsForValue()).thenThrow(RuntimeException.class);
 
-        assertThrows(CurrencyRateException.class, () -> currencyRateRepository.getCurrencyRate());
+        assertThrows(CurrencyRateException.class, () -> currencyRateRepository.getCreatedTime());
     }
 }

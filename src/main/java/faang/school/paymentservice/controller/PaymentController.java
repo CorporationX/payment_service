@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.util.Random;
 
 @RequiredArgsConstructor
@@ -47,12 +48,17 @@ public class PaymentController {
         );
     }
 
-    @GetMapping("/currency")
-    public double getCurrencies(
+    @GetMapping("/currency/exchange")
+    public double exchange(
             @RequestParam Currency from,
             @RequestParam Currency to,
             @NotNull @Positive @RequestParam BigDecimal amount
     ) {
         return currencyRateService.exchange(from, to, amount);
+    }
+
+    @GetMapping("/currency/time")
+    public LocalDateTime getCurrenciesUpdatedAt() {
+        return currencyRateService.getCurrencyRateCreatedTime();
     }
 }

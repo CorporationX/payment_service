@@ -5,6 +5,7 @@ import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.CurrencyRate;
 import faang.school.paymentservice.exception.CurrencyRateException;
 import faang.school.paymentservice.repository.CurrencyRateRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CurrencyRateServiceTest {
+    private Map<Currency, Double> rates;
 
     @Mock
     private CurrencyRateRepository currencyRateRepository;
@@ -41,23 +43,16 @@ class CurrencyRateServiceTest {
         verify(currencyRateRepository).saveCurrencyRate(currencyRate);
     }
 
-    @Test
-    void testGet() {
-        CurrencyRate currencyRate = new CurrencyRate();
-        when(currencyRateRepository.getCurrencyRate()).thenReturn(currencyRate);
-        CurrencyRate result = currencyRateService.get();
-        assertEquals(currencyRate, result);
+    @BeforeEach
+    void setUp() {
+        rates = new HashMap<>();
+        rates.put(Currency.USD, 1.0);
+        rates.put(Currency.EUR, 0.85);
     }
 
     @Test
     void testExchangeCorrectInput() {
-        CurrencyRate currencyRate = new CurrencyRate();
-        Map<Currency, Double> rates = new HashMap<>();
-        rates.put(Currency.USD, 1.0);
-        rates.put(Currency.EUR, 0.85);
-        currencyRate.setRates(rates);
-
-        when(currencyRateRepository.getCurrencyRate()).thenReturn(currencyRate);
+        when(currencyRateRepository.getCurrencyRates(Currency.USD, Currency.EUR)).thenReturn(rates);
         when(rateConfig.getConversionRateFactor()).thenReturn(1.0);
 
         BigDecimal amount = new BigDecimal("100");
@@ -70,29 +65,18 @@ class CurrencyRateServiceTest {
 
     @Test
     void testExchangeFromRateIsZero() {
-        CurrencyRate currencyRate = new CurrencyRate();
-        Map<Currency, Double> rates = new HashMap<>();
-        rates.put(Currency.USD, 0.0);
-        rates.put(Currency.EUR, 0.85);
-        currencyRate.setRates(rates);
-
-        when(currencyRateRepository.getCurrencyRate()).thenReturn(currencyRate);
+        rates.put(Currency.AED, 0.0);
+        when(currencyRateRepository.getCurrencyRates(Currency.AED, Currency.EUR)).thenReturn(rates);
         when(rateConfig.getConversionRateFactor()).thenReturn(1.0);
 
         BigDecimal amount = new BigDecimal("100");
 
-        assertThrows(CurrencyRateException.class, () -> currencyRateService.exchange(Currency.USD, Currency.EUR, amount));
+        assertThrows(CurrencyRateException.class, () -> currencyRateService.exchange(Currency.AED, Currency.EUR, amount));
     }
 
     @Test
     void testExchangeToRateIsZero() {
-        CurrencyRate currencyRate = new CurrencyRate();
-        Map<Currency, Double> rates = new HashMap<>();
-        rates.put(Currency.USD, 1.0);
-        rates.put(Currency.EUR, 0.0);
-        currencyRate.setRates(rates);
-
-        when(currencyRateRepository.getCurrencyRate()).thenReturn(currencyRate);
+        when(currencyRateRepository.getCurrencyRates(Currency.USD, Currency.EUR)).thenReturn(rates);
         when(rateConfig.getConversionRateFactor()).thenReturn(1.0);
 
         BigDecimal amount = new BigDecimal("100");
@@ -102,19 +86,7 @@ class CurrencyRateServiceTest {
 
     @Test
     void testExchange_CurrencyRateIsNull() {
-        when(currencyRateRepository.getCurrencyRate()).thenReturn(null);
-
-        BigDecimal amount = new BigDecimal("100");
-
-        assertThrows(NullPointerException.class, () -> currencyRateService.exchange(Currency.USD, Currency.EUR, amount));
-    }
-
-    @Test
-    void testExchange_RatesAreNull() {
-        CurrencyRate currencyRate = new CurrencyRate();
-        currencyRate.setRates(null);
-
-        when(currencyRateRepository.getCurrencyRate()).thenReturn(currencyRate);
+        when(currencyRateRepository.getCurrencyRates(Currency.USD, Currency.EUR)).thenReturn(null);
 
         BigDecimal amount = new BigDecimal("100");
 

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,14 +25,10 @@ public class CurrencyRateService {
         currencyRateRepository.saveCurrencyRate(currencyRate);
     }
 
-    public CurrencyRate get() {
-        return currencyRateRepository.getCurrencyRate();
-    }
-
     public double exchange(Currency from, Currency to, BigDecimal amount) {
-        CurrencyRate currencyRate = currencyRateRepository.getCurrencyRate();
-        double fromRate = currencyRate.getRates().get(from);
-        double toRate = currencyRate.getRates().get(to);
+        Map<Currency, Double> currencyRate = currencyRateRepository.getCurrencyRates(from, to);
+        double fromRate = currencyRate.get(from);
+        double toRate = currencyRate.get(to);
         double conversionRateFactor = rateConfig.getConversionRateFactor();
 
         try {
@@ -41,5 +39,9 @@ public class CurrencyRateService {
             log.error("Error while exchanging", e);
             throw new CurrencyRateException("Fail to exchange, try again later");
         }
+    }
+
+    public LocalDateTime getCurrencyRateCreatedTime(){
+        return currencyRateRepository.getCreatedTime();
     }
 }
