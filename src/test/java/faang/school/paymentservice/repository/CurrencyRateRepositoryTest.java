@@ -1,7 +1,6 @@
 package faang.school.paymentservice.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.CurrencyRate;
 import faang.school.paymentservice.exception.CurrencyRateException;
 import org.junit.jupiter.api.Test;
@@ -22,40 +21,32 @@ class CurrencyRateRepositoryTest {
     @Mock
     private StringRedisTemplate redisTemplate;
 
-    @Mock
-    private ObjectMapper objectMapper;
-
     @InjectMocks
     private CurrencyRateRepository currencyRateRepository;
 
     @Test
-    void testSaveCurrencyRateThrowsJsonProcessingException() throws JsonProcessingException {
+    void testSaveCurrencyRateThrowsCurrencyRateException() {
         CurrencyRate currencyRate = new CurrencyRate();
-        when(objectMapper.writeValueAsString(currencyRate)).thenThrow(JsonProcessingException.class);
 
         assertThrows(CurrencyRateException.class, () ->
                 currencyRateRepository.saveCurrencyRate(currencyRate));
 
-        verify(objectMapper).writeValueAsString(currencyRate);
         verify(redisTemplate, never()).opsForValue();
     }
 
     @Test
-    void testSaveCurrencyRateThrowsRuntimeException() throws JsonProcessingException {
-        CurrencyRate currencyRate = new CurrencyRate();
-        when(objectMapper.writeValueAsString(currencyRate)).thenThrow(RuntimeException.class);
+    void testGetCurrencyRateThrowsCurrencyRateException() {
+        when(redisTemplate.opsForHash()).thenThrow(RuntimeException.class);
 
-        assertThrows(CurrencyRateException.class, () ->
-                currencyRateRepository.saveCurrencyRate(currencyRate));
-
-        verify(objectMapper).writeValueAsString(currencyRate);
-        verify(redisTemplate, never()).opsForValue();
+        assertThrows(CurrencyRateException.class,
+                () -> currencyRateRepository.getCurrencyRates(Currency.AFN, Currency.AMD));
     }
 
     @Test
-    void testGetCreatedTimeThrowsRuntimeException() {
-        when(redisTemplate.opsForValue()).thenThrow(RuntimeException.class);
+    void testGetCreatedTimeThrowsCurrencyRateException() {
+        when(redisTemplate.opsForHash()).thenThrow(RuntimeException.class);
 
-        assertThrows(CurrencyRateException.class, () -> currencyRateRepository.getCreatedTime());
+        assertThrows(CurrencyRateException.class,
+                () -> currencyRateRepository.getCreatedTime());
     }
 }
