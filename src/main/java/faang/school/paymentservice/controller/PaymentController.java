@@ -1,20 +1,32 @@
 package faang.school.paymentservice.controller;
 
+import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
-import java.text.DecimalFormat;
-import java.util.Random;
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
+import faang.school.paymentservice.service.CurrencyRateService;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.Random;
+
+@RequiredArgsConstructor
+@Validated
 @RestController
 @RequestMapping("/api")
 public class PaymentController {
+    private final CurrencyRateService currencyRateService;
 
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
@@ -33,5 +45,14 @@ public class PaymentController {
                 dto.currency(),
                 message)
         );
+    }
+
+    @GetMapping("/currency")
+    public double getCurrencies(
+            @RequestParam Currency from,
+            @RequestParam Currency to,
+            @NotNull @Positive @RequestParam BigDecimal amount
+    ) {
+        return currencyRateService.exchange(from, to, amount);
     }
 }
