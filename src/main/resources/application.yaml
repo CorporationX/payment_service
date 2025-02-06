@@ -1,6 +1,6 @@
 server:
   port: 9080
 
-logging:
-  level:
-    root: info
+spring:
+  profiles:
+    active: local
