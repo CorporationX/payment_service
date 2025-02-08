@@ -3,6 +3,8 @@ server:
   servlet:
     context-path: /payment/api/v1
 spring:
+  profiles:
+    active: local
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/postgres
@@ -39,10 +41,6 @@ redis:
   channel:
     exchange_rates: currency
 
-logging:
-  level:
-    root: info
-
 resilience4j:
   retry:
     instances:
@@ -52,3 +50,29 @@ resilience4j:
         exponentialBackoffMultiplier: 2
         retryExceptions:
           - feign.FeignException
+
+logging:
+  level:
+    root: info
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+
+logging:
+  level:
+    root: debug
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    root: info
