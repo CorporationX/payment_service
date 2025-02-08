@@ -1,10 +1,31 @@
+server:
+  port: 9080
+  servlet:
+    context-path: /payment/api/v1
 spring:
   profiles:
     active: local
-
-
-server:
-  port: 9080
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: user
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  cloud:
+    openfeign:
+      client:
+        config:
+          userService:
+            url: http://localhost:8080/users/api
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
 
 logging:
   level:
