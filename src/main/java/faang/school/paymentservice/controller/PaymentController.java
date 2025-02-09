@@ -24,12 +24,12 @@ public class PaymentController {
     private final CurrencyExchangeConfig exchangeConfig;
     private final ConverterService converterService;
 
-    @PostMapping("payment")
+    @PostMapping("currency")
     public CurrencyExchangeResponse getCurrencyExchangeResponse() {
         return converterService.getCurrentCurrencyExchangeRate();
     }
 
-    @PostMapping("/payment")
+    @PostMapping("payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
         String message = String.format(
                 PAYMENT_MESSAGE,
