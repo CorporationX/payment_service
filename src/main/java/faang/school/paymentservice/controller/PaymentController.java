@@ -2,23 +2,22 @@ package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.config.CurrencyExchangeConfig;
 import faang.school.paymentservice.dto.*;
-
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.util.Random;
-
 import faang.school.paymentservice.service.ConverterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.Random;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class PaymentController {
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
-    private static final String CONVERT_MONEY_MESS = "You convert %s %s to %s %S with commission %f%%";
+    private static final String CONVERT_MONEY_MESS = "You convert %s %s to %s %s with commission %f%%";
     private static final String PAYMENT_MESSAGE = "payment on %s %s was accepted";
 
     private final CurrencyExchangeConfig exchangeConfig;
