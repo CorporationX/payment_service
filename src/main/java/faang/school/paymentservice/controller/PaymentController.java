@@ -47,6 +47,7 @@ public class PaymentController {
         );
     }
 
+    @PostMapping("exchange")
     public ResponseEntity<PaymentResponse> exchangeCurrency(@RequestBody @Validated PaymentRequest dto,
                                                             @RequestParam Currency targetCurrency) {
         BigDecimal newAmount = converterService.convertWithCommission(dto, targetCurrency);
