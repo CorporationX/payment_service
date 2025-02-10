@@ -1,3 +1,20 @@
+spring:
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
+currency:
+  rate:
+    apiUrl: https://api.exchangeratesapi.io/v1/
+    connectionTimeoutSeconds: 10
+    readTimeoutSeconds: 10
+    accessKey:
+    connectionRetrySeconds: 60
+    connectionRetryAttempts: 5
+    updateExchangeRatesMillis: 300_000
+    conversionRateFactor: 1.1
+
 server:
   port: 9080
 
