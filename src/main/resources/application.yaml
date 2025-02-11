@@ -4,3 +4,8 @@ server:
 logging:
   level:
     root: info
+
+services:
+  exchange-service:
+    host: https://openexchangerates.org
+    app-id: 255c64b4372544d880895eed1d07444f
