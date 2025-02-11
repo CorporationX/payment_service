@@ -21,6 +21,11 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    implementation ("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation ("org.springframework.data:spring-data-redis")
+    implementation("org.springframework.retry:spring-retry:2.0.11")
+    implementation("org.springframework.boot:spring-boot-starter-webflux:3.4.2")
+    implementation("org.springframework.boot:spring-boot-starter-aop:3.4.2")
 
     /**
      * Database

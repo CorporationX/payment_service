@@ -25,6 +25,20 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
+currency:
+  fetch:
+    cron: "0 * * * * ?"
+  exchange:
+    url: https://api.exchangeratesapi.io/v1/latest
+    access-key: 9a0774e234d2bf1c16fdd7a2f6e84850
+    base: USD
+    actual-currency: EUR,USD,RUB,BYN
+
+master_redis:
+  image: redis/redis-stack:latest
+  ports:
+    - "6379:6379"
+
 logging:
   level:
     root: info
