@@ -23,3 +23,9 @@ server:
 logging:
   level:
     root: info
+
+currency:
+  exchange:
+    url: https://openexchangerates.org
+    appId: 7b5e207c5c8a4fb9aeefaf900491cf6d
+    commission: 1
