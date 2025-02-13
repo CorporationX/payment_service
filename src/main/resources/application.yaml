@@ -4,3 +4,10 @@ server:
 logging:
   level:
     root: info
+
+cron:
+  expression: "0 19 13 * * ?"
+
+currency-api:
+  baseUrl: "http://api.exchangeratesapi.io/v1/"
+  key: "d3b4b86860c6a6338b090e66f051f291"
