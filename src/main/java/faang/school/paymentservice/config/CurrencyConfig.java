@@ -12,7 +12,7 @@ public class CurrencyConfig {
     private String url;
 
     @Bean
-    private WebClient webClient() {
+    public WebClient webClient() {
         return WebClient.builder()
                 .baseUrl(url)
                 .build();

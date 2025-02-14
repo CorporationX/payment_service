@@ -1,5 +1,7 @@
 package faang.school.paymentservice.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import faang.school.paymentservice.client.ExchangeRatesClient;
 import faang.school.paymentservice.dto.payment.ExchangeRates;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -9,14 +11,16 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CurrencyService {
-    private final WebClient webClient;
+    private final ExchangeRatesClient exchangeRatesClient;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
 
     @Value("${currency.exchange.access-key}")
     private String accessKey;
@@ -24,31 +28,29 @@ public class CurrencyService {
     @Value("${currency.exchange.actual-currency}")
     private String actualCurrency;
 
-    @Value("${currency.exchange.base}")
-    private String baseCurrency;
-
-    @Value("${redis.key}")
+    @Value("${redis.channels.calculations-channel.name}")
     private String redisKey;
 
     @Retryable(retryFor = FeignException.class, maxAttempts = 10, backoff = @Backoff(delay = 1000, multiplier = 3))
     public void fetchCurrencyRates() {
-        ExchangeRates exchangeRates = webClient
-                .get()
-                .uri(uriBuilder -> uriBuilder.path("/latest")
-                        .queryParam("access-key", accessKey)
-                        .queryParam("symbols", actualCurrency)
-                        .queryParam("base", baseCurrency)
-                        .build())
-                .retrieve()
-                .bodyToMono(ExchangeRates.class)
-                .block();
-
-        if (exchangeRates != null) {
-            redisTemplate.opsForValue().set(redisKey, exchangeRates);
+        try {
+            ExchangeRates exchangeRates = exchangeRatesClient.getExchangeRates(accessKey, actualCurrency);
+            if (exchangeRates != null) {
+                redisTemplate.opsForValue().set(redisKey, exchangeRates);
+            }
+        } catch (FeignException e) {
+            log.error("Ошибка при получении информации о курсах валют", e);
         }
     }
 
     public ExchangeRates getCurrencyRates() {
-        return (ExchangeRates) redisTemplate.opsForHash().entries(redisKey);
+        return Optional.ofNullable(redisTemplate.opsForValue().get(redisKey))
+                .map(cachedRates -> objectMapper.convertValue(cachedRates, ExchangeRates.class))
+                .orElseGet(() -> {
+                    fetchCurrencyRates();
+                    return objectMapper.convertValue(redisTemplate
+                            .opsForValue()
+                            .get(redisKey), ExchangeRates.class);
+                });
     }
 }
