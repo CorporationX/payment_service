@@ -4,3 +4,14 @@ server:
 logging:
   level:
     root: info
+
+exchange-rates:
+  base-url: "https://api.exchangeratesapi.io/v1/"
+  access-key: "cd7a10a6780de9c0f5cfcd427f15dd3b"
+  endpoints:
+    get-latest-rate: "latest"
+  scheduler:
+    cron: "0 0 * * * MON-FRI" # каждый час, в начале часа (00:00, 01:00, 02:00,..), по будням
+    fixedRate: 3600000
+    initialDelay: 3000
+
