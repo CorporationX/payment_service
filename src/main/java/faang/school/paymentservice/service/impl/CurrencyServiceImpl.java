@@ -2,8 +2,8 @@ package faang.school.paymentservice.service.impl;
 
 import faang.school.paymentservice.configuration.ExchangeRatesProperties;
 import faang.school.paymentservice.service.CurrencyService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -13,17 +13,12 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CurrencyServiceImpl implements CurrencyService {
+
+    private static final String ACCESS_KEY = "access_key";
     private final ExchangeRatesProperties properties;
     private final WebClient webClient;
-
-    @Autowired
-    public CurrencyServiceImpl(WebClient.Builder webClientBuilder, ExchangeRatesProperties properties) {
-        this.properties = properties;
-        this.webClient = webClientBuilder
-                .baseUrl(properties.getBaseUrl())
-                .build();
-    }
 
     @Retryable(
             value = {WebClientException.class},
@@ -35,7 +30,7 @@ public class CurrencyServiceImpl implements CurrencyService {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(properties.getEndpoints().getGetLatestRate())
-                        .queryParam("access_key", properties.getAccessKey())
+                        .queryParam(ACCESS_KEY, properties.getAccessKey())
                         .build())
                 .retrieve()
                 .bodyToMono(String.class);

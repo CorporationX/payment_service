@@ -16,11 +16,11 @@ import reactor.core.publisher.Mono;
 public class CurrencyRateFetcherTest {
 
     @Mock
-    CurrencyService currencyService;
+    private CurrencyService currencyService;
     @Spy
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
     @InjectMocks
-    CurrencyRateFetcher currencyRateFetcher;
+    private CurrencyRateFetcher currencyRateFetcher;
     private String response;
 
     @BeforeEach
@@ -34,7 +34,7 @@ public class CurrencyRateFetcherTest {
 
         currencyRateFetcher.getCurrencyExchangeRates();
 
+        Mockito.verify(currencyService, Mockito.times(1)).getCurrencyExchangeRates();
         Assertions.assertNotNull(currencyRateFetcher.getCurrencyRates());
-        System.out.println(currencyRateFetcher.getCurrencyRates());
     }
 }

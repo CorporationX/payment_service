@@ -11,7 +11,7 @@ exchange-rates:
   endpoints:
     get-latest-rate: "latest"
   scheduler:
-    cron: "0 0 * * * *"
+    cron: "0 0 * * * MON-FRI" # каждый час, в начале часа (00:00, 01:00, 02:00,..), по будням
     fixedRate: 3600000
     initialDelay: 3000
 
