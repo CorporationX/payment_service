@@ -30,7 +30,6 @@ public class CurrencyRateFetcher {
                 currencyRates = objectMapper.readValue(value, CurrencyRateResponseDto.class);
                 log.info("CurrencyRateFetcher#getCurrencyExchangeRates: following exchange rates were saved: {}", currencyRates.rates());
             } catch (JsonProcessingException e) {
-                log.error("CurrencyRateFetcher#getCurrencyExchangeRates: method failed with message: {}", e.getMessage(), e);
                 // todo создать exceptionHandler, создать кастомное исключение, обработать в exceptionHandler
                 throw new RuntimeException(e);
             }
