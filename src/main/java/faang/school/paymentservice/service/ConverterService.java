@@ -21,7 +21,8 @@ public class ConverterService {
 
     public CurrencyExchangeResponse getCurrentCurrencyExchangeRate() {
 
-        CurrencyExchangeResponse response = converterClient.getCurrentCurrencyExchangeRate(currencyExchangeConfig.appId());
+        CurrencyExchangeResponse response = converterClient
+                .getCurrentCurrencyExchangeRate(currencyExchangeConfig.appId());
         if (response == null || response.rates() == null || response.rates().isEmpty()) {
             throw new RuntimeException("Не удалось получить корректные курсы валют.");
         }
@@ -48,7 +49,8 @@ public class ConverterService {
 
     private BigDecimal addCommission(BigDecimal amount) {
         BigDecimal commissionMultiplier = BigDecimal.ONE
-                .add(BigDecimal.valueOf(currencyExchangeConfig.commission()).divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
+                .add(BigDecimal.valueOf(currencyExchangeConfig.commission())
+                        .divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
         return amount.multiply(commissionMultiplier);
     }
 }
