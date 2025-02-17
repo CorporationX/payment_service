@@ -29,3 +29,12 @@ currency:
     url: https://openexchangerates.org
     appId: 7b5e207c5c8a4fb9aeefaf900491cf6d
     commission: 1
+  exchangerate:
+    url: https://api.exchangeratesapi.io/v1
+    apiKey: 2af009d13770aa232a734e0e8e46a873
+    fetcher:
+      cron: "*/5 * * * * *"
+    retry:
+      maxAttempts: 5
+      delay: 2000
+      multiplier: 2
