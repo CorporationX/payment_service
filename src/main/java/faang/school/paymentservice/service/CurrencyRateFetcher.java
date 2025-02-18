@@ -5,18 +5,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class CurrencyRateFetcher {
+    private static final int NUMBER_OF_THREADS = 1;
+
     private final ExchangeRateService exchangeRateService;
     private final CurrencyRateService currencyRateService;
     private final CurrencyRateMapper mapper;
 
     @Scheduled(fixedRateString = "${currency.rate.updateExchangeRatesMillis}")
     public void fetchAndSaveCurrencyRates() {
-        exchangeRateService.getCurrencyRateFromApi()
-                .subscribe(currencyRate -> currencyRateService.save(mapper.toEntity(currencyRate)));
+        Flux.just(NUMBER_OF_THREADS)
+                .flatMap(ignore -> exchangeRateService.getCurrencyRateFromApi(), NUMBER_OF_THREADS)
+                .onBackpressureLatest()
+                .subscribe(currencyRate -> currencyRateService.save(
+                        mapper.toEntity(currencyRate)));
     }
 }

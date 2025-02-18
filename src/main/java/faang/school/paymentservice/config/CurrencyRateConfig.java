@@ -13,7 +13,7 @@ public class CurrencyRateConfig {
     private String apiUrl;
     private int connectionTimeoutSeconds;
     private long readTimeoutSeconds;
-    private long connectionRetrySeconds;
+    private long connectionBackoffSeconds;
     private long connectionRetryAttempts;
     private double conversionRateFactor;
 }

@@ -1,5 +1,7 @@
 package faang.school.paymentservice.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.netty.channel.ChannelOption;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -32,5 +34,12 @@ public class WebClientConfig {
                 .baseUrl(config.getApiUrl())
                 .clientConnector(connector)
                 .build();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        return objectMapper;
     }
 }

@@ -56,7 +56,7 @@ public class CurrencyRateRepository {
                     second, (Double) values.get(1));
 
         } catch (RuntimeException e) {
-            log.error("Error while saving to Redis", e);
+            log.error("Error while get from Redis for currencies {}/{}", first, second, e);
             throw new CurrencyRateException("Fail to get currency rates, try again later");
         }
     }
