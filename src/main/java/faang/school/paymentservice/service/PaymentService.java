@@ -32,8 +32,8 @@ public class PaymentService {
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         String formattedSum = decimalFormat.format(amount);
         int verificationCode = new Random().nextInt(1000, 10000);
-        String message = String.format("Dear friend! Thank you for your purchase! " +
-                        "Your payment on %s %s was accepted.",
+        String message = String.format("Dear friend! Thank you for your purchase! "
+                        + "Your payment on %s %s was accepted.",
                 formattedSum, Currency.USD);
 
         PaymentResponse paymentResponse = PaymentResponse.builder()
@@ -45,7 +45,8 @@ public class PaymentService {
                 .build();
 
         kafkaTemplate.send(KafkaConfig.PROMOTION_BOUGHT_TOPIC, record.key(), record.value());
-        kafkaTemplate.send(KafkaConfig.NOTIFICATION_TOPIC, String.valueOf(request.userId()), convertToJson(paymentResponse));
+        kafkaTemplate.send(KafkaConfig.NOTIFICATION_TOPIC, String.valueOf(request.userId()),
+                convertToJson(paymentResponse));
     }
 
     private PromotionRequest deserializeMessage(String message) {
