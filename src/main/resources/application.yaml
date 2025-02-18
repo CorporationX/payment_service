@@ -34,6 +34,7 @@ currency:
     apiKey: 2af009d13770aa232a734e0e8e46a873
     fetcher:
       cron: "*/5 * * * * *"
+      currencies: "USD,AUD,CAD,PLN,MXN"
     retry:
       maxAttempts: 5
       delay: 2000
