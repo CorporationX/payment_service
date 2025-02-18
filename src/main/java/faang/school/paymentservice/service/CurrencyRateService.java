@@ -41,7 +41,7 @@ public class CurrencyRateService {
         }
     }
 
-    public LocalDateTime getCurrencyRateCreatedTime(){
+    public LocalDateTime getCurrencyRateCreatedTime() {
         return currencyRateRepository.getCreatedTime();
     }
 }

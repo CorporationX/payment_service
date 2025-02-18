@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: local
   data:
     redis:
       port: 6379
@@ -6,18 +8,14 @@ spring:
 
 currency:
   rate:
-    apiUrl: https://api.exchangeratesapi.io/v1/
-    connectionTimeoutSeconds: 10
-    readTimeoutSeconds: 10
-    accessKey:
-    connectionRetrySeconds: 60
-    connectionRetryAttempts: 5
+    apiUrl: https://api.exchangeratesapi.io/v1/latest?access_key=${currency.rate.accessKey}
+    connectionTimeoutSeconds: 5
+    readTimeoutSeconds: 5
+    accessKey: fcb94a92e0e80edce7e810245707431a
+    connectionBackoffSeconds: 10
+    connectionRetryAttempts: 6
     updateExchangeRatesMillis: 300_000
     conversionRateFactor: 1.1
 
 server:
   port: 9080
-
-spring:
-  profiles:
-    active: local
