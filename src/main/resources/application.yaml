@@ -33,7 +33,7 @@ currency:
     url: https://api.exchangeratesapi.io/v1
     apiKey: 2af009d13770aa232a734e0e8e46a873
     fetcher:
-      cron: "*/5 * * * * *"
+      cron: "0 0 * * * *"
       currencies: "USD,AUD,CAD,PLN,MXN"
     retry:
       maxAttempts: 5
