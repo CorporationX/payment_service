@@ -42,6 +42,18 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mockito:mockito-inline:5.2.0")
+
+    /**
+     * Test containers
+     */
+    implementation(platform("org.testcontainers:testcontainers-bom:1.17.6"))
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
+
+    /**
+     * Database
+     */
+    runtimeOnly("org.postgresql:postgresql")
 }
 
 tasks.withType<Test> {
