@@ -35,7 +35,7 @@ public class CurrencyService {
 
     @Retryable(retryFor = {WebClientResponseException.class, ResourceAccessException.class},
             maxAttempts = 4,
-            backoff = @Backoff(delay = 1000, maxDelay = 2))
+            backoff = @Backoff(delay = 1000, maxDelay = 2000))
     public void fetchAndStoreCurrencyRates() {
         webClient.get()
                 .uri(uriBuilder -> uriBuilder
