@@ -23,15 +23,13 @@ public class CurrencyRateFetcher {
 
     @Scheduled(cron = "${currency.exchangerate.fetcher.cron}")
     public void fetchAndStoreRates() {
-        log.info("Начало обновления курсов валют по расписанию");
+        log.info("Scheduled currency exchange rate updates begin");
         try {
             ExchangeRateResponse response = currencyService.fetchLatestRates(currencies);
-            if (response != null) {
-                redisTemplate.opsForValue().set(LATEST_RATES_KEY, response);
-                log.info("Курсы валют успешно обновлены и сохранены в Redis: {}", response);
-            }
+            redisTemplate.opsForValue().set(LATEST_RATES_KEY, response);
+            log.info("Exchange rates have been successfully updated and saved in Redis: {}", response);
         } catch (Exception e) {
-            log.error("Не удалось обновить курсы валют", e);
+            log.error("Couldn't update exchange rates", e);
         }
     }
 

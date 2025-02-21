@@ -27,17 +27,17 @@ public class CurrencyService {
                 config.getUrl(),
                 config.getApiKey(),
                 currencies);
-        log.info("Запрос обменных курсов по URL: {}", url);
+        log.info("Request for exchange rates at the URL: {}", url);
         try {
             ExchangeRateResponse response = webClient.get().uri(url).retrieve()
                     .bodyToMono(ExchangeRateResponse.class).block();
             if (response == null || !response.success()) {
-                throw new RuntimeException("Ошибка при получении данных курсов: " + response);
+                throw new RuntimeException("Error when receiving course data: " + response);
             }
-            log.info("Получены курсы валют: {}", response);
+            log.info("Currency exchange rates were received: {}", response);
             return response;
         } catch (Exception e) {
-            log.error("Ошибка при обращении к API обменных курсов", e);
+            log.error("Error accessing the Exchange Rate API", e);
             throw e;
         }
     }
