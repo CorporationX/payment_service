@@ -1,5 +1,13 @@
-server:
+payment-service:
+  host: localhost
   port: 9080
+
+currency:
+  exchange:
+    url: https://openexchangerates.org
+    appId: dcc217e8e3c54847a1a4142ba07bb878
+    base: USD
+    commission: 1.01
 
 logging:
   level:
