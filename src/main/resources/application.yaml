@@ -36,10 +36,19 @@ currency:
 redis:
   port: 6379
   host: localhost
-  channels:
-    calculations-channel:
-      name: currency
+  channel:
+    exchange_rates: currency
 
 logging:
   level:
     root: info
+
+resilience4j:
+  retry:
+    instances:
+      exchangeRatesRetry:
+        maxAttempts: 10
+        waitDuration: 3s
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - feign.FeignException

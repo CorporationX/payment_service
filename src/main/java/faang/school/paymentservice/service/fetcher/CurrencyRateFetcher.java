@@ -1,4 +1,4 @@
-package faang.school.paymentservice.fetcher;
+package faang.school.paymentservice.service.fetcher;
 
 import faang.school.paymentservice.service.CurrencyService;
 import lombok.RequiredArgsConstructor;

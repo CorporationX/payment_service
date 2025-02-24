@@ -4,12 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import faang.school.paymentservice.client.ExchangeRatesClient;
 import faang.school.paymentservice.dto.payment.ExchangeRates;
 import feign.FeignException;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -22,19 +21,13 @@ public class CurrencyService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    @Value("${currency.exchange.access-key}")
-    private String accessKey;
-
-    @Value("${currency.exchange.actual-currency}")
-    private String actualCurrency;
-
-    @Value("${redis.channels.calculations-channel.name}")
+    @Value("${redis.channel.exchange_rates}")
     private String redisKey;
 
-    @Retryable(retryFor = FeignException.class, maxAttempts = 10, backoff = @Backoff(delay = 1000, multiplier = 3))
+    @Retry(name = "exchangeRatesRetry")
     public void fetchCurrencyRates() {
         try {
-            ExchangeRates exchangeRates = exchangeRatesClient.getExchangeRates(accessKey, actualCurrency);
+            ExchangeRates exchangeRates = exchangeRatesClient.getExchangeRates();
             if (exchangeRates != null) {
                 redisTemplate.opsForValue().set(redisKey, exchangeRates);
             }
