@@ -76,25 +76,3 @@ spring:
 logging:
   level:
     root: info
-
----
-
-spring:
-  config:
-    activate:
-      on-profile: local
-
-logging:
-  level:
-    root: debug
-
----
-
-spring:
-  config:
-    activate:
-      on-profile: prod
-
-logging:
-  level:
-    root: info
