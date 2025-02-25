@@ -1,6 +1,7 @@
 package faang.school.paymentservice.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import faang.school.paymentservice.client.CurrencyClient;
 import faang.school.paymentservice.client.ExchangeRatesClient;
 import faang.school.paymentservice.dto.payment.Currency;
 import faang.school.paymentservice.dto.payment.ExchangeRateResponse;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
+@Service
 @RequiredArgsConstructor
 @Service
 public class ExchangeService {
