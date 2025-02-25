@@ -1,27 +1,28 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.config.ExchangeCurrencyConfig;
-import faang.school.paymentservice.dto.ConvertCurrencyResponse;
+import faang.school.paymentservice.config.ExchangeCurrencyProperties;
 import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.dto.ExchangeCurrencyResponse;
 import faang.school.paymentservice.dto.PaymentRequest;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Objects;
 import java.util.Random;
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.service.PaymentService;
-import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
+
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Validated
@@ -30,10 +31,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class PaymentController {
     private final PaymentService paymentService;
-    private final ExchangeCurrencyConfig currencyConfig;
+    private final ExchangeCurrencyProperties currencyProperties;
 
     @PostMapping("/payment")
-    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Valid PaymentRequest dto) {
+    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
         String formattedSum = decimalFormat(dto.amount());
 
         String message = String.format("Dear friend! Thank you for your purchase! " +
@@ -50,20 +51,22 @@ public class PaymentController {
         );
     }
 
-    @GetMapping("/convert/{value}/{from}/{to}")
-    public ResponseEntity<ConvertCurrencyResponse> convertCurrency(@PathVariable("value") BigDecimal amount,
-                                                                   @PathVariable("from") Currency currencyFrom,
-                                                                   @PathVariable("to") Currency currencyTo) {
+    @GetMapping("/exchange")
+    public ResponseEntity<ExchangeCurrencyResponse> convertCurrency(
+            @RequestParam @DecimalMin(value = "0.01", message = "Value must be greater than zero") BigDecimal amount,
+            @RequestParam(required = false) Currency currencyFrom,
+            @RequestParam @NotNull(message = "To currency is required") Currency currencyTo) {
 
+        currencyFrom = Objects.requireNonNullElse(currencyFrom, currencyProperties.base());
         BigDecimal convertedAmount = paymentService.convert(amount, currencyFrom, currencyTo);
 
         String message = String.format(
                 "Your amount %s %s converted to %s %s, commission %f%%",
                 decimalFormat(amount), currencyFrom,
                 decimalFormat(convertedAmount), currencyTo,
-                currencyConfig.commission());
+                currencyProperties.commission());
 
-        return ResponseEntity.ok(new ConvertCurrencyResponse(
+        return ResponseEntity.ok(new ExchangeCurrencyResponse(
                 getVerificationCode(),
                 amount, currencyFrom,
                 convertedAmount, currencyTo,

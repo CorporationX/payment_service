@@ -1,7 +1,7 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.client.ExchangeCurrencyClient;
-import faang.school.paymentservice.config.ExchangeCurrencyConfig;
+import faang.school.paymentservice.config.ExchangeCurrencyProperties;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.CurrencyRateResponse;
 import faang.school.paymentservice.exception.ExchangeCurrencyException;
@@ -29,13 +29,14 @@ public class PaymentServiceTest {
 
     @BeforeEach
     void setUp() {
-        ExchangeCurrencyConfig currencyConfig = new ExchangeCurrencyConfig(
+        ExchangeCurrencyProperties currencyProperties = new ExchangeCurrencyProperties(
                 "https://", "av6bsn3", Currency.USD, 1.0);
-        paymentService = new PaymentService(currencyClient, currencyConfig);
-        CurrencyRateResponse response = new CurrencyRateResponse();
-        Map<String, Double> rates = Map.of("EUR", 0.96, "CAD", 1.418);
-        response.setRates(rates);
-        when(currencyClient.getCurrencyRate(currencyConfig.appId(), "USD")).thenReturn(response);
+        paymentService = new PaymentService(currencyClient, currencyProperties);
+
+        CurrencyRateResponse response = CurrencyRateResponse.builder()
+                .rates(Map.of("EUR", 0.96, "CAD", 1.418)).build();
+
+        when(currencyClient.getCurrencyRate(currencyProperties.appId(), "USD")).thenReturn(response);
     }
 
     @Test

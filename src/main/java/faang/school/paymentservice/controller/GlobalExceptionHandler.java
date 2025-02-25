@@ -1,7 +1,9 @@
-package faang.school.paymentservice.exception;
+package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ErrorResponse;
+import faang.school.paymentservice.exception.DataValidationException;
+import faang.school.paymentservice.exception.ExchangeCurrencyException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,8 +55,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ExchangeCurrencyException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(ExchangeCurrencyException e) {
-        log.error("Illegal argument exception occurred\n", e);
+    public ResponseEntity<String> handleExchangeCurrencyException(ExchangeCurrencyException e) {
+        log.error("Exchange currency exception occurred\n", e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
@@ -63,7 +65,6 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         String message = e.getMessage().contains("Currency") ? "We only accept " + Arrays.toString(Currency.values())
                 : e.getMessage();
-
         return new ErrorResponse(message);
     }
 

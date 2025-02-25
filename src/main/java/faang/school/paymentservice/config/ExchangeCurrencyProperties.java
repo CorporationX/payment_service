@@ -4,7 +4,7 @@ import faang.school.paymentservice.dto.Currency;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "currency.exchange")
-public record ExchangeCurrencyConfig(
+public record ExchangeCurrencyProperties(
         String url,
         String appId,
         Currency base,
