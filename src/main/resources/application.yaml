@@ -7,7 +7,7 @@ spring:
     active: local
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5433/postgres
+    url: jdbc:postgresql://localhost:5432/postgres
     username: user
     password: password
   jpa:
@@ -26,6 +26,30 @@ spring:
             url: http://localhost:8080/users/api
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+
+currency:
+  fetch:
+    cron: "0 * * * * ?"
+  exchange:
+    url: https://api.exchangeratesapi.io
+    access-key: 9a0774e234d2bf1c16fdd7a2f6e84850
+    actual-currency: EUR,USD,RUB,BYN
+
+redis:
+  port: 6379
+  host: localhost
+  channel:
+    exchange_rates: currency
+
+resilience4j:
+  retry:
+    instances:
+      exchangeRatesRetry:
+        maxAttempts: 10
+        waitDuration: 3s
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - feign.FeignException
 
 logging:
   level:
