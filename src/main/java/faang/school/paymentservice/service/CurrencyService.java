@@ -14,15 +14,12 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Slf4j
-@Service
 @RequiredArgsConstructor
 public class CurrencyService {
     private final ExchangeRatesClient exchangeRatesClient;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
-
-    @Value("${redis.channel.exchange_rates}")
-    private String redisKey;
+    private final String redisKey;
 
     @Retry(name = "exchangeRatesRetry")
     public void fetchCurrencyRates() {

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
@@ -20,6 +19,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
@@ -38,23 +38,17 @@ public class CurrencyServiceTest {
     @Mock
     private ValueOperations<String, Object> valueOperations;
 
+
     @InjectMocks
     private CurrencyService currencyService;
-
     private ExchangeRates cachedRates;
     private Map<String, Double> rates;
-
-    @Value("${redis.channel.exchange_rates}")
-    private String redisKey;
-
-    @Value("${currency.exchange.actual-currency}")
-    private String actualCurrency;
-
-    @Value("${currency.exchange.access-key}")
-    private String accessKey;
+    private static final String REDIS_KEY = "redisKey";
 
     @BeforeEach
     public void setUp() {
+        lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        currencyService = new CurrencyService(exchangeRatesClient, redisTemplate, objectMapper, REDIS_KEY);
         cachedRates = new ExchangeRates();
         rates = new HashMap<>();
         rates.put("EUR", 1.0);
@@ -62,32 +56,40 @@ public class CurrencyServiceTest {
     }
 
     @Test
-    public void testFetchCurrencyRates() {
-        lenient().when(exchangeRatesClient.getExchangeRates())
-                .thenThrow(FeignException.class);
-
+    public void testFetchCurrencyRatesSuccess() {
+        when(exchangeRatesClient.getExchangeRates()).thenReturn(cachedRates);
         currencyService.fetchCurrencyRates();
-        verify(redisTemplate, never()).opsForValue();
+
+        verify(exchangeRatesClient).getExchangeRates();
+        verify(valueOperations).set(REDIS_KEY, cachedRates);
+    }
+
+    @Test
+    public void testFetchCurrencyRatesFalse() {
+        when(exchangeRatesClient.getExchangeRates())
+                .thenThrow(FeignException.class);
+        currencyService.fetchCurrencyRates();
+
+        verify(exchangeRatesClient).getExchangeRates();
+        verify(valueOperations, never()).set(anyString(), any());
     }
 
     @Test
     public void testGetCurrencyRatesWithCache() {
-        when(valueOperations.get(redisKey)).thenReturn(cachedRates);
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(REDIS_KEY)).thenReturn(cachedRates);
         when(objectMapper.convertValue(cachedRates, ExchangeRates.class)).thenReturn(cachedRates);
 
         ExchangeRates result = currencyService.getCurrencyRates();
 
         assertNotNull(result);
         assertEquals(1.0, result.getRates().get("EUR"));
-        verify(valueOperations).get(redisKey);
+        verify(valueOperations).get(REDIS_KEY);
         verify(exchangeRatesClient, never()).getExchangeRates();
     }
 
     @Test
     public void testGetCurrencyRatesNewRates() {
-        when(valueOperations.get(redisKey)).thenReturn(null);
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(REDIS_KEY)).thenReturn(null);
         when(exchangeRatesClient.getExchangeRates()).thenReturn(cachedRates);
         when(objectMapper.convertValue(any(), eq(ExchangeRates.class))).thenReturn(cachedRates);
 
@@ -96,6 +98,6 @@ public class CurrencyServiceTest {
         assertNotNull(result);
         assertEquals(1.0, result.getRates().get("EUR"));
         verify(exchangeRatesClient).getExchangeRates();
-        verify(valueOperations, times(2)).get(redisKey);
+        verify(valueOperations, times(2)).get(REDIS_KEY);
     }
 }
