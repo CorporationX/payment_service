@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequestMapping("/v1/currency")
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class CurrencyController {
     }
 
     @GetMapping("/convertor")
-    public double convertCurrency(@RequestParam double amount,
+    public BigDecimal convertCurrency(@RequestParam BigDecimal amount,
                                   @RequestParam Currency baseCurrency,
                                   @RequestParam Currency toCurrency) {
         return converterService.convertCurrency(amount, baseCurrency, toCurrency);
