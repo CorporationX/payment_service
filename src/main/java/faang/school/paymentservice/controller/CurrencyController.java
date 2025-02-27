@@ -3,6 +3,8 @@ package faang.school.paymentservice.controller;
 import faang.school.paymentservice.dto.payment.ExchangeRates;
 import faang.school.paymentservice.dto.payment.Currency;
 import faang.school.paymentservice.dto.payment.ExchangeRateResponse;
+import faang.school.paymentservice.dto.payment.ExchangeRates;
+import faang.school.paymentservice.service.CurrencyConverterService;
 import faang.school.paymentservice.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class CurrencyController {
     private final CurrencyService currencyService;
+    private final CurrencyConverterService converterService;
 
     @GetMapping
     public ResponseEntity<ExchangeRates> getCurrentCurrencyExchangeRate() {

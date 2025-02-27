@@ -1,6 +1,6 @@
 package faang.school.paymentservice.service;
 
-import faang.school.paymentservice.client.ConverterClient;
+import faang.school.paymentservice.client.CurrencyConverterClient;
 import faang.school.paymentservice.dto.payment.Currency;
 import faang.school.paymentservice.dto.payment.ExchangeRateResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +15,9 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ConverterService {
+public class CurrencyConverterService {
 
-    private final ConverterClient converterClient;
+    private final CurrencyConverterClient converterClient;
 
     @Value("${open-exchange-rates.key}")
     private String appId;
