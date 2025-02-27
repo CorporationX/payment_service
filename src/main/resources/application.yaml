@@ -4,3 +4,7 @@ server:
 logging:
   level:
     root: info
+
+open_exchange_rates:
+  url: https://openexchangerates.org/api/latest.json
+  app_id: a55da390488e496e917473cb5869d0e8
