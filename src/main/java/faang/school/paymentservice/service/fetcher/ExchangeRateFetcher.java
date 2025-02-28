@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CurrencyRateFetcher {
-    private final ExchangeService currencyService;
+public class ExchangeRateFetcher {
+    private final ExchangeService exchangeService;
 
     @Scheduled(cron = "${currency.fetch.cron}")
     public void getExchangeRate() {
-        currencyService.fetchCurrencyRates();
+        exchangeService.fetchCurrencyRates();
     }
 }
