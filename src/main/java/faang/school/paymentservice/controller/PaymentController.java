@@ -7,14 +7,12 @@ import faang.school.paymentservice.dto.PaymentRequest;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.Objects;
 import java.util.Random;
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.service.PaymentService;
 
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotNull;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -25,10 +23,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.DecimalMin;
+
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class PaymentController {
     private final PaymentService paymentService;
     private final ExchangeCurrencyProperties currencyProperties;
@@ -53,18 +53,17 @@ public class PaymentController {
 
     @GetMapping("/exchange")
     public ResponseEntity<ExchangeCurrencyResponse> convertCurrency(
-            @RequestParam @DecimalMin(value = "0.01", message = "Value must be greater than zero") BigDecimal amount,
-            @RequestParam(required = false) Currency currencyFrom,
-            @RequestParam @NotNull(message = "To currency is required") Currency currencyTo) {
+            @RequestParam @DecimalMin(value = "0.01") BigDecimal amount,
+            @RequestParam(required = false, defaultValue = "${currency.exchange.base}") Currency currencyFrom,
+            @RequestParam @ValidCurrency Currency currencyTo) {
 
-        currencyFrom = Objects.requireNonNullElse(currencyFrom, currencyProperties.base());
         BigDecimal convertedAmount = paymentService.convert(amount, currencyFrom, currencyTo);
 
         String message = String.format(
-                "Your amount %s %s converted to %s %s, commission %f%%",
+                "Your amount %s %s converted to %s %s, commission %s%%",
                 decimalFormat(amount), currencyFrom,
                 decimalFormat(convertedAmount), currencyTo,
-                currencyProperties.commission());
+                decimalFormat(currencyProperties.commission()));
 
         return ResponseEntity.ok(new ExchangeCurrencyResponse(
                 getVerificationCode(),

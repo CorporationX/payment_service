@@ -8,6 +8,12 @@ group = "faang.school"
 version = "1.0"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
+configurations {
+    compileOnly {
+        extendsFrom(configurations.annotationProcessor.get())
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -19,10 +25,18 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("jakarta.validation:jakarta.validation-api:2.0.2")
+    implementation("org.hibernate.validator:hibernate-validator:6.1.5.Final")
     implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2022.0.2"))
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
+    /**
+     * Database
+     */
+    implementation("org.liquibase:liquibase-core")
+    implementation("redis.clients:jedis:4.3.2")
+    runtimeOnly("org.postgresql:postgresql")
 
     /**
      * Utils & Logging

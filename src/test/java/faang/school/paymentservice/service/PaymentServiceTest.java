@@ -30,7 +30,7 @@ public class PaymentServiceTest {
     @BeforeEach
     void setUp() {
         ExchangeCurrencyProperties currencyProperties = new ExchangeCurrencyProperties(
-                "https://", "av6bsn3", Currency.USD, 1.0);
+                "https://", "av6bsn3", Currency.USD, new BigDecimal(1.75));
         paymentService = new PaymentService(currencyClient, currencyProperties);
 
         CurrencyRateResponse response = CurrencyRateResponse.builder()
@@ -42,7 +42,7 @@ public class PaymentServiceTest {
     @Test
     void testConvertSuccess() {
         BigDecimal result = paymentService.convert(BigDecimal.valueOf(100.00), Currency.USD, Currency.EUR);
-        BigDecimal shouldBe = BigDecimal.valueOf(96.96);
+        BigDecimal shouldBe = BigDecimal.valueOf(97.92);
 
         assertEquals(shouldBe, result);
     }

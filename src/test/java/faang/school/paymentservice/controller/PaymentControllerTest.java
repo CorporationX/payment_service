@@ -32,22 +32,20 @@ class PaymentControllerTest {
     @Autowired
     private ExchangeCurrencyProperties currencyProperties;
 
-
     @BeforeEach
     public void init() {
         currencyProperties = new ExchangeCurrencyProperties(
                     "https://openexchangerates.org",
                     "test-app-id",
                     Currency.USD,
-                    1.0
+                new BigDecimal("1.01")
             );
     }
 
     @Test
     void testConfigValues() {
-        assertEquals(1.0, currencyProperties.commission());
+        assertEquals(new BigDecimal("1.01"), currencyProperties.commission());
     }
-
 
     @Test
     void testConvertCurrency() throws Exception {
@@ -56,13 +54,11 @@ class PaymentControllerTest {
         Currency currencyFrom = Currency.USD;
         Currency currencyTo = Currency.CAD;
         BigDecimal convertedAmount = new BigDecimal("143.22");
-        double commission = 1.0;
 
         when(paymentService.convert(amount, currencyFrom, currencyTo)).thenReturn(convertedAmount);
 
-
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/api/exchange")
+                        .get("/api/v1/exchange")
                         .param("amount", amount.toString())
                         .param("currencyFrom", currencyFrom.name())
                         .param("currencyTo", currencyTo.name())

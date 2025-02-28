@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 
 import java.util.Arrays;
@@ -29,6 +30,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleDataValidationException(DataValidationException e) {
         log.error("Data Validation exception occurred", e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<String> handleInvalidEnum(MethodArgumentTypeMismatchException ex) {
+        String errorMessage = "Invalid currency: " + ex.getValue();
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

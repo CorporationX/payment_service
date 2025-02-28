@@ -1,5 +1,22 @@
-payment-service:
-  host: localhost
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  liquibase:
+    enabled: false
+
+
+server:
   port: 9080
 
 currency:
@@ -7,7 +24,7 @@ currency:
     url: https://openexchangerates.org
     appId: dcc217e8e3c54847a1a4142ba07bb878
     base: USD
-    commission: 1.01
+    commission: 1.03
 
 logging:
   level:

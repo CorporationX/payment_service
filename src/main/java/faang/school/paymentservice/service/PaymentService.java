@@ -33,7 +33,8 @@ public class PaymentService {
                 .orElseThrow(() -> new ExchangeCurrencyException("Exchange rate for '" + toCurrency + "' not found"));
 
         BigDecimal convertedAmount = amount.multiply(BigDecimal.valueOf(rate));
-        BigDecimal commissionAmount = BigDecimal.valueOf(1 + (currencyProperties.commission() / 100.0));
+        BigDecimal commissionAmount = BigDecimal.ONE
+                .add(currencyProperties.commission().divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
 
         return convertedAmount.multiply(commissionAmount).setScale(2, RoundingMode.HALF_UP);
     }
