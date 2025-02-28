@@ -1,7 +1,7 @@
 server:
   port: 9080
   servlet:
-    context-path: /payment/api/v1
+    context-path: /payment/api
 spring:
   profiles:
     active: local

@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CurrencyServiceTest {
+public class ExchangeServiceTest {
     @Mock
     private ExchangeRatesClient exchangeRatesClient;
     @Mock
@@ -38,17 +39,15 @@ public class CurrencyServiceTest {
     @Mock
     private ValueOperations<String, Object> valueOperations;
 
-
     @InjectMocks
-    private CurrencyService currencyService;
+    private ExchangeService currencyService;
     private ExchangeRates cachedRates;
     private Map<String, Double> rates;
-    private static final String REDIS_KEY = "redisKey";
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
+        setField(currencyService);
         lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        currencyService = new CurrencyService(exchangeRatesClient, redisTemplate, objectMapper, REDIS_KEY);
         cachedRates = new ExchangeRates();
         rates = new HashMap<>();
         rates.put("EUR", 1.0);
@@ -61,7 +60,7 @@ public class CurrencyServiceTest {
         currencyService.fetchCurrencyRates();
 
         verify(exchangeRatesClient).getExchangeRates();
-        verify(valueOperations).set(REDIS_KEY, cachedRates);
+        verify(valueOperations).set("redisKey", cachedRates);
     }
 
     @Test
@@ -76,20 +75,20 @@ public class CurrencyServiceTest {
 
     @Test
     public void testGetCurrencyRatesWithCache() {
-        when(valueOperations.get(REDIS_KEY)).thenReturn(cachedRates);
+        when(valueOperations.get("redisKey")).thenReturn(cachedRates);
         when(objectMapper.convertValue(cachedRates, ExchangeRates.class)).thenReturn(cachedRates);
 
         ExchangeRates result = currencyService.getCurrencyRates();
 
         assertNotNull(result);
         assertEquals(1.0, result.getRates().get("EUR"));
-        verify(valueOperations).get(REDIS_KEY);
+        verify(valueOperations).get("redisKey");
         verify(exchangeRatesClient, never()).getExchangeRates();
     }
 
     @Test
     public void testGetCurrencyRatesNewRates() {
-        when(valueOperations.get(REDIS_KEY)).thenReturn(null);
+        when(valueOperations.get("redisKey")).thenReturn(null);
         when(exchangeRatesClient.getExchangeRates()).thenReturn(cachedRates);
         when(objectMapper.convertValue(any(), eq(ExchangeRates.class))).thenReturn(cachedRates);
 
@@ -98,6 +97,12 @@ public class CurrencyServiceTest {
         assertNotNull(result);
         assertEquals(1.0, result.getRates().get("EUR"));
         verify(exchangeRatesClient).getExchangeRates();
-        verify(valueOperations, times(2)).get(REDIS_KEY);
+        verify(valueOperations, times(2)).get("redisKey");
+    }
+
+    private void setField(Object target) throws Exception {
+        Field field = target.getClass().getDeclaredField("redisKey");
+        field.setAccessible(true);
+        field.set(target, "redisKey");
     }
 }
