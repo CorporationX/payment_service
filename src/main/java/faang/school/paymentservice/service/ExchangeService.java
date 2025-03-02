@@ -15,11 +15,14 @@ import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
-public class CurrencyService {
+@Service
+public class ExchangeService {
     private final ExchangeRatesClient exchangeRatesClient;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
-    private final String redisKey;
+
+    @Value("${redis.channel.exchange_rates}")
+    private String redisKey;
 
     @Retry(name = "exchangeRatesRetry")
     public void fetchCurrencyRates() {
