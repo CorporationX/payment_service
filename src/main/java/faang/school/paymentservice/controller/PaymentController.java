@@ -8,7 +8,8 @@ import java.util.Random;
 
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
-import faang.school.paymentservice.service.CurrencyConverterService;
+import faang.school.paymentservice.service.CurrencyConverterServiceImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 public class PaymentController {
-    private final CurrencyConverterService currencyConverterService;
-
+    private final CurrencyConverterServiceImpl currencyConverterService;
 
     @PostMapping("/payment")
-    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
+    @Validated
+    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Valid PaymentRequest dto) {
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         String formattedSum = decimalFormat.format(dto.amount());
         BigDecimal amount = currencyConverterService.convertCurrency(dto.fromCurrency(), dto.toCurrency(), dto.amount());
