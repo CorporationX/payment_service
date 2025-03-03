@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import properties.ExchangeServiceProperties;
+import faang.school.paymentservice.properties.ExchangeServiceProperties;
 
 import java.math.BigDecimal;
 import java.util.HashMap;

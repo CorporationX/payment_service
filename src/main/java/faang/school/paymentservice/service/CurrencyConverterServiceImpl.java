@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import faang.school.paymentservice.dto.Currency;
-import properties.ExchangeServiceProperties;
+import faang.school.paymentservice.properties.ExchangeServiceProperties;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

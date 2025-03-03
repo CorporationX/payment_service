@@ -8,7 +8,7 @@ import java.util.Random;
 
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
-import faang.school.paymentservice.service.CurrencyConverterServiceImpl;
+import faang.school.paymentservice.service.CurrencyConverterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 public class PaymentController {
-    private final CurrencyConverterServiceImpl currencyConverterService;
+    private final CurrencyConverterService currencyConverterService;
 
     @PostMapping("/payment")
     @Validated
