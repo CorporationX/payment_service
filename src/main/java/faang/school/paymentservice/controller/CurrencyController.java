@@ -1,11 +1,10 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.dto.payment.ExchangeRates;
 import faang.school.paymentservice.dto.payment.Currency;
 import faang.school.paymentservice.dto.payment.ExchangeRateResponse;
 import faang.school.paymentservice.dto.payment.ExchangeRates;
 import faang.school.paymentservice.service.CurrencyConverterService;
-import faang.school.paymentservice.service.CurrencyService;
+import faang.school.paymentservice.service.ExchangeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,7 @@ import java.math.BigDecimal;
 @RequestMapping("/v1/currency")
 @RequiredArgsConstructor
 public class CurrencyController {
-    private final CurrencyService currencyService;
+    private final ExchangeService exchangeService;
     private final CurrencyConverterService converterService;
 
     @GetMapping
@@ -30,7 +29,7 @@ public class CurrencyController {
 
     @GetMapping("/rates")
     public ExchangeRateResponse getRates(@RequestParam(defaultValue = "USD") Currency baseCurrency) {
-        return converterService.getRates(baseCurrency);
+        return converterService.getRateResponse(baseCurrency);
     }
 
     @GetMapping("/convertor")

@@ -3,6 +3,7 @@ package faang.school.paymentservice.service;
 import faang.school.paymentservice.client.CurrencyConverterClient;
 import faang.school.paymentservice.dto.payment.Currency;
 import faang.school.paymentservice.dto.payment.ExchangeRateResponse;
+import faang.school.paymentservice.exception.DataValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,21 +27,21 @@ public class CurrencyConverterService {
     private double serviceFee;
 
 
-    public ExchangeRateResponse getRates(Currency baseCurrency) {
+    public ExchangeRateResponse getRateResponse(Currency baseCurrency) {
         return converterClient.getExchangeRate(appId, baseCurrency);
     }
 
     public BigDecimal convertCurrency(BigDecimal amount, Currency baseCurrency, Currency toCurrency) {
-        Map<String, BigDecimal> rates = getRates(baseCurrency).getRates();
+        Map<String, BigDecimal> rates = getRateResponse(baseCurrency).getRates();
 
         if (rates != null && rates.containsKey(toCurrency.toString())) {
-            BigDecimal rate = rates.get(toCurrency.toString());
-            BigDecimal convertedAmount = amount.multiply(rate);
-            BigDecimal finalAmount = convertedAmount.multiply(new BigDecimal(1.0 + serviceFee));
-            return finalAmount.setScale(2, RoundingMode.HALF_UP);
+            return amount
+                    .multiply(rates.get(toCurrency.toString()))
+                    .multiply(new BigDecimal(1.0 + serviceFee))
+                    .setScale(2, RoundingMode.HALF_UP);
         } else {
-            log.error("Не найден код валюты для конвертации: {}", toCurrency);
-            return BigDecimal.ZERO;
+            throw new DataValidationException("Не найден код валюты %s для конвертации"
+                    .formatted(toCurrency));
         }
     }
 }
