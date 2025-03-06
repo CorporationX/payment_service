@@ -1,11 +1,18 @@
 server:
   port: 9080
 
+spring:
+  redis:
+    host: localhost
+    port: 6379
+
 services:
   exchange-service:
     url: https://openexchangerates.org
     token: Token 2916f36523df432fa66c99d6a0a419ed
     commission-rate: 1
+    cron-expression: 0 * * * * *
+    redis-key: exchange-service
 
 logging:
   level:

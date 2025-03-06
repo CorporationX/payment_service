@@ -3,13 +3,16 @@ package faang.school.paymentservice.service;
 import faang.school.paymentservice.client.ExchangeServiceClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ExchangeResponse;
+import faang.school.paymentservice.service.currency.CurrencyConverterServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -33,6 +36,8 @@ public class CurrencyConverterServiceTest {
 
     @InjectMocks
     private CurrencyConverterServiceImpl currencyConverterService;
+    @Mock
+    private RedisService redisService;
 
     private Currency fromCurrency;
     private Currency toCurrency;
@@ -41,6 +46,7 @@ public class CurrencyConverterServiceTest {
 
     @BeforeEach
     public void setUp() {
+        redisService.delete("exchange-rates");
         prepareData();
         Mockito.lenient().when(exchangeServiceProperties.getToken()).thenReturn("token");
         Mockito.lenient().when(exchangeServiceProperties.getCommissionRate()).thenReturn(1.5);
@@ -63,6 +69,7 @@ public class CurrencyConverterServiceTest {
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         BigDecimal expectedAmount = expectedConvertedAmount.add(expectedCommission);
 
+        assertNotNull(result);
         assertEquals(expectedAmount, result);
     }
 
