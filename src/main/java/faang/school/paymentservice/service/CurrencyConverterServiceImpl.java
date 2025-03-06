@@ -2,6 +2,7 @@ package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.client.ExchangeServiceClient;
 import faang.school.paymentservice.dto.ExchangeResponse;
+import faang.school.paymentservice.dto.PaymentRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,25 +18,27 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CurrencyConverterServiceImpl implements CurrencyConverterService {
 
+
     private final ExchangeServiceClient exchangeServiceClient;
 
     private final ExchangeServiceProperties exchangeServiceProperties;
 
     @Override
-    public BigDecimal convertCurrency(Currency fromCurrency, Currency toCurrency, BigDecimal amount) {
+    public BigDecimal convertCurrency(PaymentRequest dto) {
         ExchangeResponse response = exchangeServiceClient.exchange(exchangeServiceProperties.getToken());
         Map<String, Double> rates = response.rates();
 
-        BigDecimal fromRate = getRate(rates, fromCurrency);
-        BigDecimal toRate = getRate(rates, toCurrency);
+        BigDecimal fromRate = getRate(rates, dto.fromCurrency());
+        BigDecimal toRate = getRate(rates, dto.toCurrency());
 
         if (fromRate == null || toRate == null) {
-            throw new IllegalArgumentException("Exchange rate not found for specified currencies: " + fromCurrency.name() + " to " + toCurrency.name());
+            throw new IllegalArgumentException(String.format("Exchange rate not found for specified currencies:{%s} to {%s}",
+                    dto.fromCurrency().name(), dto.toCurrency().name()));
         }
 
         BigDecimal rate = toRate.divide(fromRate, RoundingMode.HALF_UP);
 
-        return calculateAmountWithCommission(amount, rate);
+        return calculateAmountWithCommission(dto.amount(), rate);
     }
 
     private BigDecimal calculateAmountWithCommission(BigDecimal amount, BigDecimal rate) {
