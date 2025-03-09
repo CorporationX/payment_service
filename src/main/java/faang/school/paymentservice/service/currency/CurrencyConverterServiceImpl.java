@@ -30,7 +30,7 @@ public class CurrencyConverterServiceImpl implements CurrencyConverterService {
 
     @Override
     public BigDecimal convertCurrency(PaymentRequest dto) {
-        log.info("Start, convert currency from {} to {}", fromCurrency, toCurrency);
+        log.info("Start, convert currency from {} to {}", dto.fromCurrency(), dto.toCurrency());
         Map<String, Double> rates = getExchangeRates();
         BigDecimal fromRate = getRate(rates, dto.fromCurrency());
         BigDecimal toRate = getRate(rates, dto.toCurrency());

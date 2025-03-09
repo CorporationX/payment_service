@@ -4,6 +4,7 @@ import faang.school.paymentservice.client.ExchangeServiceClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ExchangeResponse;
 import faang.school.paymentservice.dto.PaymentRequest;
+import faang.school.paymentservice.service.currency.CurrencyConverterServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,15 +31,12 @@ import java.util.UUID;
 public class CurrencyConverterServiceTest {
     @Mock
     private ExchangeServiceClient exchangeServiceClient;
-
     @Mock
     private ExchangeServiceProperties exchangeServiceProperties;
-
     @InjectMocks
     private CurrencyConverterServiceImpl currencyConverterService;
     @Mock
     private RedisService redisService;
-
     private Map<String, Double> rates;
     private PaymentRequest dto;
 
@@ -73,7 +71,7 @@ public class CurrencyConverterServiceTest {
 
     @Test
     void testConvertCurrencyRateNotExist() {
-        rates.remove(toCurrency.name());
+        rates.remove(dto.fromCurrency().name());
 
         ExchangeResponse response = new ExchangeResponse("disclaimer", "license", System.currentTimeMillis(), Currency.USD.name(), rates);
 
