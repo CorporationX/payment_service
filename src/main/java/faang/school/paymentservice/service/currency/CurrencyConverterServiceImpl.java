@@ -22,7 +22,6 @@ import java.util.Map;
 public class CurrencyConverterServiceImpl implements CurrencyConverterService {
 
     private final ExchangeServiceClient exchangeServiceClient;
-
     private final ExchangeServiceProperties exchangeServiceProperties;
     private final RedisService redisService;
     @Value("${services.exchange-service.redis-key}")
