@@ -3,9 +3,8 @@ package faang.school.paymentservice.service;
 import faang.school.paymentservice.client.ExchangeServiceClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ExchangeResponse;
-import faang.school.paymentservice.service.currency.CurrencyConverterServiceImpl;
+import faang.school.paymentservice.dto.PaymentRequest;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.math.RoundingMode;
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 public class CurrencyConverterServiceTest {
@@ -39,10 +39,8 @@ public class CurrencyConverterServiceTest {
     @Mock
     private RedisService redisService;
 
-    private Currency fromCurrency;
-    private Currency toCurrency;
-    private BigDecimal amount;
     private Map<String, Double> rates;
+    private PaymentRequest dto;
 
     @BeforeEach
     public void setUp() {
@@ -60,11 +58,11 @@ public class CurrencyConverterServiceTest {
 
         when(exchangeServiceClient.exchange(any())).thenReturn(response);
 
-        BigDecimal result = currencyConverterService.convertCurrency(fromCurrency, toCurrency, amount);
+        BigDecimal result = currencyConverterService.convertCurrency(dto);
 
-        BigDecimal expectedRate = BigDecimal.valueOf(rates.get(toCurrency.name()))
-                .divide(BigDecimal.valueOf(rates.get(fromCurrency.name())), RoundingMode.HALF_UP);
-        BigDecimal expectedConvertedAmount = amount.multiply(expectedRate);
+        BigDecimal expectedRate = BigDecimal.valueOf(rates.get(dto.toCurrency().name()))
+                .divide(BigDecimal.valueOf(rates.get(dto.fromCurrency().name())), RoundingMode.HALF_UP);
+        BigDecimal expectedConvertedAmount = dto.amount().multiply(expectedRate);
         BigDecimal expectedCommission = expectedConvertedAmount.multiply(BigDecimal.valueOf(1.5))
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         BigDecimal expectedAmount = expectedConvertedAmount.add(expectedCommission);
@@ -82,15 +80,13 @@ public class CurrencyConverterServiceTest {
         when(exchangeServiceClient.exchange(any())).thenReturn(response);
 
         assertThrows(IllegalArgumentException.class, () -> {
-            currencyConverterService.convertCurrency(fromCurrency, toCurrency, amount);
-        }, String.format("Exchange rate not found for specified currencies: %s to %s", fromCurrency.name(), toCurrency.name()));
+            currencyConverterService.convertCurrency(dto);
+        }, String.format("Exchange rate not found for specified currencies: %s to %s", dto.fromCurrency().name(), dto.toCurrency().name()));
     }
 
     private void prepareData() {
-        fromCurrency = Currency.USD;
-        toCurrency = Currency.EUR;
-        amount = BigDecimal.valueOf(1000);
 
+        dto = new PaymentRequest(UUID.randomUUID(), BigDecimal.valueOf(1000), Currency.USD, Currency.EUR);
         rates = new HashMap<>();
         rates.put("USD", 1.0);
         rates.put("EUR", 0.85);

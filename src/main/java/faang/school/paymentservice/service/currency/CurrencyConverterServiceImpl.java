@@ -2,6 +2,7 @@ package faang.school.paymentservice.service.currency;
 
 import faang.school.paymentservice.client.ExchangeServiceClient;
 import faang.school.paymentservice.dto.ExchangeResponse;
+import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,27 +22,20 @@ import java.util.Map;
 public class CurrencyConverterServiceImpl implements CurrencyConverterService {
 
     private final ExchangeServiceClient exchangeServiceClient;
+
     private final ExchangeServiceProperties exchangeServiceProperties;
     private final RedisService redisService;
     @Value("${services.exchange-service.redis-key}")
     private String redisKey;
 
     @Override
-    public BigDecimal convertCurrency(Currency fromCurrency, Currency toCurrency, BigDecimal amount) {
-
+    public BigDecimal convertCurrency(PaymentRequest dto) {
         log.info("Start, convert currency from {} to {}", fromCurrency, toCurrency);
         Map<String, Double> rates = getExchangeRates();
-
-        BigDecimal fromRate = getRate(rates, fromCurrency);
-        BigDecimal toRate = getRate(rates, toCurrency);
-
-        if (fromRate == null || toRate == null) {
-            throw new IllegalArgumentException("Exchange rate not found for specified currencies: " + fromCurrency.name() + " to " + toCurrency.name());
-        }
-
+        BigDecimal fromRate = getRate(rates, dto.fromCurrency());
+        BigDecimal toRate = getRate(rates, dto.toCurrency());
         BigDecimal rate = toRate.divide(fromRate, RoundingMode.HALF_UP);
-
-        return calculateAmountWithCommission(amount, rate);
+        return calculateAmountWithCommission(dto.amount(), rate);
     }
 
     private Map<String, Double> getExchangeRates() {
@@ -57,7 +51,6 @@ public class CurrencyConverterServiceImpl implements CurrencyConverterService {
     }
 
     private BigDecimal calculateAmountWithCommission(BigDecimal amount, BigDecimal rate) {
-
         BigDecimal convertedAmount = amount.multiply(rate);
         BigDecimal commission = convertedAmount.multiply(new BigDecimal(exchangeServiceProperties.getCommissionRate()))
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
@@ -66,7 +59,6 @@ public class CurrencyConverterServiceImpl implements CurrencyConverterService {
     }
 
     private BigDecimal getRate(Map<String, Double> rates, Currency currency) {
-
         Double rate = rates.get(currency.name());
         if (rate == null) {
             throw new IllegalArgumentException("Exchange rate not found for currency: " + currency.name());

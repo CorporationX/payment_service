@@ -31,7 +31,7 @@ public class PaymentController {
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Valid PaymentRequest dto) {
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         String formattedSum = decimalFormat.format(dto.amount());
-        BigDecimal amount = currencyConverterService.convertCurrency(dto.fromCurrency(), dto.toCurrency(), dto.amount());
+        BigDecimal amount = currencyConverterService.convertCurrency(dto);
 
         int verificationCode = new Random().nextInt(1000, 10000);
         String message = String.format("Dear friend! Thank you for your purchase! " +

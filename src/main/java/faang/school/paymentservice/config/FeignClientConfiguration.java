@@ -1,4 +1,4 @@
-package faang.school.paymentservice.client;
+package faang.school.paymentservice.config;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -9,15 +9,14 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @Configuration
 public class FeignClientConfiguration {
+
     @Bean
     public RequestInterceptor requestInterceptor() {
         return new RequestInterceptor() {
             @Override
             public void apply(RequestTemplate template) {
-                log.info("Request URL: {}", template.url());
-                log.info("Request Method: {}", template.method());
-                log.info("Request Headers: {}", template.headers());
-                log.info("Request Body: {}", template.body());
+                log.info(String.format("Request URL: {%s}, Request Method: {%s},Request Headers: {%s}, Request Body: {%s}",
+                        template.url(), template.method(), template.headers(), template.body()));
             }
         };
     }
