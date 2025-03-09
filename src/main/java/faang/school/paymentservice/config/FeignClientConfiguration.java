@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @Configuration
 public class FeignClientConfiguration {
+
     @Bean
     public RequestInterceptor requestInterceptor() {
-
         return new RequestInterceptor() {
             @Override
             public void apply(RequestTemplate template) {

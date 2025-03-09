@@ -18,26 +18,16 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CurrencyConverterServiceImpl implements CurrencyConverterService {
 
-
     private final ExchangeServiceClient exchangeServiceClient;
-
     private final ExchangeServiceProperties exchangeServiceProperties;
 
     @Override
     public BigDecimal convertCurrency(PaymentRequest dto) {
         ExchangeResponse response = exchangeServiceClient.exchange(exchangeServiceProperties.getToken());
         Map<String, Double> rates = response.rates();
-
         BigDecimal fromRate = getRate(rates, dto.fromCurrency());
         BigDecimal toRate = getRate(rates, dto.toCurrency());
-
-        if (fromRate == null || toRate == null) {
-            throw new IllegalArgumentException(String.format("Exchange rate not found for specified currencies:{%s} to {%s}",
-                    dto.fromCurrency().name(), dto.toCurrency().name()));
-        }
-
         BigDecimal rate = toRate.divide(fromRate, RoundingMode.HALF_UP);
-
         return calculateAmountWithCommission(dto.amount(), rate);
     }
 
