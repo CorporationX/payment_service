@@ -17,8 +17,10 @@ dependencies {
     /**
      * Spring boot starters
      */
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation ("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -34,11 +36,24 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.26")
     implementation("org.mapstruct:mapstruct:1.5.3.Final")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 
     /**
      * Database
      */
     implementation("redis.clients:jedis:4.3.2")
+    implementation("org.liquibase:liquibase-core")
+    implementation("org.springframework.kafka:spring-kafka:3.3.2")
+    runtimeOnly("org.postgresql:postgresql")
+
+    /**
+     * Test containers
+     */
+    implementation(platform("org.testcontainers:testcontainers-bom:1.17.6"))
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation("com.redis.testcontainers:testcontainers-redis-junit-jupiter:1.4.6")
+    testImplementation("org.testcontainers:kafka")
 
     /**
      * Tests

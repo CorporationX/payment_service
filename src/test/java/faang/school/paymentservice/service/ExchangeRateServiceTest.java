@@ -1,8 +1,8 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.config.CurrencyRateConfig;
-import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.entity.CurrencyRateDto;
+import faang.school.paymentservice.enums.Currency;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

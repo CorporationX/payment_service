@@ -1,5 +1,6 @@
 package faang.school.paymentservice.dto;
 
+import faang.school.paymentservice.enums.Currency;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

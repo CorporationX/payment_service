@@ -1,7 +1,7 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.config.CurrencyRateConfig;
-import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.enums.Currency;
 import faang.school.paymentservice.dto.CurrencyRate;
 import faang.school.paymentservice.exception.CurrencyRateException;
 import faang.school.paymentservice.repository.CurrencyRateRepository;

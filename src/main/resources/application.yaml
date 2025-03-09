@@ -5,6 +5,67 @@ spring:
     redis:
       port: 6379
       host: localhost
+      authorization-message:
+        key-name: "authorization:message:counters"
+      cancel-message:
+        key-name: "cancel:message:counters"
+      clearing-message:
+        key-name: "clearing:message:counters"
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    topics:
+      payment-topics:
+        authorization:
+          request-topic-name: "auth-message-request-topic"
+          response:
+            topic-name: "auth-message-response-topic"
+        cancel:
+          request-topic-name: "cancel-message-request-topic"
+          response:
+            topic-name: "cancel-message-response-topic"
+        clearing:
+          request-topic-name: "clearing-message-request-topic"
+          response:
+            topic-name: "clearing-message-response-topic"
+        response-listener-group: "group-response"
+        dlt:
+          topic-name: "auth-payment.DLT"
+
+    consumer:
+      max-attempts: 3
+      retry-interval-ms: 3000
+
+    producer:
+      request-retries: 3
+      retries: 3
+      properties:
+        retry:
+          backoff:
+            ms: 1000
+        delivery:
+          timeout:
+            ms: 120000
+        enable:
+          idempotence: true
 
 currency:
   rate:
@@ -14,8 +75,15 @@ currency:
     accessKey: fcb94a92e0e80edce7e810245707431a
     connectionBackoffSeconds: 10
     connectionRetryAttempts: 6
-    updateExchangeRatesMillis: 300_000
+    updateExchangeRatesMillis: 3_000_000
     conversionRateFactor: 1.1
 
 server:
   port: 9080
+
+payment:
+  valid-interval-minutes: 2
+  cron:
+    check-new: "*/5 * * * * *"
+    check-cancel: 0 */2 * * * *
+    check-clearing: 0 */2 * * * *
