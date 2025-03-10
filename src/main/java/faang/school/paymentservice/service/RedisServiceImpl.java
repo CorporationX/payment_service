@@ -18,10 +18,8 @@ public class RedisServiceImpl implements RedisService {
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 
-
     @Override
     public <T> void save(String key, T value) {
-
         log.info(String.format("Saving data to redis , key={%s}", key));
 
         try {
