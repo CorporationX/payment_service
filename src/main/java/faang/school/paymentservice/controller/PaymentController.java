@@ -1,11 +1,7 @@
 package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.PaymentRequest;
-import java.text.DecimalFormat;
-import java.util.Random;
 import faang.school.paymentservice.dto.PaymentResponse;
-import faang.school.paymentservice.dto.PaymentStatus;
-import faang.school.paymentservice.service.ExchangeRateService;
 import faang.school.paymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
