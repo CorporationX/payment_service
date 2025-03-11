@@ -24,7 +24,7 @@ currency:
     url: https://openexchangerates.org
     appId: dcc217e8e3c54847a1a4142ba07bb878
     base: USD
-    commission: 1.03
+    commissionPercent: 1.0
 
 logging:
   level:

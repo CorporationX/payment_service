@@ -34,7 +34,7 @@ public class PaymentService {
 
         BigDecimal convertedAmount = amount.multiply(BigDecimal.valueOf(rate));
         BigDecimal commissionAmount = BigDecimal.ONE
-                .add(currencyProperties.commission().divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                .add(currencyProperties.commissionPercent().divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
 
         return convertedAmount.multiply(commissionAmount).setScale(2, RoundingMode.HALF_UP);
     }

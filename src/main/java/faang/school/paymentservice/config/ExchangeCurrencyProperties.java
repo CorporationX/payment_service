@@ -10,6 +10,6 @@ public record ExchangeCurrencyProperties(
         String url,
         String appId,
         Currency base,
-        BigDecimal commission
+        BigDecimal commissionPercent
 ) {
 }

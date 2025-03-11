@@ -60,10 +60,10 @@ public class PaymentController {
         BigDecimal convertedAmount = paymentService.convert(amount, currencyFrom, currencyTo);
 
         String message = String.format(
-                "Your amount %s %s converted to %s %s, commission %s%%",
+                "Your amount %s %s converted to %s %s, commissionPercent %s%%",
                 decimalFormat(amount), currencyFrom,
                 decimalFormat(convertedAmount), currencyTo,
-                decimalFormat(currencyProperties.commission()));
+                decimalFormat(currencyProperties.commissionPercent()));
 
         return ResponseEntity.ok(new ExchangeCurrencyResponse(
                 getVerificationCode(),

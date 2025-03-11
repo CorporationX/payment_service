@@ -44,7 +44,7 @@ class PaymentControllerTest {
 
     @Test
     void testConfigValues() {
-        assertEquals(new BigDecimal("1.01"), currencyProperties.commission());
+        assertEquals(new BigDecimal("1.01"), currencyProperties.commissionPercent());
     }
 
     @Test
