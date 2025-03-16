@@ -2,29 +2,69 @@ package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ErrorResponse;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import faang.school.paymentservice.exception.DataValidationException;
+import faang.school.paymentservice.exception.ExchangeCurrencyException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(DataValidationException.class)
+    public ResponseEntity<String> handleDataValidationException(DataValidationException e) {
+        log.error("Data Validation exception occurred", e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<String> handleInvalidEnum(MethodArgumentTypeMismatchException ex) {
+        String errorMessage = "Invalid currency: " + ex.getValue();
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        return e.getBindingResult().getAllErrors().stream()
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException e) {
+        Map<String, String> errors = e.getBindingResult().getFieldErrors().stream()
                 .collect(Collectors.toMap(
-                        error -> ((FieldError) error).getField(),
-                        error -> Objects.requireNonNullElse(error.getDefaultMessage(), ""))
-                );
+                        FieldError::getField,
+                        error -> Objects.requireNonNullElse(error.getDefaultMessage(), "Unknown error"),
+                        (existing, replacement) -> existing
+                ));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException e) {
+        log.error("Entity not Found exception occurred\n", e);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error("Illegal argument exception occurred\n", e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(ExchangeCurrencyException.class)
+    public ResponseEntity<String> handleExchangeCurrencyException(ExchangeCurrencyException e) {
+        log.error("Exchange currency exception occurred\n", e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -32,7 +72,6 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         String message = e.getMessage().contains("Currency") ? "We only accept " + Arrays.toString(Currency.values())
                 : e.getMessage();
-
         return new ErrorResponse(message);
     }
 
@@ -42,3 +81,5 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(e.getMessage());
     }
 }
+
+
