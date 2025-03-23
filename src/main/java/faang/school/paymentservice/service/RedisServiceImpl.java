@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public <T> void save(String key, T value) {
-        log.info(String.format("Saving data to redis , key={%s}", key));
+        log.info("Saving data to redis , key={%s}", key);
 
         try {
             String jsonValue = objectMapper.writeValueAsString(value);
@@ -32,34 +33,38 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public <T> T get(String key, Class<T> clazz) {
-        log.info(String.format("Getting data from redis , key={%s}", key));
+    public <T> Optional<T> get(String key, Class<T> clazz) {
+        log.info("Getting data from Redis, key={%s}", key);
         String jsonValue = redisTemplate.opsForValue().get(key);
         try {
-            return objectMapper.readValue(jsonValue, clazz);
+            if (jsonValue != null) {
+                return Optional.of(objectMapper.readValue(jsonValue, clazz));
+            }
         } catch (IOException e) {
             log.error("Error reading value from Redis", e);
             e.printStackTrace();
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public <T> T get(String key, TypeReference<T> typeReference) {
-        log.info(String.format("Getting data from redis , key={%s}", key));
+    public <T> Optional<T> get(String key, TypeReference<T> typeReference) {
+        log.info("Getting data from Redis, key={%s}", key);
         String jsonValue = redisTemplate.opsForValue().get(key);
         try {
-            return objectMapper.readValue(jsonValue, typeReference);
+            if (jsonValue != null) {
+                return Optional.of(objectMapper.readValue(jsonValue, typeReference));
+            }
         } catch (IOException e) {
-            e.printStackTrace();
             log.error("Error reading value from Redis", e);
+            e.printStackTrace();
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public void delete(String key) {
-        log.info(String.format("Deleting data from redis , key={%s}", key));
+        log.info("Deleting data from redis , key={%s}", key);
         redisTemplate.delete(key);
     }
 }
