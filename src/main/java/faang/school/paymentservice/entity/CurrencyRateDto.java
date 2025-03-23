@@ -1,6 +1,6 @@
 package faang.school.paymentservice.entity;
 
-import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.enums.Currency;
 import lombok.Builder;
 
 import java.util.Map;

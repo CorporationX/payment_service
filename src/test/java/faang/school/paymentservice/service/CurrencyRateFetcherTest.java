@@ -1,6 +1,6 @@
 package faang.school.paymentservice.service;
 
-import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.enums.Currency;
 import faang.school.paymentservice.dto.CurrencyRate;
 import faang.school.paymentservice.entity.CurrencyRateDto;
 import faang.school.paymentservice.mapper.CurrencyRateMapper;

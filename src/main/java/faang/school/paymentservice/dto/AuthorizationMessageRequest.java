@@ -2,25 +2,20 @@ package faang.school.paymentservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import faang.school.paymentservice.enums.Currency;
-import faang.school.paymentservice.enums.PaymentStatus;
 import faang.school.paymentservice.enums.PaymentType;
 import lombok.Builder;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record PaymentResponse(
+public record AuthorizationMessageRequest(
         UUID id,
         String senderAccountNumber,
         String receiverAccountNumber,
-        BigDecimal amount,
         Currency currency,
-        LocalDateTime createdAt,
-        LocalDateTime paymentDateTime,
-        PaymentStatus paymentStatus,
+        BigDecimal amount,
         PaymentType paymentType
 ) {
 }

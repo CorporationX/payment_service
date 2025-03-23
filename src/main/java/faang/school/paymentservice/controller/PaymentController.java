@@ -1,10 +1,12 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.PaymentResponse;
-import faang.school.paymentservice.dto.PaymentStatus;
+import faang.school.paymentservice.entity.Payment;
+import faang.school.paymentservice.enums.Currency;
+import faang.school.paymentservice.mapper.PaymentMapper;
 import faang.school.paymentservice.service.CurrencyRateService;
+import faang.school.paymentservice.service.PaymentService;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.time.LocalDateTime;
-import java.util.Random;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Validated
@@ -28,24 +29,36 @@ import java.util.Random;
 @RequestMapping("/api")
 public class PaymentController {
     private final CurrencyRateService currencyRateService;
+    private final PaymentMapper paymentMapper;
+    private final PaymentService paymentService;
 
-    @PostMapping("/payment")
-    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00");
-        String formattedSum = decimalFormat.format(dto.amount());
-        int verificationCode = new Random().nextInt(1000, 10000);
-        String message = String.format("Dear friend! Thank you for your purchase! " +
-                        "Your payment on %s %s was accepted.",
-                formattedSum, dto.currency().name());
+    @PostMapping("/payment/send")
+    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest paymentRequest) {
+        Payment payment = paymentMapper.paymentRequestToPayment(paymentRequest);
+        payment = paymentService.createPayment(payment);
+        PaymentResponse response = paymentMapper.paymentToPaymentResponse(payment);
+        return ResponseEntity.ok(response);
+    }
 
-        return ResponseEntity.ok(new PaymentResponse(
-                PaymentStatus.SUCCESS,
-                verificationCode,
-                dto.paymentNumber(),
-                dto.amount(),
-                dto.currency(),
-                message)
-        );
+    @PostMapping("/payment/cancel")
+    public ResponseEntity<PaymentResponse> cancelPayment(@NotNull @RequestParam UUID paymentId) {
+        Payment payment = paymentService.cancelPayment(paymentId);
+        PaymentResponse response = paymentMapper.paymentToPaymentResponse(payment);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/payment/clearing")
+    public ResponseEntity<PaymentResponse> clearingPayment(@NotNull @RequestParam UUID paymentId) {
+        Payment payment = paymentService.clearingPayment(paymentId);
+        PaymentResponse response = paymentMapper.paymentToPaymentResponse(payment);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/payment")
+    public ResponseEntity<PaymentResponse> getPayment(@NotNull @RequestParam UUID paymentId) {
+        Payment payment = paymentService.getPaymentById(paymentId);
+        PaymentResponse response = paymentMapper.paymentToPaymentResponse(payment);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/currency/exchange")

@@ -1,6 +1,6 @@
 package faang.school.paymentservice.repository;
 
-import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.enums.Currency;
 import faang.school.paymentservice.dto.CurrencyRate;
 import faang.school.paymentservice.exception.CurrencyRateException;
 import org.junit.jupiter.api.Test;
