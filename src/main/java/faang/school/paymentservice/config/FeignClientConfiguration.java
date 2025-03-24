@@ -15,7 +15,7 @@ public class FeignClientConfiguration {
         return new RequestInterceptor() {
             @Override
             public void apply(RequestTemplate template) {
-                log.info("Request URL: {%s}, Request Method: {%s},Request Headers: {%s}, Request Body: {%s}",
+                log.info("Request URL: {}, Request Method: {},Request Headers: {}, Request Body: {}",
                         template.url(), template.method(), template.headers(), template.body());
             }
         };

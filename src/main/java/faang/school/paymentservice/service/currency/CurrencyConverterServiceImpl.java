@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -38,14 +39,15 @@ public class CurrencyConverterServiceImpl implements CurrencyConverterService {
     }
 
     private Map<String, Double> getExchangeRates() {
-        Map<String, Double> rates = redisService.get(redisKey, new TypeReference<>() {
+        Optional<Map<String, Double>> optionalRates = redisService.get(redisKey, new TypeReference<>() {
         });
-        if (rates == null) {
+        Map<String, Double> rates = optionalRates.orElseGet(() -> {
             log.info("Exchange rates not found in cache, fetching from external API");
             ExchangeResponse response = exchangeServiceClient.exchange(exchangeServiceProperties.getToken());
-            rates = response.rates();
-            redisService.save(redisKey, rates);
-        }
+            Map<String, Double> fetchedRates = response.rates();
+            redisService.save(redisKey, fetchedRates);
+            return fetchedRates;
+        });
         return rates;
     }
 

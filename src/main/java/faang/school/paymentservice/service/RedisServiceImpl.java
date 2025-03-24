@@ -21,7 +21,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public <T> void save(String key, T value) {
-        log.info("Saving data to redis , key={%s}", key);
+        log.info("Saving data to redis , key={}", key);
 
         try {
             String jsonValue = objectMapper.writeValueAsString(value);
@@ -34,7 +34,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public <T> Optional<T> get(String key, Class<T> clazz) {
-        log.info("Getting data from Redis, key={%s}", key);
+        log.info("Getting data from Redis, key={}", key);
         String jsonValue = redisTemplate.opsForValue().get(key);
         try {
             if (jsonValue != null) {
@@ -49,7 +49,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public <T> Optional<T> get(String key, TypeReference<T> typeReference) {
-        log.info("Getting data from Redis, key={%s}", key);
+        log.info("Getting data from Redis, key={}", key);
         String jsonValue = redisTemplate.opsForValue().get(key);
         try {
             if (jsonValue != null) {
@@ -64,7 +64,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void delete(String key) {
-        log.info("Deleting data from redis , key={%s}", key);
+        log.info("Deleting data from redis , key={}", key);
         redisTemplate.delete(key);
     }
 }
