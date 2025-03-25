@@ -11,4 +11,5 @@ public class ExchangeServiceProperties {
 
     private String token;
     private double commissionRate;
+    private String cronExpression;
 }

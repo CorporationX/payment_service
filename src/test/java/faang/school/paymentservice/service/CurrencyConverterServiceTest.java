@@ -4,6 +4,7 @@ import faang.school.paymentservice.client.ExchangeServiceClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ExchangeResponse;
 import faang.school.paymentservice.dto.PaymentRequest;
+import faang.school.paymentservice.service.currency.CurrencyConverterServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -29,18 +31,18 @@ import java.util.UUID;
 public class CurrencyConverterServiceTest {
     @Mock
     private ExchangeServiceClient exchangeServiceClient;
-
     @Mock
     private ExchangeServiceProperties exchangeServiceProperties;
-
     @InjectMocks
     private CurrencyConverterServiceImpl currencyConverterService;
-
+    @Mock
+    private RedisService redisService;
     private Map<String, Double> rates;
     private PaymentRequest dto;
 
     @BeforeEach
     public void setUp() {
+        redisService.delete("exchange-rates");
         prepareData();
         Mockito.lenient().when(exchangeServiceProperties.getToken()).thenReturn("token");
         Mockito.lenient().when(exchangeServiceProperties.getCommissionRate()).thenReturn(1.5);
@@ -63,12 +65,13 @@ public class CurrencyConverterServiceTest {
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         BigDecimal expectedAmount = expectedConvertedAmount.add(expectedCommission);
 
+        assertNotNull(result);
         assertEquals(expectedAmount, result);
     }
 
     @Test
     void testConvertCurrencyRateNotExist() {
-        rates.remove(dto.toCurrency().name());
+        rates.remove(dto.fromCurrency().name());
 
         ExchangeResponse response = new ExchangeResponse("disclaimer", "license", System.currentTimeMillis(), Currency.USD.name(), rates);
 
