@@ -1,6 +1,14 @@
 server:
   port: 9080
 
-logging:
-  level:
-    root: info
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
