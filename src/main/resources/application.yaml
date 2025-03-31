@@ -4,3 +4,16 @@ server:
 logging:
   level:
     root: info
+
+currency:
+  rate:
+    update:
+      cron: "0 0 * * *" # Каждый день в полночь
+
+exchangerates:
+  api:
+    url: "https://api.exchangeratesapi.io"
+    access_key: "2f141144ca656b52bf11b99c8e269651"
+    base: "USD"
+    symbols: "GBP,JPY,EUR,RUB"
+    #https://api.exchangeratesapi.io/v1/latest? access_key = API_KEY & base = USD & symbols = GBP,JPY,EUR
