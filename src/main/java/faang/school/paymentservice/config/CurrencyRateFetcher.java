@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 public class CurrencyRateFetcher {
     private final CurrencyService currencyService;
 
-@Scheduled(cron = "${currency.rate.update.cron}")
-    public void fetchCurrencyRates(){
-    currencyService.updateCurrencyRates();
+    @Scheduled(cron = "${currency.rate.update.cron}")
+    public void fetchCurrencyRates() {
+        currencyService.updateCurrencyRates();
     }
 }
