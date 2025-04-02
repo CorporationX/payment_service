@@ -4,3 +4,10 @@ server:
 logging:
   level:
     root: info
+
+app:
+  corn:
+    schedule: "0 0 * * * ?"
+  api:
+    baseUrl: "https://api.exchangeratesapi.io"
+    accessKey: "YOUR_API_KEY"
