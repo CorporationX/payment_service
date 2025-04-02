@@ -5,13 +5,10 @@ import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ExchangeRatesResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-@Service
 @Slf4j
 @RequiredArgsConstructor
 public class CurrencyConverterService {
