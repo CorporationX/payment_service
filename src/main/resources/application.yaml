@@ -4,3 +4,7 @@ server:
 logging:
   level:
     root: info
+
+currency:
+  app-id: 228f820a3ae34a91a21e610dd228da8b
+  api-url: https://openexchangerates.org/api
