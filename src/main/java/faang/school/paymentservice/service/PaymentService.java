@@ -19,7 +19,7 @@ public class PaymentService {
     private final CurrencyConverterService converter;
 
     public PaymentResponse sendPayment(PaymentRequest dto){
-        BigDecimal finalAmount = converter.convert(dto.amount(),dto.currency(), Currency.USD);
+        BigDecimal finalAmount = converter.convert(dto, Currency.USD);
 
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         String formattedSum = decimalFormat.format(finalAmount);

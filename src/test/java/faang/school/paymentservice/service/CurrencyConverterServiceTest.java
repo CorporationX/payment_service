@@ -3,6 +3,7 @@ package faang.school.paymentservice.service;
 import faang.school.paymentservice.client.CurrencyClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ExchangeRatesResponse;
+import faang.school.paymentservice.dto.PaymentRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -28,6 +29,7 @@ class CurrencyConverterServiceTest {
     CurrencyClient currencyClient;
 
     private ExchangeRatesResponse response;
+    private PaymentRequest paymentRequest = new PaymentRequest(1,BigDecimal.valueOf(1000),Currency.USD);
 
     @BeforeEach
     public void setUp() {
@@ -35,7 +37,6 @@ class CurrencyConverterServiceTest {
         Map<String, Double> rates = new HashMap<>();
         rates.put("USD", 1.0);
         rates.put("EUR", 0.92539);
-
         response = new ExchangeRatesResponse("USD", rates);
     }
 
@@ -47,7 +48,7 @@ class CurrencyConverterServiceTest {
 
             when(currencyClient.getRates(anyString())).thenReturn(response);
             Assertions.assertThrows(IllegalArgumentException.class, () -> {
-                currencyConverterService.convert(BigDecimal.valueOf(1000), Currency.USD, Currency.EUR);
+                currencyConverterService.convert(paymentRequest, Currency.EUR);
             });
         }
 
@@ -57,34 +58,38 @@ class CurrencyConverterServiceTest {
 
             when(currencyClient.getRates(anyString())).thenReturn(response);
             Assertions.assertThrows(IllegalArgumentException.class, () -> {
-                currencyConverterService.convert(BigDecimal.valueOf(1000), Currency.USD, Currency.EUR);
+                currencyConverterService.convert(paymentRequest, Currency.EUR);
             });
         }
 
         @Test
         void convertUSDToUSD() {
             when(currencyClient.getRates(anyString())).thenReturn(response);
-            BigDecimal result = currencyConverterService.convert(BigDecimal.valueOf(1000), Currency.USD, Currency.USD);
+            BigDecimal result = currencyConverterService.convert(paymentRequest, Currency.USD);
             assertEquals(new BigDecimal("1010.00"), result);
         }
         @Test
         void convertUSDToEUR() {
             when(currencyClient.getRates(anyString())).thenReturn(response);
-            BigDecimal result = currencyConverterService.convert(BigDecimal.valueOf(1000), Currency.USD, Currency.EUR);
+            BigDecimal result = currencyConverterService.convert(paymentRequest, Currency.EUR);
             assertEquals(new BigDecimal("934.64"), result);
         }
 
         @Test
         void convertEURToUSD() {
+            paymentRequest = new PaymentRequest(1,BigDecimal.valueOf(1000),Currency.EUR);
+
             when(currencyClient.getRates(anyString())).thenReturn(response);
-            BigDecimal result = currencyConverterService.convert(BigDecimal.valueOf(1000), Currency.EUR, Currency.USD);
+            BigDecimal result = currencyConverterService.convert(paymentRequest, Currency.USD);
             assertEquals(new BigDecimal("1091.43"), result);
         }
 
         @Test
         void convertEURToEUR() {
+            paymentRequest = new PaymentRequest(1,BigDecimal.valueOf(1000),Currency.EUR);
+
             when(currencyClient.getRates(anyString())).thenReturn(response);
-            BigDecimal result = currencyConverterService.convert(BigDecimal.valueOf(1000), Currency.EUR, Currency.EUR);
+            BigDecimal result = currencyConverterService.convert(paymentRequest, Currency.EUR);
             assertEquals(new BigDecimal("1010.00"), result);
         }
     }

@@ -3,6 +3,7 @@ package faang.school.paymentservice.service;
 import faang.school.paymentservice.client.CurrencyClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ExchangeRatesResponse;
+import faang.school.paymentservice.dto.PaymentRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +17,10 @@ public class CurrencyConverterService {
     private final CurrencyClient currencyClient;
     private final String appId;
 
-    public BigDecimal convert(BigDecimal amount, Currency from, Currency to) {
+    public BigDecimal convert(PaymentRequest dto, Currency to) {
+        BigDecimal amount = dto.amount();
+        Currency from = dto.currency();
+
         ExchangeRatesResponse response = currencyClient.getRates(appId);
         Double fromRate = response.rates().get(from.name());
         Double toRate = response.rates().get(to.name());
