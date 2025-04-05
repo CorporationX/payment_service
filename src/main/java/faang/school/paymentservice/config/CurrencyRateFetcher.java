@@ -18,6 +18,6 @@ public class CurrencyRateFetcher {
         currencyService.updateCurrencyRates()
                 .doOnSuccess(aVoid -> log.info("Курсы валют успешно обновлены."))
                 .doOnError(throwable -> log.error("Ошибка при обновлении курсов валют: {}", throwable.getMessage()))
-                .subscribe(); // Запускаем подписку на Mono
+                .subscribe();
     }
 }

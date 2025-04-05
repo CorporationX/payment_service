@@ -2,6 +2,7 @@ package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.model.CurrencyResponse;
 import faang.school.paymentservice.model.LatestRatesEndpoint;
+import faang.school.paymentservice.properties.CurrencyRateRetryProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -12,10 +13,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@EnableConfigurationProperties({LatestRatesEndpoint.class})
+@EnableConfigurationProperties({LatestRatesEndpoint.class, CurrencyRateRetryProperties.class})
 public class CurrencyService {
 
     private final WebClient webClient;
@@ -24,7 +26,11 @@ public class CurrencyService {
     private CurrencyResponse currencyResponse;
     private Map<String, Double> currencyRates;
 
-    @Retryable(value = {Exception.class}, maxAttempts = 5, backoff = @Backoff(delay = 2000))
+    @Retryable(
+            retryFor = {Exception.class},
+            maxAttemptsExpression = "#{@currencyRateRetryProperties.maxAttempts}",
+            backoff = @Backoff(delayExpression = "#{@currencyRateRetryProperties.delay}")
+    )
     public Mono<Void> updateCurrencyRates() {
         return webClient
                 .get()
@@ -34,22 +40,14 @@ public class CurrencyService {
                 .bodyToMono(CurrencyResponse.class)
                 .doOnNext(response -> {
                     this.currencyResponse = response;
-                    currencyRates = response.getRates();
+                    currencyRates = response.rates();
                     log.info("Курсы валют успешно обновлены: {}", currencyRates);
-                    log.info("Базовая валюта: {}", currencyResponse.getBase());
+                    log.info("Базовая валюта: {}", currencyResponse.base());
                 })
                 .doOnError(throwable -> {
                     log.error("Ошибка при обновлении курсов валют: {}", throwable.getMessage());
                 })
-                .then(); // Возвращаем Mono<Void> для указания завершения
-    }
-
-    public CurrencyResponse getCurrencyResponse() {
-        return currencyResponse;
-    }
-
-    public Map<String, Double> getCurrencyRates() {
-        return currencyRates;
+                .then();
     }
 }
 

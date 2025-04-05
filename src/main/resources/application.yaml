@@ -17,3 +17,7 @@ exchangerates:
     base: "EUR" #базовая валюта
     symbols: "GBP,JPY,USD,RUB"
     #http://api.exchangeratesapi.io/v1/latest? access_key = API_KEY & base = USD & symbols = GBP,JPY,EUR
+
+retry:
+  maxAttempts: 5
+  delay: 2000
