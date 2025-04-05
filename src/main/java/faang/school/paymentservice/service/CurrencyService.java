@@ -1,7 +1,7 @@
 package faang.school.paymentservice.service;
 
-import faang.school.paymentservice.model.CurrencyResponse;
-import faang.school.paymentservice.model.LatestRatesEndpoint;
+import faang.school.paymentservice.dto.CurrencyResponse;
+import faang.school.paymentservice.properties.LatestRatesEndpoint;
 import faang.school.paymentservice.properties.CurrencyRateRetryProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package faang.school.paymentservice.model;
+package faang.school.paymentservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -11,6 +11,3 @@ public record CurrencyResponse(
         @JsonProperty("date") String date,
         @JsonProperty("rates") Map<String, Double> rates) {
 }
-
-
-

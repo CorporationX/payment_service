@@ -1,4 +1,4 @@
-package faang.school.paymentservice.model;
+package faang.school.paymentservice.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
