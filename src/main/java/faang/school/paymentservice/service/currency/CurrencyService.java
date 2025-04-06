@@ -26,7 +26,7 @@ public class CurrencyService {
     @Value("${app.api.accessKey}")
     private String accessKey;
 
-    @Retryable(value = {Exception.class}, backoff = @Backoff(delay = 3000, multiplier = 2))
+    @Retryable(value = {CurrencyRatesUnavailableException.class}, backoff = @Backoff(delay = 3000, multiplier = 2))
     public void fetchCurrencyRates() {
         log.info("Starting to fetch currency rates.");
         ExchangeRateResponse response = webClient
@@ -36,14 +36,15 @@ public class CurrencyService {
                             .path("/v1/latest")
                             .queryParam("access_key", accessKey)
                             .queryParam("base", "EUR")
+                            .queryParam("symbols", EnumConverter.convertCurrencyEnumToString())
                             .build())
                 .retrieve()
                 .bodyToMono(ExchangeRateResponse.class)
                 .block();
-        if (response != null && response.getRates() != null) {
+        if (response != null && response.isSuccess() && response.getRates() != null) {
             log.info("Successfully fetched currency rates: {}", response.getRates());
             for (Currency currency : Currency.values()) {
-                BigDecimal rate = response.getRates().getOrDefault(currency, BigDecimal.ZERO);
+                BigDecimal rate = response.getRates().getOrDefault(currency.name(), BigDecimal.ZERO);
                 currencyRates.put(currency, rate);
                 log.info("Updated rate for {}: {}", currency, rate);
             }
