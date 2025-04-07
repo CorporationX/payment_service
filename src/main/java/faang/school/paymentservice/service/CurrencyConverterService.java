@@ -6,6 +6,7 @@ import faang.school.paymentservice.dto.ExchangeRatesResponse;
 import faang.school.paymentservice.dto.PaymentRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -17,22 +18,40 @@ public class CurrencyConverterService {
     private final CurrencyClient currencyClient;
     private final String appId;
 
+    @Value("${currency.scale}")
+    private int scale;
+
+    @Value("${currency.usd-conversion-scale}")
+    private int usdConversionScale;
+
+    @Value("${currency.rounding-mode}")
+    private RoundingMode roundingMode;
+
+    @Value("${currency.fee-multiplier}")
+    private BigDecimal feeMultiplier;
+
     public BigDecimal convert(PaymentRequest dto, Currency to) {
         BigDecimal amount = dto.amount();
         Currency from = dto.currency();
 
         ExchangeRatesResponse response = currencyClient.getRates(appId);
-        Double fromRate = response.rates().get(from.name());
-        Double toRate = response.rates().get(to.name());
+
+        if (response == null || response.rates() == null) {
+            log.error("Currency API returned null response or rates");
+            throw new IllegalStateException("Invalid currency data");
+        }
+
+        BigDecimal fromRate = response.rates().get(from.name());
+        BigDecimal toRate = response.rates().get(to.name());
 
         if (fromRate == null || toRate == null) {
             log.error("Currency not supported: {} or {}", from, to);
             throw new IllegalArgumentException("Currency not supported");
         }
 
-        BigDecimal usdAmount = amount.divide(BigDecimal.valueOf(fromRate), 10, RoundingMode.HALF_UP);
-        BigDecimal converted = usdAmount.multiply(BigDecimal.valueOf(toRate));
-        BigDecimal withFee = converted.multiply(BigDecimal.valueOf(1.01));
-        return withFee.setScale(2, RoundingMode.HALF_UP);
+        BigDecimal usdAmount = amount.divide(fromRate, usdConversionScale, roundingMode);
+        BigDecimal converted = usdAmount.multiply(toRate);
+        BigDecimal withFee = converted.multiply(feeMultiplier);
+        return withFee.setScale(scale, roundingMode);
     }
 }

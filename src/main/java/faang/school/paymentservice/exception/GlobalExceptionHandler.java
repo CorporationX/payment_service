@@ -51,6 +51,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "IllegalArgument");
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
+        return buildErrorResponse(ex, HttpStatus.SERVICE_UNAVAILABLE, "IllegalStateException");
+    }
+
     private ResponseEntity<Object> buildErrorResponse(Exception ex, HttpStatus status, String error) {
         return buildErrorResponse(cleanMessage(ex), status, error);
     }
