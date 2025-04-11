@@ -13,6 +13,7 @@ spring:
       acks: all
       max-in-flight-per-connection: 1
       transaction-id-prefix: "payment-service-"
+      isolation.level: "read-committed"
 
       topics:
         premium:
