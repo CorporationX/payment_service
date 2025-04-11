@@ -18,13 +18,12 @@ public class KafkaPublisher {
         kafkaTemplate.executeInTransaction(kafkaOperations -> {
             try {
                 kafkaOperations.send(topic, objectMapper.writeValueAsString(object));
-                log.info("{} sent to user_service", object);
+                log.info("Published to kafka: {}", object);
             } catch (JsonProcessingException e) {
                 log.error("Error while serializing", e);
                 throw new RuntimeException(e);
             }
             return true;
         });
-        log.info("Published to kafka: {}", object);
     }
 }
