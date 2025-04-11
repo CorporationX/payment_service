@@ -1,5 +1,5 @@
 package faang.school.paymentservice.dto;
 
-public enum Currency {
+public enum CurrencyDto {
     USD, EUR
 }

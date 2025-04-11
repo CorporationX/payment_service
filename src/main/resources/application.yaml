@@ -4,3 +4,35 @@ server:
 logging:
   level:
     root: info
+
+spring:
+  kafka:
+    producer:
+      bootstrap-servers: "localhost:9092"
+      enable.idempotence: true
+      acks: all
+      max-in-flight-per-connection: 1
+      transaction-id-prefix: "payment-service-"
+
+      topics:
+        premium:
+          payment-response-topic: "premium-payment-response-topic"
+          price-response-topic: "premium-price-response-topic"
+
+    consumer:
+      enable-auto-commit: false
+      isolation.level: "read-committed"
+      auto.offset.reset: "latest"
+
+      topics:
+        premium:
+          payment-request-topic: "premium-payment-request-topic"
+          price-request-topic: "premium-price-request-topic"
+
+      groups:
+        premium:
+          payment-request-group: "premium-payment-request-group"
+          price-request-group: "premium-price-request-group"
+
+    listener:
+      ack-mode: "manual"
