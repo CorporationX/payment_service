@@ -35,5 +35,9 @@ spring:
           payment-request-group: "premium-payment-request-group"
           price-request-group: "premium-price-request-group"
 
+      correlation:
+        premium-price: "premium-price-correlation-id"
+        premium-payment: "premium-payment-correlation-id"
+
     listener:
       ack-mode: "manual"
