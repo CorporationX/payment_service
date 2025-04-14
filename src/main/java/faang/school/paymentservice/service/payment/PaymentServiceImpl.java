@@ -3,9 +3,12 @@ package faang.school.paymentservice.service.payment;
 import faang.school.paymentservice.dto.PaymentRequestDto;
 import faang.school.paymentservice.dto.PaymentResponseDto;
 import faang.school.paymentservice.dto.PaymentStatus;
+import faang.school.paymentservice.dto.exchange.ExchangeRequestDto;
+import faang.school.paymentservice.dto.exchange.ExchangeResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Random;
 
@@ -27,6 +30,15 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentRequestDto.amount(),
                 paymentRequestDto.currency(),
                 message)
+        );
+    }
+
+    @Override
+    public ExchangeResponseDto convertCurrency(ExchangeRequestDto exchangeRequest) {
+        return new ExchangeResponseDto(
+                exchangeRequest.getToCurrency(),
+                BigDecimal.TEN,
+                exchangeRequest.getUserId()
         );
     }
 }

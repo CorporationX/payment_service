@@ -1,7 +1,5 @@
 package faang.school.paymentservice.service.kafka.listener;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import faang.school.paymentservice.dto.PaymentResponseDto;
 import faang.school.paymentservice.dto.exchange.ExchangeRequestDto;
 import faang.school.paymentservice.dto.exchange.ExchangeResponseDto;
@@ -9,6 +7,7 @@ import faang.school.paymentservice.dto.premium.PremiumPaymentRequestDto;
 import faang.school.paymentservice.dto.premium.PremiumPaymentResponseDto;
 import faang.school.paymentservice.service.kafka.publisher.KafkaPublisher;
 import faang.school.paymentservice.service.payment.PaymentService;
+import faang.school.paymentservice.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -19,7 +18,6 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 
 import static faang.school.paymentservice.messages.ErrorMessages.FAILED_TO_ACKNOWLEDGE_KAFKA_MESSAGE;
@@ -29,8 +27,9 @@ import static faang.school.paymentservice.messages.ErrorMessages.FAILED_TO_ACKNO
 @RequiredArgsConstructor
 public class PremiumPaymentListener {
     public static final String RECEIVED_MESSAGE_FROM_KAFKA = "Received message from kafka: {}";
+
     private final PaymentService paymentService;
-    private final ObjectMapper objectMapper;
+    private final JsonUtils jsonUtils;
     private final KafkaPublisher kafkaPublisher;
 
     @Value("${spring.kafka.producer.topics.premium.payment-response-topic}")
@@ -53,14 +52,9 @@ public class PremiumPaymentListener {
     public void premiumPaymentRequestListener(ConsumerRecord<String, String> record, Acknowledgment acknowledgment) {
         String message = record.value();
         log.info(RECEIVED_MESSAGE_FROM_KAFKA, message);
-        PremiumPaymentRequestDto premiumPaymentRequest;
-        try {
-            premiumPaymentRequest = objectMapper.readValue(message,
-                    PremiumPaymentRequestDto.class);
-        } catch (JsonProcessingException e) {
-            log.error("Error while deserializing PremiumPaymentResponseDto", e);
-            throw new RuntimeException(e);
-        }
+        PremiumPaymentRequestDto premiumPaymentRequest =
+                jsonUtils.deserialize(message, PremiumPaymentRequestDto.class);
+
         PaymentResponseDto paymentResponse = paymentService.sendPayment(
                 premiumPaymentRequest.getPaymentRequestDto()).getBody();
 
@@ -77,7 +71,6 @@ public class PremiumPaymentListener {
         } else {
             log.warn("No premium-price-correlation-id header found in the request");
         }
-
         kafkaPublisher.sendInTransaction(premiumPaymentResponseDto, paymentResponseTopic,
                 premiumPaymentCorrelationId, correlationId);
 
@@ -97,27 +90,16 @@ public class PremiumPaymentListener {
     public void premiumPriceRequestListener(ConsumerRecord<String, String> record, Acknowledgment acknowledgment) {
         String message = record.value();
         log.info("Received message from Kafka: {}", message);
-        ExchangeRequestDto exchangeRequest;
-        try {
-            exchangeRequest = objectMapper.readValue(message, ExchangeRequestDto.class);
-        } catch (JsonProcessingException e) {
-            log.error("Error while deserializing ExchangeRequestDto", e);
-            throw new RuntimeException(e);
-        }
-
+        ExchangeRequestDto exchangeRequest = jsonUtils.deserialize(message, ExchangeRequestDto.class);
         String correlationId = null;
+
         Header header = record.headers().lastHeader(premiumPriceCorrelationId);
         if (header != null) {
             correlationId = new String(header.value(), StandardCharsets.UTF_8);
         } else {
             log.warn("No premium-payment-correlation-id header found in the request");
         }
-        ExchangeResponseDto exchangeResponse = new ExchangeResponseDto(
-                exchangeRequest.getToCurrency(),
-                BigDecimal.TEN,
-                exchangeRequest.getUserId()
-        );
-
+        ExchangeResponseDto exchangeResponse = paymentService.convertCurrency(exchangeRequest);
         kafkaPublisher.sendInTransaction(exchangeResponse, priceResponseTopic,
                 premiumPriceCorrelationId, correlationId);
 

@@ -1,7 +1,6 @@
 package faang.school.paymentservice.service.kafka.publisher;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import faang.school.paymentservice.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -15,22 +14,17 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @RequiredArgsConstructor
 public class KafkaPublisher {
-    private final ObjectMapper objectMapper;
+    private final JsonUtils jsonUtils;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     public void sendInTransaction(Object object, String topic, String correlationHeader, String correlationId) {
         kafkaTemplate.executeInTransaction(kafkaOperations -> {
-            try {
-                ProducerRecord<String, String> record = new ProducerRecord<>(topic, objectMapper.writeValueAsString(object));
-                if (correlationId != null) {
-                    record.headers().add(new RecordHeader(correlationHeader, correlationId.getBytes(StandardCharsets.UTF_8)));
-                }
-                kafkaOperations.send(record);
-                log.info("Published to Kafka: {} with correlationId: {}", object, correlationId);
-            } catch (JsonProcessingException e) {
-                log.error("Error serializing", e);
-                throw new RuntimeException(e);
+            ProducerRecord<String, String> record = new ProducerRecord<>(topic, jsonUtils.serialize(object));
+            if (correlationId != null) {
+                record.headers().add(new RecordHeader(correlationHeader, correlationId.getBytes(StandardCharsets.UTF_8)));
             }
+            kafkaOperations.send(record);
+            log.info("Published to Kafka: {} with correlationId: {}", object, correlationId);
             return true;
         });
     }
