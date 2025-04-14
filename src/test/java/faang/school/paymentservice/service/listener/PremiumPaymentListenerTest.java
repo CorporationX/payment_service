@@ -101,6 +101,7 @@ public class PremiumPaymentListenerTest {
 
         verify(kafkaPublisher, times(1)).sendInTransaction(any(PremiumPaymentResponseDto.class),
                 eq(paymentResponseTopic), eq(premiumPaymentCorrelationId), eq(correlationId));
+        verify(acknowledgment, times(1)).acknowledge();
     }
 
     @Test
@@ -117,5 +118,6 @@ public class PremiumPaymentListenerTest {
 
         verify(kafkaPublisher, times(1)).sendInTransaction(any(ExchangeResponseDto.class),
                 eq(priceResponseTopic), eq(premiumPriceCorrelationId), eq(correlationId));
+        verify(acknowledgment, times(1)).acknowledge();
     }
 }
