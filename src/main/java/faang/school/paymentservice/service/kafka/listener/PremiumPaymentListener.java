@@ -106,7 +106,7 @@ public class PremiumPaymentListener {
         try {
             acknowledgment.acknowledge();
         } catch (Exception e) {
-            log.error("Failed to acknowledge Kafka message", e);
+            log.error(FAILED_TO_ACKNOWLEDGE_KAFKA_MESSAGE, e);
             throw new RuntimeException(e);
         }
     }
