@@ -53,19 +53,19 @@ public class PremiumPaymentListenerTest {
     @Mock
     private Acknowledgment acknowledgment;
 
-    private PremiumRequestDto premiumRequest;
-    private PaymentRequestDto paymentRequest;
-    private PremiumPaymentRequestDto premiumPaymentRequest;
-    private PaymentResponseDto paymentResponse;
-    private ExchangeRequestDto exchangeRequest;
-    private ExchangeResponseDto exchangeResponse;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String paymentResponseTopic = "topic1";
     private final String priceResponseTopic = "topic2";
     private final String premiumPaymentCorrelationId = "correlation-id-1";
     private final String correlationId = "correlation-1";
     private final String premiumPriceCorrelationId = "correlation-id-2";
+
+    private PremiumRequestDto premiumRequest;
+    private PaymentRequestDto paymentRequest;
+    private PremiumPaymentRequestDto premiumPaymentRequest;
+    private PaymentResponseDto paymentResponse;
+    private ExchangeRequestDto exchangeRequest;
+    private ExchangeResponseDto exchangeResponse;
 
     @BeforeEach
     public void setUp() {
