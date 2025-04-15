@@ -1,5 +1,6 @@
 package faang.school.paymentservice.service;
 
+import faang.school.paymentservice.components.CurrencyApiClient;
 import faang.school.paymentservice.dto.CurrencyResponse;
 import faang.school.paymentservice.properties.LatestRatesEndpoint;
 import faang.school.paymentservice.properties.CurrencyRateRetryProperties;
@@ -19,12 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @EnableConfigurationProperties({LatestRatesEndpoint.class, CurrencyRateRetryProperties.class})
 public class CurrencyService {
-
-    private final WebClient webClient;
-    private final LatestRatesEndpoint endpoint;
-
-    private CurrencyResponse currencyResponse;
-    private Map<String, Double> currencyRates;
+    private final CurrencyApiClient currencyApiClient;
 
     @Retryable(
             retryFor = {Exception.class},
@@ -32,17 +28,9 @@ public class CurrencyService {
             backoff = @Backoff(delayExpression = "#{@currencyRateRetryProperties.delay}")
     )
     public Mono<Void> updateCurrencyRates() {
-        return webClient
-                .get()
-                .uri(endpoint.url() + "?access_key=" + endpoint.access_key() +
-                        "&base=" + endpoint.base() + "&symbols=" + endpoint.symbols())
-                .retrieve()
-                .bodyToMono(CurrencyResponse.class)
+        return currencyApiClient.getCurrencyRates()
                 .doOnNext(response -> {
-                    this.currencyResponse = response;
-                    currencyRates = response.rates();
-                    log.info("Курсы валют успешно обновлены: {}", currencyRates);
-                    log.info("Базовая валюта: {}", currencyResponse.base());
+                    log.info("Курсы валют успешно обновлены: {}", response.rates());
                 })
                 .doOnError(throwable -> {
                     log.error("Ошибка при обновлении курсов валют: {}", throwable.getMessage());

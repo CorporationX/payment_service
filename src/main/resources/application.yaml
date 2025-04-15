@@ -13,10 +13,9 @@ currency:
 exchangerates:
   api:
     url: "http://api.exchangeratesapi.io/v1/latest"
-    access_key: " API_KEY" #ваш API_KEY
-    base: "EUR" #базовая валюта
+    access_key: " API_KEY"
+    base: "EUR"
     symbols: "GBP,JPY,USD,RUB"
-    #http://api.exchangeratesapi.io/v1/latest? access_key = API_KEY & base = USD & symbols = GBP,JPY,EUR
 
 retry:
   maxAttempts: 5
