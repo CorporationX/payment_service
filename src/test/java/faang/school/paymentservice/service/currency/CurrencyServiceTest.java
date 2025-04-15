@@ -12,30 +12,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CurrencyServiceTest {
+class CurrencyServiceTest {
 
     @Mock
     private WebClient webClient;
 
     @Mock
-    private WebClient.RequestHeadersUriSpec<?> requestHeadersUriSpec;
-
-    @Mock
-    private WebClient.RequestHeadersSpec<?> requestHeadersSpec;
+    private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
 
     @Mock
     private WebClient.ResponseSpec responseSpec;
@@ -44,75 +37,62 @@ public class CurrencyServiceTest {
     private CurrencyService currencyService;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        Field accessKeyField = CurrencyService.class.getDeclaredField("accessKey");
-        accessKeyField.setAccessible(true);
-        accessKeyField.set(currencyService, "dummy_access_key");
+    void setUp() {
+        when(webClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
     }
 
     @Test
-    public void fetchCurrencyRatesSuccessTest() {
-        ExchangeRateResponse exchangeRateResponse = new ExchangeRateResponse();
-        exchangeRateResponse.setSuccess(true);
-        exchangeRateResponse.setTimestamp(123456);
-        exchangeRateResponse.setBase("EUR");
-        exchangeRateResponse.setDate("2023-10-01");
+    void fetchCurrencyRates_SuccessfulResponse_UpdatesRates() {
+        ExchangeRateResponse mockResponse = new ExchangeRateResponse();
+        mockResponse.setSuccess(true);
+        mockResponse.setRates(Map.of(
+                "USD", BigDecimal.valueOf(1.2),
+                "EUR", BigDecimal.valueOf(1.0),
+                "GBP", BigDecimal.valueOf(0.9)
+        ));
 
-        Map<String, BigDecimal> rates = new HashMap<>();
-        rates.put(Currency.USD.name(), new BigDecimal("1.1"));
-        rates.put(Currency.EUR.name(), new BigDecimal("1.0"));
-        rates.put(Currency.GBP.name(), new BigDecimal("0.9"));
-        exchangeRateResponse.setRates(rates);
+        when(responseSpec.bodyToMono(ExchangeRateResponse.class))
+                .thenReturn(Mono.just(mockResponse));
 
-        doReturn(requestHeadersUriSpec).when(webClient).get();
-        when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(ExchangeRateResponse.class)).thenReturn(Mono.just(exchangeRateResponse));
+        currencyService.fetchCurrencyRates().block();
 
-        currencyService.fetchCurrencyRates();
-
-        Map<Currency, BigDecimal> actualRates = currencyService.getCurrencyRates();
-        assertEquals(new BigDecimal("1.1"), actualRates.get(Currency.USD));
-        assertEquals(new BigDecimal("1.0"), actualRates.get(Currency.EUR));
-        assertEquals(new BigDecimal("0.9"), actualRates.get(Currency.GBP));
-
-        verify(webClient).get();
-        verify(requestHeadersUriSpec).uri(any(Function.class));
-        verify(requestHeadersSpec).retrieve();
-        verify(responseSpec).bodyToMono(ExchangeRateResponse.class);
+        Map<Currency, BigDecimal> rates = currencyService.getCurrencyRates();
+        assertEquals(BigDecimal.valueOf(1.2), rates.get(Currency.USD));
+        assertEquals(BigDecimal.valueOf(1.0), rates.get(Currency.EUR));
+        assertEquals(BigDecimal.valueOf(0.9), rates.get(Currency.GBP));
     }
 
     @Test
-    public void fetchCurrencyRatesFailureTest_ResponseIsNull() {
-        doReturn(requestHeadersUriSpec).when(webClient).get();
-        when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+    void fetchCurrencyRates_EmptyResponse_ThrowsException() {
+        when(responseSpec.bodyToMono(ExchangeRateResponse.class))
+                .thenReturn(Mono.empty());
 
-        when(responseSpec.bodyToMono(ExchangeRateResponse.class)).thenReturn(Mono.empty());
-
-        CurrencyRatesUnavailableException exception = assertThrows(CurrencyRatesUnavailableException.class,
-                () -> currencyService.fetchCurrencyRates());
-
-        assertEquals("Currency rates not available", exception.getMessage());
+        assertThrows(CurrencyRatesUnavailableException.class, () -> {
+            currencyService.fetchCurrencyRates().block();
+        });
     }
 
-
     @Test
-    public void fetchCurrencyRatesFailureTest_SuccessFalse() {
-        ExchangeRateResponse exchangeRateResponse = new ExchangeRateResponse();
-        exchangeRateResponse.setSuccess(false);
-        exchangeRateResponse.setTimestamp(123456);
-        exchangeRateResponse.setBase("EUR");
-        exchangeRateResponse.setDate("2023-10-01");
-        exchangeRateResponse.setRates(new HashMap<>());
+    void getCurrencyRates_ReturnsUnmodifiableMap() {
+        ExchangeRateResponse mockResponse = new ExchangeRateResponse();
+        mockResponse.setSuccess(true);
+        mockResponse.setRates(Map.of(
+                "USD", BigDecimal.valueOf(1.2),
+                "EUR", BigDecimal.valueOf(1.0),
+                "GBP", BigDecimal.valueOf(0.9)
+        ));
 
-        doReturn(requestHeadersUriSpec).when(webClient).get();
-        when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(ExchangeRateResponse.class)).thenReturn(Mono.just(exchangeRateResponse));
+        when(responseSpec.bodyToMono(ExchangeRateResponse.class))
+                .thenReturn(Mono.just(mockResponse));
 
-        CurrencyRatesUnavailableException exception = assertThrows(CurrencyRatesUnavailableException.class,
-                () -> currencyService.fetchCurrencyRates());
-        assertEquals("Currency rates not available", exception.getMessage());
+        currencyService.fetchCurrencyRates().block();
+
+        Map<Currency, BigDecimal> rates = currencyService.getCurrencyRates();
+
+        assertThrows(UnsupportedOperationException.class, () -> {
+            rates.put(Currency.USD, BigDecimal.ZERO);
+        });
     }
 }

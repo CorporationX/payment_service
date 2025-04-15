@@ -9,5 +9,6 @@ app:
   corn:
     schedule: "0 0 * * * ?"
   api:
-    baseUrl: "https://api.exchangeratesapi.io"
-    accessKey: "3c578daa0956702bb77b51453b5b67c4"
+    exchangerates:
+      baseUrl: "https://api.exchangeratesapi.io"
+      accessKey: "3c578daa0956702bb77b51453b5b67c4"

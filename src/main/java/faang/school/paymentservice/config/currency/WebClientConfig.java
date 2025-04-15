@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-    @Value("${app.api.baseUrl}")
+    @Value("${app.api.exchangerates.baseUrl}")
     private String baseUrl;
 
     @Bean

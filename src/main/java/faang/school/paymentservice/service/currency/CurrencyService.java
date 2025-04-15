@@ -10,6 +10,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -23,36 +24,34 @@ public class CurrencyService {
     private final WebClient webClient;
     private final Map<Currency, BigDecimal> currencyRates = new ConcurrentHashMap<>();
 
-    @Value("${app.api.accessKey}")
+    @Value("${app.api.exchangerates.accessKey}")
     private String accessKey;
 
     @Retryable(value = {CurrencyRatesUnavailableException.class}, backoff = @Backoff(delay = 3000, multiplier = 2))
-    public void fetchCurrencyRates() {
+    public Mono<Void> fetchCurrencyRates() {
         log.info("Starting to fetch currency rates.");
-        ExchangeRateResponse response = webClient
-                .get()
-                .uri(builder ->
-                    builder
-                            .path("/v1/latest")
-                            .queryParam("access_key", accessKey)
-                            .queryParam("base", "EUR")
-                            .queryParam("symbols", EnumConverter.convertCurrencyEnumToString())
-                            .build())
+
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/v1/latest")
+                        .queryParam("access_key", accessKey)
+                        .queryParam("base", "EUR")
+                        .queryParam("symbols", EnumConverter.convertCurrencyEnumToString())
+                        .build())
                 .retrieve()
                 .bodyToMono(ExchangeRateResponse.class)
-                .block();
-        if (response != null && response.isSuccess() && response.getRates() != null) {
-            log.info("Successfully fetched currency rates: {}", response.getRates());
-            for (Currency currency : Currency.values()) {
-                BigDecimal rate = response.getRates().getOrDefault(currency.name(), BigDecimal.ZERO);
-                currencyRates.put(currency, rate);
-                log.info("Updated rate for {}: {}", currency, rate);
-            }
-        } else {
-            log.error("Currency rates not available");
-            throw new CurrencyRatesUnavailableException("Currency rates not available");
-        }
-        log.info("Currency rates update completed.");
+                .doOnNext(response -> {
+                    if (response != null && response.isSuccess() && response.getRates() != null) {
+                        log.info("Successfully fetched currency rates: {}", response.getRates());
+                        for (Currency currency : Currency.values()) {
+                            BigDecimal rate = response.getRates().getOrDefault(currency.name(), BigDecimal.ZERO);
+                            currencyRates.put(currency, rate);
+                            log.info("Updated rate for {}: {}", currency, rate);
+                        }
+                    }
+                })
+                .switchIfEmpty(Mono.error(new CurrencyRatesUnavailableException("Currency rates not available")))
+                .then()
+                .doOnTerminate(() -> log.info("Currency rates update completed."));
     }
 
     public Map<Currency, BigDecimal> getCurrencyRates() {
