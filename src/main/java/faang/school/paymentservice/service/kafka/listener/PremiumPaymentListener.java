@@ -74,12 +74,7 @@ public class PremiumPaymentListener {
         kafkaPublisher.sendInTransaction(premiumPaymentResponseDto, paymentResponseTopic,
                 premiumPaymentCorrelationId, correlationId);
 
-        try {
-            acknowledgment.acknowledge();
-        } catch (Exception e) {
-            log.error(FAILED_TO_ACKNOWLEDGE_KAFKA_MESSAGE, e);
-            throw new RuntimeException(e);
-        }
+        acknowledgeMessage(acknowledgment);
     }
 
     @KafkaListener(
@@ -103,6 +98,10 @@ public class PremiumPaymentListener {
         kafkaPublisher.sendInTransaction(exchangeResponse, priceResponseTopic,
                 premiumPriceCorrelationId, correlationId);
 
+        acknowledgeMessage(acknowledgment);
+    }
+
+    private void acknowledgeMessage(Acknowledgment acknowledgment) {
         try {
             acknowledgment.acknowledge();
         } catch (Exception e) {
