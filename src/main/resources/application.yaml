@@ -20,3 +20,8 @@ exchangerates:
 retry:
   maxAttempts: 5
   delay: 2000
+
+webclient:
+  connect-timeout: 1000
+  read-timeout: 2000
+  write-timeout: 2000
