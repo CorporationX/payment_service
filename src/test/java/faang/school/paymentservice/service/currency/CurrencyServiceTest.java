@@ -18,6 +18,7 @@ import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -69,9 +70,11 @@ class CurrencyServiceTest {
         when(responseSpec.bodyToMono(ExchangeRateResponse.class))
                 .thenReturn(Mono.empty());
 
-        assertThrows(CurrencyRatesUnavailableException.class, () -> {
+        Exception exception = assertThrows(CurrencyRatesUnavailableException.class, () -> {
             currencyService.fetchCurrencyRates().block();
         });
+
+        assertTrue(exception.getMessage().contains("Currency rates not available"));
     }
 
     @Test
