@@ -27,7 +27,13 @@ public class CurrencyService {
     @Value("${app.api.exchangerates.accessKey}")
     private String accessKey;
 
-    @Retryable(value = {CurrencyRatesUnavailableException.class}, backoff = @Backoff(delay = 3000, multiplier = 2))
+    @Retryable(
+            value = {CurrencyRatesUnavailableException.class},
+            backoff = @Backoff(
+                    delayExpression = "${app.currencyrates.retry.delay}",
+                    multiplierExpression = "${app.currencyrates.retry.multiplier}"
+            )
+    )
     public Mono<Void> fetchCurrencyRates() {
         log.info("Starting to fetch currency rates.");
 

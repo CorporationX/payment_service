@@ -6,8 +6,12 @@ logging:
     root: info
 
 app:
-  corn:
-    schedule: "0 0 * * * ?"
+  currencyrates:
+    retry:
+      delay: 3000
+      multiplier: 2
+    cron:
+      schedule: "0 0 * * * ?"
   api:
     exchangerates:
       baseUrl: "https://api.exchangeratesapi.io"
