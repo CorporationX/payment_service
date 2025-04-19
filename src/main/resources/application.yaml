@@ -4,3 +4,24 @@ server:
 logging:
   level:
     root: info
+
+currency:
+  rate:
+    update:
+      cron: "0 0 0 * * *" # Каждый день в полночь
+
+exchangerates:
+  api:
+    url: "http://api.exchangeratesapi.io/v1/latest"
+    access_key: " API_KEY"
+    base: "EUR"
+    symbols: "GBP,JPY,USD,RUB"
+
+retry:
+  maxAttempts: 5
+  delay: 2000
+
+webclient:
+  connect-timeout: 1000
+  read-timeout: 2000
+  write-timeout: 2000
