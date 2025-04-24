@@ -7,6 +7,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,6 +16,8 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
+@Setter
+@Getter
 @Entity
 @Table( name = "payment_operaations")
 public class PaymentOperation {
