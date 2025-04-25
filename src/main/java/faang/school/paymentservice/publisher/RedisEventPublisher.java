@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class RedisEventPublisher {
     private final RedisTemplate<String, String> redisTemplate;
 
-    public <T extends RedisEvent> void publish(T event) {
+    public <T extends RedisEvent> void send(T event) {
         String topic = event.getChannelEvent();
         redisTemplate.convertAndSend(topic, event);
     }

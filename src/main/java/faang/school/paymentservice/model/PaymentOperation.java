@@ -1,5 +1,7 @@
 package faang.school.paymentservice.model;
 
+import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.dto.PaymentStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,7 +21,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @Entity
-@Table( name = "payment_operaations")
+@Table(name = "payment_operations")
 public class PaymentOperation {
     @Id
     private UUID id;
@@ -33,12 +35,13 @@ public class PaymentOperation {
     @Column(name = "amount")
     private BigDecimal amount;
 
-    @Column(name = "currency_code",nullable = false)
-    private String currencyCode;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "currency_code", nullable = false)
+    private Currency currency;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
-    private String paymentStatus;
+    private PaymentStatus paymentStatus;
 
     @Column(name = "authorization_id", nullable = true)
     private String authorizationId;
@@ -58,11 +61,4 @@ public class PaymentOperation {
     @Version
     @Column(name = "version", nullable = false)
     private Integer version;
-
-    public enum PaymentStatus{
-        PENDING,
-        AUTHORIZED,
-        CLEARED, CANCELLED,
-        FAILED
-    }
 }
