@@ -4,3 +4,20 @@ server:
 logging:
   level:
     root: info
+
+spring:
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      retries: 3
+      enable-idempotence: true
+      acks: -1
+    consumer:
+      isolation-level: read_committed
+      enable-auto-commit: false
+
+    topics:
+      promotion-payment-request: "promotion-payment-request"
+      promotion-payment-response: "promotion-payment-response"
+    group-id:
+      payment-promotion-group-id: "payment-promotion-group"
