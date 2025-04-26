@@ -2,10 +2,12 @@ package faang.school.paymentservice.dto.message;
 
 import faang.school.paymentservice.dto.redis.RedisEvent;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import java.time.Instant;
 import java.util.UUID;
 
+@Data
 public class ClearingMessage implements RedisEvent {
     @NotNull
     private UUID operationId;

@@ -21,10 +21,6 @@ public interface PaymentMapper {
     @Mapping(target = "version", ignore = true)
     PaymentOperation toPaymentOperation(PaymentRequest paymentRequest);
 
-    @Mapping(target = "verificationCode", source = "")
-    @Mapping(target = "status", source = "")
-    @Mapping(target = "paymentNumber", source = "")
-    @Mapping(target = "message", source = "")
     PaymentResponse toPaymentResponse(PaymentOperation paymentOperation);
 
     AuthorizationMessage toAuthorizationMessage(PaymentOperation paymentOperation);

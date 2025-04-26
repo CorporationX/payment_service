@@ -6,26 +6,28 @@ import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.dto.message.AuthorizationMessage;
 import faang.school.paymentservice.dto.message.CancellationMessage;
 import faang.school.paymentservice.dto.message.ClearingMessage;
+import faang.school.paymentservice.exception.EntityNotFoundException;
 import faang.school.paymentservice.mapper.PaymentMapper;
 import faang.school.paymentservice.model.PaymentOperation;
-import faang.school.paymentservice.publisher.RedisEventPublisher;
 import faang.school.paymentservice.repository.PaymentOperationRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+@EnableKafka
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final PaymentOperationRepository paymentOperationRepository;
-    private final RedisEventPublisher redisEventPublisher;
     private final PaymentMapper paymentMapper;
 
     @Transactional
@@ -35,9 +37,9 @@ public class PaymentService {
         paymentOperation.setPaymentStatus(PaymentStatus.PENDING);
         paymentOperation = paymentOperationRepository.save(paymentOperation);
         AuthorizationMessage message = paymentMapper.toAuthorizationMessage(paymentOperation);
-
         PaymentResponse paymentResponse = paymentMapper.toPaymentResponse(paymentOperation);
-        redisEventPublisher.send(message);
+
+        kafkaTemplate.send("payment_service", message);
 
         return paymentResponse;
     }
@@ -47,14 +49,15 @@ public class PaymentService {
         PaymentOperation paymentOperation = paymentOperationRepository.findById(id).orElseThrow(() ->
         {
             log.error("Payment with id {} not found", id);
-            return new EntityNotFoundException();
+            return new EntityNotFoundException("Payment with id " + id + " not found");
         });
 
         paymentOperation.setPaymentStatus(PaymentStatus.CANCELLED);
         paymentOperationRepository.save(paymentOperation);
 
         CancellationMessage message = paymentMapper.toCancellationMessage(paymentOperation);
-        redisEventPublisher.send(message);
+
+        kafkaTemplate.send("payment_service", message);
     }
 
     @Transactional
@@ -62,7 +65,7 @@ public class PaymentService {
         PaymentOperation paymentOperation = paymentOperationRepository.findById(id).orElseThrow(() ->
         {
             log.error("Payment with id {} not found", id);
-            return new EntityNotFoundException();
+            return new EntityNotFoundException("Payment with id " + id + " not found");
         });
 
         if (!paymentOperation.getPaymentStatus().equals(PaymentStatus.AUTHORIZED)) {
@@ -73,6 +76,6 @@ public class PaymentService {
         paymentOperationRepository.save(paymentOperation);
 
         ClearingMessage message = paymentMapper.toClearingMessage(paymentOperation);
-        redisEventPublisher.send(message);
+        kafkaTemplate.send("payment_service", message);
     }
 }
