@@ -19,6 +19,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation ("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.retry:spring-retry:1.3.4")
+    implementation("org.aspectj:aspectjrt:1.9.7")
+    implementation("org.aspectj:aspectjweaver:1.9.7")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     /**
@@ -37,6 +41,7 @@ dependencies {
      */
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
+    testImplementation("io.projectreactor:reactor-test:3.5.3")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

@@ -5,6 +5,18 @@ logging:
   level:
     root: info
 
+app:
+  currencyrates:
+    retry:
+      delay: 3000
+      multiplier: 2
+    cron:
+      schedule: "0 0 * * * ?"
+  api:
+    exchangerates:
+      baseUrl: "https://api.exchangeratesapi.io"
+      accessKey: "3c578daa0956702bb77b51453b5b67c4"
+
 spring:
   kafka:
     producer:
@@ -41,3 +53,4 @@ spring:
 
     listener:
       ack-mode: "manual"
+
