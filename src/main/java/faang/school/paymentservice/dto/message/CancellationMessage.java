@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Data
-public class CancellationMessage  {
+public class CancellationMessage implements PaymentOperationMessage {
     @NotNull
     private UUID operationId;
 

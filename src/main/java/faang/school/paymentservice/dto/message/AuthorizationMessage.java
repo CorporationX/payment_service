@@ -9,15 +9,15 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Data
-public class AuthorizationMessage {
+public class AuthorizationMessage implements PaymentOperationMessage {
     @NotNull
     private UUID operationId;
 
     @NotNull
-    private UUID sourceAccountId;
+    private UUID senderAccountId;
 
     @NotNull
-    private UUID destinationAccountId;
+    private UUID recipientAccountId;
 
     @NotNull
     @Min(1)

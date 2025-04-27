@@ -28,7 +28,7 @@ public class PaymentService {
     private final ApplicationEventPublisher eventPublisher;
 
 
-//    @Transactional
+    @Transactional
     public void initiatePayment(@NotNull @Valid PaymentRequest request) {
         PaymentOperation operation = paymentMapper.toPaymentOperation(request);
         operation.setPaymentStatus(PaymentStatus.PENDING);
@@ -41,30 +41,32 @@ public class PaymentService {
 
     @Transactional
     public void cancelPayment(@NotNull UUID id) {
-        PaymentOperation paymentOperation = paymentOperationRepository.findById(id).orElseThrow(() ->
-        {
+        PaymentOperation operation = paymentOperationRepository.findById(id).orElseThrow(() -> {
             log.error("Payment with id {} not found", id);
             return new EntityNotFoundException("Payment with id " + id + " not found");
         });
 
-        paymentOperation.setPaymentStatus(PaymentStatus.CANCELLED);
-        paymentOperationRepository.save(paymentOperation);
+        operation.setPaymentStatus(PaymentStatus.CANCELLED);
+        paymentOperationRepository.save(operation);
+
+        eventPublisher.publishEvent(new PaymentEvent(operation));
 
     }
 
     @Transactional
     public void forcedPayment(@NotNull UUID id) {
-        PaymentOperation paymentOperation = paymentOperationRepository.findById(id).orElseThrow(() ->
-        {
+        PaymentOperation operation = paymentOperationRepository.findById(id).orElseThrow(() -> {
             log.error("Payment with id {} not found", id);
             return new EntityNotFoundException("Payment with id " + id + " not found");
         });
 
-        if (!paymentOperation.getPaymentStatus().equals(PaymentStatus.AUTHORIZED)) {
+        if (!operation.getPaymentStatus().equals(PaymentStatus.AUTHORIZED)) {
             throw new IllegalArgumentException("Payment with id " + id + " is not authorized");
         }
 
-        paymentOperation.setPaymentStatus(PaymentStatus.CLEARED);
-        paymentOperationRepository.save(paymentOperation);
+        operation.setPaymentStatus(PaymentStatus.CLEARED);
+        paymentOperationRepository.save(operation);
+
+        eventPublisher.publishEvent(new PaymentEvent(operation));
     }
 }

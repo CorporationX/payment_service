@@ -6,6 +6,7 @@ import faang.school.paymentservice.service.PaymentService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+@Slf4j
 @Validated
 @RestController
 @RequestMapping("/api")
@@ -26,18 +28,21 @@ public class PaymentController {
     @PostMapping
     public ResponseEntity<PaymentResponse> initiatePayment(
             @RequestBody @NotNull @Valid PaymentRequest request) {
-         paymentService.initiatePayment(request);
+        log.info("Initiating payment for request: {}", request);
+        paymentService.initiatePayment(request);
         return ResponseEntity.accepted().build();
     }
 
     @PostMapping("{id}/cancel")
     public ResponseEntity<Void> cancelPayment(@PathVariable UUID id) {
+        log.info("Cancelling payment with id: {}", id);
         paymentService.cancelPayment(id);
         return ResponseEntity.accepted().build();
     }
 
     @PostMapping("{id}/forced-payment")
     public ResponseEntity<Void> forcedPayment(@PathVariable UUID id) {
+        log.info("Executing forced payment for id: {}", id);
         paymentService.forcedPayment(id);
         return ResponseEntity.accepted().build();
     }

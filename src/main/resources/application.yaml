@@ -20,15 +20,16 @@ spring:
       linger-ms: 20
       batch-size: 16384
       compression-type: snappy
+    topics:
+      authorization: authorization-topic
+      cancellation: cancellation-topic
+      clearing: clearing-topic
 
     consumer:
       group-id: my-app-group
       auto-offset-reset: earliest
       enable-auto-commit: false
       max-poll-records: 500
-      concurrency: 3
-      session-timeout-ms: 10000
-      heartbeat-interval-ms: 3000
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml

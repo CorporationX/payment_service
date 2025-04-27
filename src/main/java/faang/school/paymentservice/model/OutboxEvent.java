@@ -24,7 +24,6 @@ import java.util.UUID;
 @Entity
 @Table(name = "outbox_event")
 public class OutboxEvent {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;

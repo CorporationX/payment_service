@@ -13,6 +13,7 @@ public class ObjectMapperConfig {
 
     @Bean
     public ObjectMapper objectMapper() {
+        log.info("Creating ObjectMapper");
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
