@@ -50,6 +50,8 @@ logging:
 scheduler:
   clearing:
     cron: "0 * * * * * "
+  publisher:
+    cron: "*/5 * * * * *"
 
 publisher:
   batch: 100

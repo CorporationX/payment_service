@@ -2,7 +2,6 @@ package faang.school.paymentservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import faang.school.paymentservice.dto.outbox.OutboxStatus;
 import faang.school.paymentservice.event.PaymentEvent;
 import faang.school.paymentservice.mapper.OutboxMapper;
 import faang.school.paymentservice.model.OutboxEvent;
@@ -11,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Service
@@ -23,7 +21,6 @@ public class PaymentOutboxService {
 
     @EventListener
     public void handleOutboxEvent(PaymentEvent event) {
-        log.info("handleOutboxEvent");
         try {
             OutboxEvent outboxEvent = outboxMapper.toOutboxEvent(event.operation());
             outboxEvent.setPayload(objectMapper.writeValueAsString(event.operation()));

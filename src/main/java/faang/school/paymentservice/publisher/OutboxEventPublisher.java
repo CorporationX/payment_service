@@ -47,5 +47,4 @@ public class OutboxEventPublisher {
             throw new RuntimeException(e);
         }
     }
-
 }
