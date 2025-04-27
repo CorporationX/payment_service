@@ -1,11 +1,8 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.dto.PaymentRequest;
-import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
-import faang.school.paymentservice.dto.message.AuthorizationMessage;
-import faang.school.paymentservice.dto.message.CancellationMessage;
-import faang.school.paymentservice.dto.message.ClearingMessage;
+import faang.school.paymentservice.event.PaymentEvent;
 import faang.school.paymentservice.exception.EntityNotFoundException;
 import faang.school.paymentservice.mapper.PaymentMapper;
 import faang.school.paymentservice.model.PaymentOperation;
@@ -15,8 +12,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -26,22 +23,20 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
-    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final PaymentOperationRepository paymentOperationRepository;
     private final PaymentMapper paymentMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
-    @Transactional
-    public PaymentResponse initiatePayment(@NotNull @Valid PaymentRequest request) {
 
-        PaymentOperation paymentOperation = paymentMapper.toPaymentOperation(request);
-        paymentOperation.setPaymentStatus(PaymentStatus.PENDING);
-        paymentOperation = paymentOperationRepository.save(paymentOperation);
-        AuthorizationMessage message = paymentMapper.toAuthorizationMessage(paymentOperation);
-        PaymentResponse paymentResponse = paymentMapper.toPaymentResponse(paymentOperation);
+//    @Transactional
+    public void initiatePayment(@NotNull @Valid PaymentRequest request) {
+        PaymentOperation operation = paymentMapper.toPaymentOperation(request);
+        operation.setPaymentStatus(PaymentStatus.PENDING);
+        operation = paymentOperationRepository.save(operation);
 
-        kafkaTemplate.send("payment_service", message);
+        eventPublisher.publishEvent(new PaymentEvent(operation));
 
-        return paymentResponse;
+        //return paymentMapper.toPaymentResponse(operation);
     }
 
     @Transactional
@@ -55,9 +50,6 @@ public class PaymentService {
         paymentOperation.setPaymentStatus(PaymentStatus.CANCELLED);
         paymentOperationRepository.save(paymentOperation);
 
-        CancellationMessage message = paymentMapper.toCancellationMessage(paymentOperation);
-
-        kafkaTemplate.send("payment_service", message);
     }
 
     @Transactional
@@ -74,8 +66,5 @@ public class PaymentService {
 
         paymentOperation.setPaymentStatus(PaymentStatus.CLEARED);
         paymentOperationRepository.save(paymentOperation);
-
-        ClearingMessage message = paymentMapper.toClearingMessage(paymentOperation);
-        kafkaTemplate.send("payment_service", message);
     }
 }

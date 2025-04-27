@@ -1,0 +1,14 @@
+CREATE TABLE outbox_event(
+id UUID PRIMARY KEY,
+payment_operation_id UUID NOT NULL,
+
+event_type VARCHAR(50) NOT NULL
+CHECK(event_type IN ('PENDING', 'AUTHORIZED', 'CLEARED', 'CANCELLED', 'FAILED')),
+
+payload JSONB NOT NULL,
+outbox_status VARCHAR(20) NOT NULL DEFAULT 'NEW'
+CHECK (outbox_status IN ('NEW', 'SENT', 'ERROR')),
+
+created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+sent_at TIMESTAMP WITH TIME ZONE
+);

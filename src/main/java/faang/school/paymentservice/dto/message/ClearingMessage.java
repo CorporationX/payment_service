@@ -1,6 +1,5 @@
 package faang.school.paymentservice.dto.message;
 
-import faang.school.paymentservice.dto.redis.RedisEvent;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -8,7 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Data
-public class ClearingMessage implements RedisEvent {
+public class ClearingMessage {
     @NotNull
     private UUID operationId;
 
@@ -17,9 +16,4 @@ public class ClearingMessage implements RedisEvent {
 
     @NotNull
     private Instant timestamp;
-
-    @Override
-    public String getChannelEvent() {
-        return "";
-    }
 }

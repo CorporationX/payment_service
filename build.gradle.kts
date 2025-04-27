@@ -31,6 +31,7 @@ dependencies {
     implementation("org.liquibase:liquibase-core")
     implementation("redis.clients:jedis")
     runtimeOnly("org.postgresql:postgresql")
+    implementation("com.vladmihalcea:hibernate-types-60:2.21.1")
 
     /**
      * Utils & Logging
@@ -42,6 +43,8 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.26")
     implementation("org.mapstruct:mapstruct:1.5.3.Final")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
 
     /**
      * Tests

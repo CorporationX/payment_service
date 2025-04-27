@@ -6,6 +6,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
@@ -24,6 +26,7 @@ import java.util.UUID;
 @Table(name = "payment_operations")
 public class PaymentOperation {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @Column(name = "sender_account_id", nullable = false)
@@ -44,7 +47,7 @@ public class PaymentOperation {
     private PaymentStatus paymentStatus;
 
     @Column(name = "authorization_id", nullable = true)
-    private String authorizationId;
+    private UUID authorizationId;
 
     @Column(name = "clear_scheduled_at")
     private Instant clearScheduledAt;

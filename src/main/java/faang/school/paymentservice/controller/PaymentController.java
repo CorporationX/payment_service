@@ -26,8 +26,8 @@ public class PaymentController {
     @PostMapping
     public ResponseEntity<PaymentResponse> initiatePayment(
             @RequestBody @NotNull @Valid PaymentRequest request) {
-        PaymentResponse paymentResponse = paymentService.initiatePayment(request);
-        return ResponseEntity.ok(paymentResponse);
+         paymentService.initiatePayment(request);
+        return ResponseEntity.accepted().build();
     }
 
     @PostMapping("{id}/cancel")

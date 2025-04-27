@@ -49,7 +49,4 @@ public class KafkaProducerConfig {
     public KafkaTemplate<String, Object> dtoKafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
-
-
-
 }

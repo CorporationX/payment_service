@@ -34,7 +34,6 @@ public class KafkaConsumerConfig {
         return props;
     }
 
-    // Универсальный Listener Container Factory
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory =
