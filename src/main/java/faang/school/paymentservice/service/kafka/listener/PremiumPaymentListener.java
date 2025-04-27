@@ -56,11 +56,11 @@ public class PremiumPaymentListener {
                 jsonUtils.deserialize(message, PremiumPaymentRequestDto.class);
 
         PaymentResponseDto paymentResponse = paymentService.sendPayment(
-                premiumPaymentRequest.getPaymentRequestDto()).getBody();
+                premiumPaymentRequest.getPaymentRequest()).getBody();
 
         PremiumPaymentResponseDto premiumPaymentResponseDto = PremiumPaymentResponseDto.builder()
-                .premiumRequestDto(premiumPaymentRequest.getPremiumRequestDto())
-                .paymentResponseDto(paymentResponse)
+                .premiumRequest(premiumPaymentRequest.getPremiumRequest())
+                .paymentResponse(paymentResponse)
                 .byUser(premiumPaymentRequest.isByUser())
                 .build();
 
