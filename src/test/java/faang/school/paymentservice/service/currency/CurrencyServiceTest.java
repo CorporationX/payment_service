@@ -1,6 +1,6 @@
 package faang.school.paymentservice.service.currency;
 
-import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.dto.CurrencyDto;
 import faang.school.paymentservice.dto.ExchangeRateResponse;
 import faang.school.paymentservice.exception.CurrencyRatesUnavailableException;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,10 +59,10 @@ class CurrencyServiceTest {
 
         currencyService.fetchCurrencyRates().block();
 
-        Map<Currency, BigDecimal> rates = currencyService.getCurrencyRates();
-        assertEquals(BigDecimal.valueOf(1.2), rates.get(Currency.USD));
-        assertEquals(BigDecimal.valueOf(1.0), rates.get(Currency.EUR));
-        assertEquals(BigDecimal.valueOf(0.9), rates.get(Currency.GBP));
+        Map<CurrencyDto, BigDecimal> rates = currencyService.getCurrencyRates();
+        assertEquals(BigDecimal.valueOf(1.2), rates.get(CurrencyDto.USD));
+        assertEquals(BigDecimal.valueOf(1.0), rates.get(CurrencyDto.EUR));
+        assertEquals(BigDecimal.valueOf(0.9), rates.get(CurrencyDto.GBP));
     }
 
     @Test
@@ -92,10 +92,10 @@ class CurrencyServiceTest {
 
         currencyService.fetchCurrencyRates().block();
 
-        Map<Currency, BigDecimal> rates = currencyService.getCurrencyRates();
+        Map<CurrencyDto, BigDecimal> rates = currencyService.getCurrencyRates();
 
         assertThrows(UnsupportedOperationException.class, () -> {
-            rates.put(Currency.USD, BigDecimal.ZERO);
+            rates.put(CurrencyDto.USD, BigDecimal.ZERO);
         });
     }
 }
