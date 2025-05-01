@@ -1,6 +1,6 @@
 package faang.school.paymentservice.service.currency;
 
-import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.dto.CurrencyDto;
 import faang.school.paymentservice.dto.ExchangeRateResponse;
 import faang.school.paymentservice.exception.CurrencyRatesUnavailableException;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class CurrencyService {
     private final WebClient webClient;
-    private final Map<Currency, BigDecimal> currencyRates = new ConcurrentHashMap<>();
+    private final Map<CurrencyDto, BigDecimal> currencyRates = new ConcurrentHashMap<>();
 
     @Value("${app.api.exchangerates.accessKey}")
     private String accessKey;
@@ -48,7 +48,7 @@ public class CurrencyService {
                 .doOnNext(response -> {
                     if (response != null && response.isSuccess() && response.getRates() != null) {
                         log.info("Successfully fetched currency rates: {}", response.getRates());
-                        for (Currency currency : Currency.values()) {
+                        for (CurrencyDto currency : CurrencyDto.values()) {
                             BigDecimal rate = response.getRates().getOrDefault(currency.name(), BigDecimal.ZERO);
                             currencyRates.put(currency, rate);
                             log.info("Updated rate for {}: {}", currency, rate);
@@ -60,7 +60,7 @@ public class CurrencyService {
                 .doOnTerminate(() -> log.info("Currency rates update completed."));
     }
 
-    public Map<Currency, BigDecimal> getCurrencyRates() {
+    public Map<CurrencyDto, BigDecimal> getCurrencyRates() {
         return Collections.unmodifiableMap(currencyRates);
     }
 }
