@@ -1,7 +1,7 @@
 package faang.school.paymentservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,13 +15,13 @@ import java.util.Map;
 @NoArgsConstructor
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SlaveExchangeRateResponse {
+public class StringExchangeRateResponse {
 
-    @JsonProperty("timestamp")
+    @JsonAlias({"timestamp", "time_last_update_unix"})
     private Integer timestamp;
-    @JsonProperty("base")
+    @JsonAlias({"base", "base_code"})
     private String base;
-    @JsonProperty("rates")
+    @JsonAlias({"rates", "conversion_rates"})
     private Map<String, BigDecimal> rates;
 
 }

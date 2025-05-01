@@ -1,19 +1,17 @@
 package faang.school.paymentservice.service.currency.implementations;
 
-import faang.school.paymentservice.dto.PrimaryExchangeRateResponse;
+import faang.school.paymentservice.dto.StringExchangeRateResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriBuilder;
 
-import java.math.BigDecimal;
 import java.net.URI;
-import java.util.Map;
 import java.util.function.Function;
 
 @Component
 @Slf4j
-public class PrimaryExchangeRateProvider extends AbstractExchangeRateProvider<PrimaryExchangeRateResponse> {
+public class PrimaryExchangeRateProvider extends AbstractExchangeRateProvider {
 
     public PrimaryExchangeRateProvider(@Value("${currency.api.primary-provider.base-url}") String baseUrl,
                                        @Value("${currency.api.primary-provider.accessKey}") String accessKey,
@@ -22,10 +20,10 @@ public class PrimaryExchangeRateProvider extends AbstractExchangeRateProvider<Pr
     }
 
     @Override
-    public PrimaryExchangeRateResponse fetchResponse() {
+    public StringExchangeRateResponse fetchResponse() {
         return webClient.get().uri(buildUri())
                 .retrieve()
-                .bodyToMono(PrimaryExchangeRateResponse.class)
+                .bodyToMono(StringExchangeRateResponse.class)
                 .doOnError(error -> log.error("Error fetching exchange rates: ", error))
                 .block();
     }
@@ -35,20 +33,5 @@ public class PrimaryExchangeRateProvider extends AbstractExchangeRateProvider<Pr
         return uriBuilder -> uriBuilder
                 .path("/" + accessKey + endpoint)
                 .build();
-    }
-
-    @Override
-    protected Integer getTimestamp(PrimaryExchangeRateResponse response) {
-        return response.getTimestamp();
-    }
-
-    @Override
-    protected String getBase(PrimaryExchangeRateResponse response) {
-        return response.getBase();
-    }
-
-    @Override
-    protected Map<String, BigDecimal> getRates(PrimaryExchangeRateResponse response) {
-        return response.getRates();
     }
 }

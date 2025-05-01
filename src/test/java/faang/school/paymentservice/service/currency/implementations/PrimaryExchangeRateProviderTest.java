@@ -1,6 +1,6 @@
 package faang.school.paymentservice.service.currency.implementations;
 
-import faang.school.paymentservice.dto.PrimaryExchangeRateResponse;
+import faang.school.paymentservice.dto.StringExchangeRateResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +48,7 @@ class PrimaryExchangeRateProviderTest {
 
     @Test
     void testFetchResponseWhenReturnValidResponse() {
-        PrimaryExchangeRateResponse expectedResponse = PrimaryExchangeRateResponse.builder()
+        StringExchangeRateResponse expectedResponse = StringExchangeRateResponse.builder()
                 .timestamp(123456789)
                 .base("EUR")
                 .rates(Map.of("EUR", BigDecimal.ONE, "USD", new BigDecimal("0.9")))
@@ -60,9 +60,9 @@ class PrimaryExchangeRateProviderTest {
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(PrimaryExchangeRateResponse.class)).thenReturn(Mono.just(expectedResponse));
+        when(responseSpec.bodyToMono(StringExchangeRateResponse.class)).thenReturn(Mono.just(expectedResponse));
 
-        PrimaryExchangeRateResponse actual = provider.fetchResponse();
+        StringExchangeRateResponse actual = provider.fetchResponse();
 
         assertEquals(expectedResponse, actual);
     }
@@ -76,7 +76,7 @@ class PrimaryExchangeRateProviderTest {
 
     @Test
     void testGetTimestampWhenReturnTimestamp() {
-        PrimaryExchangeRateResponse response = PrimaryExchangeRateResponse.builder()
+        StringExchangeRateResponse response = StringExchangeRateResponse.builder()
                 .timestamp(1234)
                 .build();
 
@@ -85,7 +85,7 @@ class PrimaryExchangeRateProviderTest {
 
     @Test
     void testGetBaseWhenReturnBaseCurrency() {
-        PrimaryExchangeRateResponse response = PrimaryExchangeRateResponse.builder()
+        StringExchangeRateResponse response = StringExchangeRateResponse.builder()
                 .base("EUR")
                 .build();
 
@@ -95,7 +95,7 @@ class PrimaryExchangeRateProviderTest {
     @Test
     void getRatesWhenReturnRatesMap() {
         Map<String, BigDecimal> rates = Map.of("EUR", BigDecimal.ONE);
-        PrimaryExchangeRateResponse response = PrimaryExchangeRateResponse.builder()
+        StringExchangeRateResponse response = StringExchangeRateResponse.builder()
                 .rates(rates)
                 .build();
 
