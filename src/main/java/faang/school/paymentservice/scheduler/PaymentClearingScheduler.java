@@ -10,7 +10,20 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
-
+/**
+ * Планировщик для автоматического клиринга (проведения) платежей по расписанию.
+ * <p>
+ * Основные функции:
+ * <ul>
+ *   <li>Поиск платежей, готовых к клирингу (со статусом PENDING и прошедшей датой clearScheduledAt)</li>
+ *   <li>Принудительное проведение найденных платежей через {@link PaymentService#forcedPayment}</li>
+ * </ul>
+ *
+ * <p>Расписание работы задается в конфигурации свойством:
+ * <ul>
+ *   <li><code>scheduler.clearing.cron</code> - cron-выражение для настройки расписания</li>
+ * </ul>
+ */
 @Component
 @RequiredArgsConstructor
 public class PaymentClearingScheduler {

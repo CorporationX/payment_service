@@ -13,6 +13,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+/**
+ * Сервис для обработки исходящих событий о платежах (Outbox pattern).
+ * <p>
+ * Основные функции:
+ * <ul>
+ *   <li>Сериализация платежных операций в формат JSON</li>
+ *   <li>Сохранение событий в outbox-таблицу перед фиксацией транзакции</li>
+ *   <li>Обработка ошибок сериализации</li>
+ * </ul>
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

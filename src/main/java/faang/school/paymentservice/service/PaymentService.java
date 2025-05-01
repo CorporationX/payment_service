@@ -21,7 +21,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Slf4j
+/**
+ * Сервис для обработки платежных операций.
+ * <p>
+ * Обеспечивает основные операции с платежами:
+ * <ul>
+ *   <li>Инициация нового платежа</li>
+ *   <li>Отмена существующего платежа</li>
+ *   <li>Принудительное проведение платежа (forced payment)</li>
+ * </ul>
+ *
+ * <p>Все операции выполняются в транзакционном контексте ({@code @Transactional}).
+ */
+ @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentService {

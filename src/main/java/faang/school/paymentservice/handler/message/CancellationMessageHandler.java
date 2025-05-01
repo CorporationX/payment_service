@@ -12,6 +12,20 @@ import faang.school.paymentservice.model.PaymentOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+/**
+ * Обработчик событий отмены платежей.
+ * <p>
+ * Реализует логику преобразования событий об отмененных платежах ({@link PaymentStatus#CANCELED})
+ * в сообщения для Kafka.
+ *
+ * <p>Основные функции:
+ * <ul>
+ *   <li>Проверка возможности обработки события по статусу платежа</li>
+ *   <li>Десериализация payload из {@link OutboxEvent}</li>
+ *   <li>Преобразование в DTO для Kafka ({@link PaymentOperationMessage})</li>
+ *   <li>Определение соответствующего топика Kafka для отправки</li>
+ * </ul>
+ */
 @Component
 @RequiredArgsConstructor
 public class CancellationMessageHandler implements EventHandler {

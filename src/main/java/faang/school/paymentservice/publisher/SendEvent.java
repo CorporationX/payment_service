@@ -17,6 +17,16 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Компонент для отправки событий в Kafka.
+ * <p>
+ * Основные функции:
+ * <ul>
+ *   <li>Отправка событий платежей в соответствующие топики Kafka</li>
+ *   <li>Обработка событий через соответствующие обработчики ({@link EventHandler})</li>
+ *   <li>Обновление статуса событий в outbox-таблице</li>
+ * </ul>
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

@@ -3,6 +3,7 @@ package faang.school.paymentservice.controller;
 import faang.school.paymentservice.dto.PaymentRequest;
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.service.PaymentService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,10 @@ import java.util.UUID;
 public class PaymentController {
     private final PaymentService paymentService;
 
+    @Operation(
+            summary = "Initiate payment",
+            description = "Creates a new payment transaction"
+    )
     @PostMapping
     public ResponseEntity<PaymentResponse> initiatePayment(
             @RequestBody @NotNull @Valid PaymentRequest request) {
@@ -33,16 +38,22 @@ public class PaymentController {
         PaymentResponse response = paymentService.initiatePayment(request);
         return ResponseEntity.ok(response);
     }
-
+    @Operation(
+            summary = "Cancel payment",
+            description = "Cancels existing payment by ID"
+    )
     @PostMapping("{id}/cancel")
     public ResponseEntity<PaymentResponse> cancelPayment(@PathVariable UUID id) {
         log.info("Cancelling payment with id: {}", id);
         PaymentResponse response = paymentService.cancelPayment(id);
         return ResponseEntity.ok(response);
     }
-
-    @PostMapping("{id}/forced-payment")
-    public ResponseEntity<PaymentResponse> forcedPayment(@PathVariable UUID id) {
+    @Operation(
+            summary = "Force payment",
+            description = "Executes forced payment operation (admin only)"
+    )
+    @PostMapping("/forced-payment")
+    public ResponseEntity<PaymentResponse> forcedPayment(@RequestBody UUID id) {
         log.info("Executing forced payment for id: {}", id);
         PaymentResponse response = paymentService.forcedPayment(id);
         return ResponseEntity.ok(response);

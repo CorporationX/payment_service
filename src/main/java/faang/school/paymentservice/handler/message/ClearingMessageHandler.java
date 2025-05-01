@@ -12,6 +12,20 @@ import faang.school.paymentservice.model.PaymentOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+/**
+ * Обработчик событий клиринга (проведения) платежей.
+ * <p>
+ * Реализует логику преобразования событий о проведенных платежах ({@link PaymentStatus#CLEARED})
+ * в сообщения для Kafka.
+ *
+ * <p>Основные функции:
+ * <ul>
+ *   <li>Определение, может ли обработать событие по статусу платежа</li>
+ *   <li>Десериализация payload из OutboxEvent</li>
+ *   <li>Преобразование в DTO для Kafka ({@link PaymentOperationMessage})</li>
+ *   <li>Определение топика для отправки</li>
+ * </ul>
+ */
 @Component
 @RequiredArgsConstructor
 public class ClearingMessageHandler implements EventHandler {

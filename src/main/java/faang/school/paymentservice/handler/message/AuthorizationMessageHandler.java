@@ -12,6 +12,20 @@ import faang.school.paymentservice.model.PaymentOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+/**
+ * Обработчик событий авторизации платежей.
+ * <p>
+ * Реализует логику преобразования событий о платежах, ожидающих авторизацию ({@link PaymentStatus#PENDING}),
+ * в сообщения для Kafka.
+ *
+ * <p>Основные функции:
+ * <ul>
+ *   <li>Проверка возможности обработки события по статусу платежа</li>
+ *   <li>Десериализация JSON payload из {@link OutboxEvent}</li>
+ *   <li>Преобразование в DTO для Kafka ({@link PaymentOperationMessage})</li>
+ *   <li>Определение топика Kafka для отправки сообщений об авторизации</li>
+ * </ul>
+ */
 @Component
 @RequiredArgsConstructor
 public class AuthorizationMessageHandler implements EventHandler {

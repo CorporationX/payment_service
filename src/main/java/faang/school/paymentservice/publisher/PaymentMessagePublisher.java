@@ -11,6 +11,21 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Компонент для публикации платежных событий в Kafka.
+ * <p>
+ * Основные функции:
+ * <ul>
+ *   <li>Пакетная публикация событий с указанным статусом</li>
+ *   <li>Интеграция с {@link SendEvent} для фактической отправки в Kafka</li>
+ *   <li>Поддержка пакетной обработки через конфигурируемый размер batch</li>
+ * </ul>
+ *
+ * <p>Конфигурация:
+ * <ul>
+ *   <li><code>publisher.batch</code> - размер пакета для обработки (по умолчанию: 100)</li>
+ * </ul>
+ */
 @Component
 @RequiredArgsConstructor
 public class PaymentMessagePublisher {

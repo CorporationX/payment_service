@@ -36,7 +36,6 @@ public class KafkaProducerConfig {
         return props;
     }
 
-    // Универсальный Producer
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
         return new DefaultKafkaProducerFactory<>(
