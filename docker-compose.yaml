@@ -1,0 +1,20 @@
+version: '3.8'
+
+networks:
+  main-net:
+    external: true
+
+services:
+  payment-service:
+    container_name: payment-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9080:9080"
+    networks:
+      - main-net
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:19092
+    depends_on: []
+    restart: unless-stopped
