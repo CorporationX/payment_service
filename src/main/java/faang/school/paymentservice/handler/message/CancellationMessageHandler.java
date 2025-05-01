@@ -14,22 +14,22 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ClearingMessageHandlerOutbox implements OutboxEventHandler {
+public class CancellationMessageHandler implements EventHandler {
     private final ObjectMapper objectMapper;
     private final PaymentMapper paymentMapper;
     private final Topics topics;
 
     @Override
     public boolean canHandle(PaymentStatus status) {
-        return status == PaymentStatus.AUTHORIZED;//если платежь в состоянии авторизации, то он идет на клиринг
+        return status == PaymentStatus.CANCELED;
     }
 
     @Override
     public KafkaMessageWrapper handle(OutboxEvent event) throws JsonProcessingException {
         String payload = event.getPayload();
         PaymentOperation operation = objectMapper.readValue(payload, PaymentOperation.class);
-        PaymentOperationMessage operationMessage = paymentMapper.toClearingMessage(operation);
-        String topic = topics.getAuthorizationTopic();
+        PaymentOperationMessage operationMessage = paymentMapper.toCancellationMessage(operation);
+        String topic = topics.getCancellationTopic();
         return new KafkaMessageWrapper(operationMessage, topic);
     }
 }

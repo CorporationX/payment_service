@@ -10,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -59,9 +58,4 @@ public class PaymentOperation {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Instant updatedAt;
-
-    //optimistic locking
-    @Version
-    @Column(name = "version", nullable = false)
-    private Integer version;
 }

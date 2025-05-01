@@ -32,6 +32,7 @@ public class KafkaProducerConfig {
                 kafkaProperties.getProducerLingerMs());
         props.put(ProducerConfig.BATCH_SIZE_CONFIG,
                 kafkaProperties.getProducerBatchSize());
+        props.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, true);
         return props;
     }
 

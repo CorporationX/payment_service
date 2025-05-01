@@ -17,12 +17,11 @@ public class PaymentClearingScheduler {
     private final PaymentOperationRepository repository;
     private final PaymentService paymentService;
 
-    //todo try catch
     @Scheduled(cron = "${scheduler.clearing.cron}")
     public void processScheduledClearing() {
         Instant now = Instant.now();
         List<PaymentOperation> operations =
-                repository.findByPaymentStatusAndClearScheduledAtBefore(PaymentStatus.AUTHORIZED, now);
+                repository.findByPaymentStatusAndClearScheduledAtBefore(PaymentStatus.PENDING, now);
 
         operations.forEach(operation -> paymentService.forcedPayment(operation.getId()));
     }

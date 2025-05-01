@@ -14,14 +14,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AuthorizationMessageHandlerOutbox implements OutboxEventHandler {
+public class AuthorizationMessageHandler implements EventHandler {
     private final ObjectMapper objectMapper;
     private final PaymentMapper paymentMapper;
     private final Topics topics;
 
     @Override
     public boolean canHandle(PaymentStatus status) {
-        return status == PaymentStatus.PENDING;//если платеж создан, то он уходит та на аавторизацию
+        return status == PaymentStatus.PENDING;
     }
 
     @Override

@@ -19,7 +19,7 @@ public class KafkaConfig {
     @Bean
     public JsonDeserializer<Object> jsonDeserializer() {
         JsonDeserializer<Object> deserializer = new JsonDeserializer<>();
-        deserializer.addTrustedPackages("faang.school.paymentservice.dto.*");
+        deserializer.addTrustedPackages("*");
         log.info("Deserializer is create");
         return deserializer;
     }

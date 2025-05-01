@@ -29,40 +29,22 @@ public class PaymentController {
     public ResponseEntity<PaymentResponse> initiatePayment(
             @RequestBody @NotNull @Valid PaymentRequest request) {
         log.info("Initiating payment for request: {}", request);
-        paymentService.initiatePayment(request);
-        return ResponseEntity.accepted().build();
+
+        PaymentResponse response = paymentService.initiatePayment(request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("{id}/cancel")
-    public ResponseEntity<Void> cancelPayment(@PathVariable UUID id) {
+    public ResponseEntity<PaymentResponse> cancelPayment(@PathVariable UUID id) {
         log.info("Cancelling payment with id: {}", id);
-        paymentService.cancelPayment(id);
-        return ResponseEntity.accepted().build();
+        PaymentResponse response = paymentService.cancelPayment(id);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("{id}/forced-payment")
-    public ResponseEntity<Void> forcedPayment(@PathVariable UUID id) {
+    public ResponseEntity<PaymentResponse> forcedPayment(@PathVariable UUID id) {
         log.info("Executing forced payment for id: {}", id);
-        paymentService.forcedPayment(id);
-        return ResponseEntity.accepted().build();
+        PaymentResponse response = paymentService.forcedPayment(id);
+        return ResponseEntity.ok(response);
     }
-
-//    @PostMapping("/payment")
-//    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
-//        DecimalFormat decimalFormat = new DecimalFormat("0.00");
-//        String formattedSum = decimalFormat.format(dto.amount());
-//        int verificationCode = new Random().nextInt(1000, 10000);
-//        String message = String.format("Dear friend! Thank you for your purchase! " +
-//                        "Your payment on %s %s was accepted.",
-//                formattedSum, dto.currency().name());
-//
-//        return ResponseEntity.ok(new PaymentResponse(
-//                PaymentStatus.SUCCESS,
-//                verificationCode,
-//                dto.paymentNumber(),
-//                dto.amount(),
-//                dto.currency(),
-//                message)
-//        );
-//    }
 }

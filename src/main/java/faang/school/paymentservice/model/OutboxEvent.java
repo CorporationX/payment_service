@@ -45,4 +45,7 @@ public class OutboxEvent {
 
     @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE DEFAULT NOW()")
     private OffsetDateTime createdAt;
+
+    @Column(name = "sent_at", nullable = true, columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    private OffsetDateTime sentAt;
 }

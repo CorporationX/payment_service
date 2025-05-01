@@ -12,10 +12,11 @@ import java.util.UUID;
 @Mapper(componentModel = "spring")
 public interface OutboxMapper {
 
+    @Mapping(target = "sentAt", ignore = true)
     @Mapping(target = "id", qualifiedByName = "generateId")
     @Mapping(target = "paymentOperationId", source = "paymentOperation.id")
     @Mapping(target = "eventType", source = "paymentOperation.paymentStatus")
-    @Mapping(target = "payload",ignore = true)
+    @Mapping(target = "payload", ignore = true)
     @Mapping(target = "outboxStatus", ignore = true)
     @Mapping(target = "createdAt", expression = "java(java.time.OffsetDateTime.now())")
     OutboxEvent toOutboxEvent(PaymentOperation paymentOperation);

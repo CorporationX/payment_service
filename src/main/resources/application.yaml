@@ -4,6 +4,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: user
     password: password
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -12,8 +13,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
   kafka:
     bootstrap-servers: localhost:9092
+
     producer:
       retries: 3
       acks: all
@@ -47,12 +50,24 @@ server:
 logging:
   level:
     root: info
+    # Логирование SQL и параметров
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    # Логи транзакций
+    org.springframework.transaction: DEBUG
+    org.springframework.orm.jpa: DEBUG
+    # Логи JPA/Hibernate
+    org.hibernate: WARN
+    jakarta.persistence: WARN
+    # Логи кафки
+    org.apache.kafka: WARN
+    org.springframework.kafka: WARN
 
 scheduler:
   clearing:
     cron: "0 * * * * * "
   publisher:
-    cron: "*/5 * * * * *"
+    cron: "0/30 * * * * * "
 
 publisher:
   batch: 100

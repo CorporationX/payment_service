@@ -17,10 +17,13 @@ public interface PaymentMapper {
     @Mapping(target = "authorizationId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "version", ignore = true)
     PaymentOperation toPaymentOperation(PaymentRequest paymentRequest);
 
-    PaymentResponse toPaymentResponse(PaymentOperation paymentOperation);
+    @Mapping(target = "verificationCode", ignore = true)
+    @Mapping(target = "status", source = "paymentOperation.paymentStatus")
+    @Mapping(target = "paymentNumber", ignore = true)
+    @Mapping(target = "message", source = "message")
+    PaymentResponse toPaymentResponse(PaymentOperation paymentOperation, String message);
 
     @Mapping(target = "timestamp", expression = "java(java.time.Instant.now())")
     @Mapping(target = "operationId", source = "id")
@@ -33,4 +36,8 @@ public interface PaymentMapper {
     @Mapping(target = "timestamp", expression = "java(java.time.Instant.now())")
     @Mapping(target = "operationId", source = "id")
     ClearingMessage toClearingMessage(PaymentOperation paymentOperation);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "paymentStatus", ignore = true)
+    PaymentOperation clone(PaymentOperation paymentOperation);
 }

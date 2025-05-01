@@ -13,7 +13,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class OutboxEventPublisher {
+public class PaymentMessagePublisher {
     private final SendEvent sendEvent;
     private final OutboxEventRepository outboxEventRepository;
 

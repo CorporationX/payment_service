@@ -1,11 +1,15 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.dto.PaymentRequest;
+import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
+import faang.school.paymentservice.dto.outbox.OutboxStatus;
 import faang.school.paymentservice.event.PaymentEvent;
 import faang.school.paymentservice.exception.EntityNotFoundException;
+import faang.school.paymentservice.exception.PaymentNotAuthException;
 import faang.school.paymentservice.mapper.PaymentMapper;
 import faang.school.paymentservice.model.PaymentOperation;
+import faang.school.paymentservice.repository.OutboxEventRepository;
 import faang.school.paymentservice.repository.PaymentOperationRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -13,12 +17,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@EnableKafka
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -26,47 +28,64 @@ public class PaymentService {
     private final PaymentOperationRepository paymentOperationRepository;
     private final PaymentMapper paymentMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final OutboxEventRepository outboxEventRepository;
 
 
     @Transactional
-    public void initiatePayment(@NotNull @Valid PaymentRequest request) {
+    public PaymentResponse initiatePayment(@NotNull @Valid PaymentRequest request) {
         PaymentOperation operation = paymentMapper.toPaymentOperation(request);
-        operation.setPaymentStatus(PaymentStatus.PENDING);
-        operation = paymentOperationRepository.save(operation);
 
-        eventPublisher.publishEvent(new PaymentEvent(operation));
-
-        //return paymentMapper.toPaymentResponse(operation);
+        return saveOperation(operation, PaymentStatus.PENDING);
     }
 
     @Transactional
-    public void cancelPayment(@NotNull UUID id) {
-        PaymentOperation operation = paymentOperationRepository.findById(id).orElseThrow(() -> {
+    public PaymentResponse cancelPayment(@NotNull UUID id) {
+        PaymentOperation authOperation = authorizationPayment(id);
+
+        PaymentOperation operation = paymentMapper.clone(authOperation);
+
+        return saveOperation(operation, PaymentStatus.CANCELED);
+    }
+
+    @Transactional
+    public PaymentResponse forcedPayment(@NotNull UUID id) {
+        PaymentOperation authOperation = authorizationPayment(id);
+
+        PaymentOperation operation = paymentMapper.clone(authOperation);
+
+        return saveOperation(operation, PaymentStatus.CLEARED);
+    }
+
+    private PaymentOperation authorizationPayment(UUID id) {
+        PaymentOperation authOperation = paymentOperationRepository.findById(id).orElseThrow(() -> {
             log.error("Payment with id {} not found", id);
             return new EntityNotFoundException("Payment with id " + id + " not found");
         });
 
-        operation.setPaymentStatus(PaymentStatus.CANCELLED);
-        paymentOperationRepository.save(operation);
-
-        eventPublisher.publishEvent(new PaymentEvent(operation));
-
-    }
-
-    @Transactional
-    public void forcedPayment(@NotNull UUID id) {
-        PaymentOperation operation = paymentOperationRepository.findById(id).orElseThrow(() -> {
-            log.error("Payment with id {} not found", id);
-            return new EntityNotFoundException("Payment with id " + id + " not found");
-        });
-
-        if (!operation.getPaymentStatus().equals(PaymentStatus.AUTHORIZED)) {
-            throw new IllegalArgumentException("Payment with id " + id + " is not authorized");
+        if(outboxEventRepository.notExistsSentAuth(id,PaymentStatus.PENDING,OutboxStatus.SENT)){
+            throw new PaymentNotAuthException("Payment with id " + id + " is not authorized");
         }
 
-        operation.setPaymentStatus(PaymentStatus.CLEARED);
-        paymentOperationRepository.save(operation);
+        authOperation.setPaymentStatus(PaymentStatus.AUTHORIZED);
+        authOperation.setAuthorizationId(id);
+        return authOperation;
+    }
 
-        eventPublisher.publishEvent(new PaymentEvent(operation));
+    private PaymentResponse saveOperation(PaymentOperation operation, PaymentStatus status) {
+        try {
+            operation.setPaymentStatus(status);
+            operation = paymentOperationRepository.save(operation);
+
+            eventPublisher.publishEvent(new PaymentEvent(operation));
+
+            log.debug("Validation with id {} success", operation.getId());
+            return paymentMapper.toPaymentResponse(operation, "");
+        } catch (Exception e) {
+            operation.setPaymentStatus(PaymentStatus.FAILED);
+            operation = paymentOperationRepository.save(operation);
+
+            log.debug("Validation with id {} failed", operation.getId());
+            return paymentMapper.toPaymentResponse(operation, e.getMessage());
+        }
     }
 }

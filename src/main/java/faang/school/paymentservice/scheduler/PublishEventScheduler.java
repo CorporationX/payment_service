@@ -1,7 +1,7 @@
 package faang.school.paymentservice.scheduler;
 
 import faang.school.paymentservice.dto.outbox.OutboxStatus;
-import faang.school.paymentservice.publisher.OutboxEventPublisher;
+import faang.school.paymentservice.publisher.PaymentMessagePublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class PublishEventScheduler {
-    private final OutboxEventPublisher outboxEventPublisher;
+    private final PaymentMessagePublisher paymentMessagePublisher;
 
     @Scheduled(cron = "${scheduler.publisher.cron}")
     public void publishEventScheduler() {
-        outboxEventPublisher.publishEvent(OutboxStatus.NEW);
+        paymentMessagePublisher.publishEvent(OutboxStatus.NEW);
     }
 }
