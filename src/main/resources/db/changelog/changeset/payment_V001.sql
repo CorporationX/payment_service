@@ -30,3 +30,6 @@ CHECK (outbox_status IN ('NEW', 'SENT', 'ERROR')),
 created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 sent_at TIMESTAMP WITH TIME ZONE
 );
+
+CREATE INDEX idx_payment_operations_status_scheduled
+ON payment_operations (payment_status, clear_scheduled_at);

@@ -45,7 +45,7 @@ public class PaymentController {
             description = "Cancels existing payment by ID"
     )
     @PostMapping("{id}/cancel")
-    public ResponseEntity<PaymentResponse> cancelPayment(@PathVariable UUID id) {
+    public ResponseEntity<PaymentResponse> cancelPayment(@NotNull @PathVariable UUID id) {
         log.info("Cancelling payment with id: {}", id);
         PaymentResponse response = paymentService.cancelPayment(id);
         return ResponseEntity.ok(response);
@@ -54,8 +54,8 @@ public class PaymentController {
             summary = "Force payment",
             description = "Executes forced payment operation (admin only)"
     )
-    @PostMapping("/forced-payment")
-    public ResponseEntity<PaymentResponse> forcedPayment(@RequestBody UUID id) {
+    @PostMapping("{id}/forced-payment")
+    public ResponseEntity<PaymentResponse> forcedPayment(@NotNull @PathVariable UUID id) {
         log.info("Executing forced payment for id: {}", id);
         PaymentResponse response = paymentService.forcedPayment(id);
         return ResponseEntity.ok(response);

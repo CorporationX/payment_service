@@ -33,7 +33,7 @@ import java.util.UUID;
  *
  * <p>Все операции выполняются в транзакционном контексте ({@code @Transactional}).
  */
- @Slf4j
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
@@ -74,7 +74,8 @@ public class PaymentService {
             return new EntityNotFoundException("Payment with id " + id + " not found");
         });
 
-        if(outboxEventRepository.notExistsSentAuth(id,PaymentStatus.PENDING,OutboxStatus.SENT)){
+        if (outboxEventRepository.notExistsSentAuth(id, PaymentStatus.PENDING, OutboxStatus.SENT)) {
+            log.error("Payment with id {} is not authorized", id);
             throw new PaymentNotAuthException("Payment with id " + id + " is not authorized");
         }
 

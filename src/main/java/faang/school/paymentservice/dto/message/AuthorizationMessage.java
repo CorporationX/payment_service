@@ -1,7 +1,7 @@
 package faang.school.paymentservice.dto.message;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -20,7 +20,7 @@ public class AuthorizationMessage implements PaymentOperationMessage {
     private UUID recipientAccountId;
 
     @NotNull
-    @Min(1)
+    @Positive
     private BigDecimal amount;
 
     @NotNull
