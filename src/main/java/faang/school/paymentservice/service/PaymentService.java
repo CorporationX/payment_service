@@ -81,6 +81,7 @@ public class PaymentService {
 
         authOperation.setPaymentStatus(PaymentStatus.AUTHORIZED);
         authOperation.setAuthorizationId(id);
+        authOperation = paymentOperationRepository.save(authOperation);
         return authOperation;
     }
 
