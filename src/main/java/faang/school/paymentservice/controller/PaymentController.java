@@ -50,6 +50,7 @@ public class PaymentController {
         PaymentResponse response = paymentService.cancelPayment(id);
         return ResponseEntity.ok(response);
     }
+
     @Operation(
             summary = "Force payment",
             description = "Executes forced payment operation (admin only)"
