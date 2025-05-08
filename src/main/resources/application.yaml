@@ -4,3 +4,24 @@ server:
 logging:
   level:
     root: info
+
+currency:
+  api:
+    primary-provider:
+      base-url: https://v6.exchangerate-api.com/v6
+      endpoint: /latest/EUR
+      accessKey: d2344ce5e9b5a2da92e0fcad
+    slave-provider:
+      base-url: https://api.exchangeratesapi.io
+      endpoint: /v1/latest
+      accessKey: 27cff61d0b49340f112959d20908cf26
+  cron:
+    expression: 0 * * * * *
+
+spring:
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
