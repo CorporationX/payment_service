@@ -31,7 +31,7 @@ public class SlaveExchangeRateProvider extends AbstractExchangeRateProvider {
     @Override
     protected Function<UriBuilder, URI> buildUri() {
         return uriBuilder -> uriBuilder
-                .path(endpoint)
+                .pathSegment(endpoint)
                 .queryParam("access_key", accessKey)
                 .build();
     }

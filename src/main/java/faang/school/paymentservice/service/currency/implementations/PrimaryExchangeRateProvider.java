@@ -31,7 +31,7 @@ public class PrimaryExchangeRateProvider extends AbstractExchangeRateProvider {
     @Override
     protected Function<UriBuilder, URI> buildUri() {
         return uriBuilder -> uriBuilder
-                .path("/" + accessKey + endpoint)
+                .pathSegment(accessKey, endpoint)
                 .build();
     }
 }

@@ -26,7 +26,7 @@ class PrimaryExchangeRateProviderTest {
 
     @InjectMocks
     private PrimaryExchangeRateProvider provider =
-            new PrimaryExchangeRateProvider("https://api.example.com", "testKey", "/latest");
+            new PrimaryExchangeRateProvider("https://api.example.com", "testKey", "latest");
 
     @Mock
     private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
@@ -39,7 +39,7 @@ class PrimaryExchangeRateProviderTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        provider = new PrimaryExchangeRateProvider("https://api.example.com", "testKey", "/latest");
+        provider = new PrimaryExchangeRateProvider("https://api.example.com", "testKey", "latest");
 
         Field field = AbstractExchangeRateProvider.class.getDeclaredField("webClient");
         field.setAccessible(true);

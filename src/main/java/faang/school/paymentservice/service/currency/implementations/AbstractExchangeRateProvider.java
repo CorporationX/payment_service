@@ -13,16 +13,24 @@ import org.springframework.web.util.UriBuilder;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
 public abstract class AbstractExchangeRateProvider implements ExchangeRateProvider {
+
+    protected static final Set<String> ALLOWED_CURRENCIES =
+            Arrays.stream(Currency.values())
+                    .map(Enum::name)
+                    .collect(Collectors.toSet());
+
     protected final WebClient webClient;
-    protected final String baseUrl;
     protected final String accessKey;
     protected final String endpoint;
+
 
     public AbstractExchangeRateProvider(String baseUrl,
                                         String accessKey,
@@ -31,7 +39,6 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
                 .baseUrl(baseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
-        this.baseUrl = baseUrl;
         this.accessKey = accessKey;
         this.endpoint = endpoint;
     }
@@ -44,7 +51,7 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
         StringExchangeRateResponse response = fetchResponse();
         if (response == null) {
             log.error("Failed to fetch exchange rates: response is null");
-            throw new RuntimeException("Failed to fetch exchange rates: response is null");
+            throw new ExchangeRatesException("Failed to fetch exchange rates: response is null");
         }
         exchangeRateResponse.setTimestamp(getTimestamp(response));
         exchangeRateResponse.setBase(getBase(response));
@@ -69,22 +76,28 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
         return response.getRates();
     }
 
-    protected Map<Currency, BigDecimal> filterRates(Map<String, BigDecimal> rates) {
-        return rates.entrySet().stream()
+    private Map<Currency, BigDecimal> filterRates(Map<String, BigDecimal> rates) {
+        Map<Currency, BigDecimal> filteredRates = rates.entrySet().stream()
                 .filter(e -> isAllowedCurrency(e.getKey()))
+                .filter(e -> isValidRate(e.getValue()))
                 .collect(Collectors.toMap(
                         e -> Currency.valueOf(e.getKey()),
                         Map.Entry::getValue
                 ));
-    }
 
-    protected boolean isAllowedCurrency(String currency) {
-        try {
-            Currency.valueOf(currency);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
+        if (filteredRates.size() < ALLOWED_CURRENCIES.size()) {
+            log.error("Failed to fetch exchange rates: some currencies are not allowed");
+            throw new ExchangeRatesException("Failed to fetch exchange rates: some currencies are not allowed");
         }
+
+        return filteredRates;
     }
 
+    private boolean isAllowedCurrency(String currency) {
+        return ALLOWED_CURRENCIES.contains(currency);
+    }
+
+    private boolean isValidRate(BigDecimal rate) {
+        return rate != null && rate.compareTo(BigDecimal.ZERO) > 0;
+    }
 }
