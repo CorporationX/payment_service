@@ -2,6 +2,7 @@ package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.dto.PaymentOperationRequest;
 import faang.school.paymentservice.mapper.PaymentOperationMapper;
+import faang.school.paymentservice.publisher.PaymentOperationEventPublisher;
 import faang.school.paymentservice.repository.PaymentProcessingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ public class PaymentProcessingService {
 
     private final PaymentProcessingRepository paymentProcessingRepository;
     private final PaymentOperationMapper paymentOperationMapper;
+    private final PaymentOperationEventPublisher paymentOperationEventPublisher;
 
     public void initPayment(PaymentOperationRequest request) {
 
