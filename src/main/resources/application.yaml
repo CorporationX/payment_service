@@ -1,9 +1,45 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  data:
+    kafka:
+      bootstrap-servers: localhost:9092
+      consumer:
+        group-id: payment-group
+        auto-offset-reset: earliest
+      producer:
+        acks: "1"
+      topics:
+        payment-operation:
+          name: "payment-operation-topic"
+          partitions: 3
+          replicas: 1
+
+  profiles:
+    active: local
+
 server:
   port: 9080
 
 logging:
   level:
-    root: info
+    root: debug
 
 currency:
   rate:
@@ -25,3 +61,14 @@ webclient:
   connect-timeout: 1000
   read-timeout: 2000
   write-timeout: 2000
+
+thread-pool-setting:
+  payment-clearing:
+    pool-size: 1
+    shutdown-timeout-seconds: 30
+    thread-name-prefix: "PaymentClearingPool-"
+    is-wait-shutdown: true
+
+scheduled-setting:
+  payment-clearing:
+    cron: "0 */5 * * * *"
