@@ -19,7 +19,7 @@ public class PaymentProcessingService {
     private final PaymentOperationEventPublisher paymentOperationEventPublisher;
 
     public void initPayment(PaymentOperationRequest request) {
-
+        
     }
 
     public void cancelPayment(Long paymentId) {

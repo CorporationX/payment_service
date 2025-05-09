@@ -43,8 +43,8 @@ dependencies {
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
     implementation("org.springframework.retry:spring-retry:2.0.11")
     implementation ("org.springframework.boot:spring-boot-starter-webflux")
-    implementation ("io.projectreactor.netty:reactor-netty:1.0.24") // Убедитесь, что используете последнюю версию
-    implementation("org.aspectj:aspectjweaver:1.9.9.1") // Убедитесь, что используете последнюю стабильную версию
+    implementation ("io.projectreactor.netty:reactor-netty:1.0.24")
+    implementation("org.aspectj:aspectjweaver:1.9.9.1")
 
     /**
      * Test containers

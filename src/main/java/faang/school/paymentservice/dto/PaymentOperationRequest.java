@@ -14,9 +14,6 @@ public record PaymentOperationRequest(
         @NotNull(message = "Sender id must not be null")
         Long senderId,
 
-        @NotNull(message = "Sender type must not be null")
-        OwnerType senderType,
-
         @NotNull(message = "Receiver id must not be null")
         Long receiverId,
 
