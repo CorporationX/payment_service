@@ -1,5 +1,9 @@
 package faang.school.paymentservice.dto;
 
 public enum PaymentStatus {
-    SUCCESS
+    PENDING,
+    AUTHORIZED,
+    CLEARED,
+    CANCELED,
+    FAILED
 }

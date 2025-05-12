@@ -1,6 +1,73 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      retries: 3
+      acks: all
+      linger-ms: 20
+      batch-size: 16384
+      compression-type: snappy
+    consumer:
+      group-id: my-app-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      max-poll-records: 500
+    topics:
+      authorization: authorization-topic
+      cancellation: cancellation-topic
+      clearing: clearing-topic
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  data:
+    redis:
+      port: 6379
+      host: localhost
+      connect_timeout: 5000
+      read_timeout: 3000
+
 server:
   port: 9080
 
 logging:
   level:
     root: info
+    # Логирование SQL и параметров
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    # Логи транзакций
+    org.springframework.transaction: DEBUG
+    org.springframework.orm.jpa: DEBUG
+    # Логи JPA/Hibernate
+    org.hibernate: WARN
+    jakarta.persistence: WARN
+    # Логи кафки
+    org.apache.kafka: WARN
+    org.springframework.kafka: WARN
+
+scheduler:
+  clearing:
+    cron: "0 * * * * * "
+  publisher:
+    cron: "0/30 * * * * * "
+
+publisher:
+  batch: 100
