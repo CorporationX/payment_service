@@ -1,4 +1,4 @@
-package faang.school.paymentservice.config.properties;
+package faang.school.paymentservice.properties.kafka;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

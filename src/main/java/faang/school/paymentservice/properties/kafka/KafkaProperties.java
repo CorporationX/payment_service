@@ -1,4 +1,4 @@
-package faang.school.paymentservice.config.properties;
+package faang.school.paymentservice.properties.kafka;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -14,6 +14,8 @@ public record KafkaProperties(
     ) {}
 
     public record Producer(
-            String acks
+            String acks,
+            boolean enableIdempotence,
+            int deliveryTimeoutMs
     ) {}
 }

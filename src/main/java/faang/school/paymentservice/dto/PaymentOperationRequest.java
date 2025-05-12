@@ -11,9 +11,6 @@ import java.math.BigDecimal;
 @Builder
 public record PaymentOperationRequest(
 
-        @NotNull(message = "Sender id must not be null")
-        Long senderId,
-
         @NotNull(message = "Receiver id must not be null")
         Long receiverId,
 

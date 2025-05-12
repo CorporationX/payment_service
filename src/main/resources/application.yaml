@@ -25,9 +25,15 @@ spring:
         auto-offset-reset: earliest
       producer:
         acks: all
+        enable-idempotence: true
+        delivery-timeout-ms: 5000
       topics:
         payment-operation:
           name: "payment-operation-topic"
+          partitions: 3
+          replicas: 1
+        payment-response:
+          name: "payment-response-topic"
           partitions: 3
           replicas: 1
 
@@ -63,12 +69,29 @@ webclient:
   write-timeout: 2000
 
 thread-pool-setting:
-  payment-clearing:
+  request-force-confirming:
     pool-size: 1
     shutdown-timeout-seconds: 30
-    thread-name-prefix: "PaymentClearingPool-"
+    thread-name-prefix: "RequestForceConfirmingPool-"
+    is-wait-shutdown: true
+  request-sender:
+    pool-size: 1
+    shutdown-timeout-seconds: 30
+    thread-name-prefix: "RequestSenderPool-"
+    is-wait-shutdown: true
+  outbox-clearing:
+    pool-size: 1
+    shutdown-timeout-seconds: 30
+    thread-name-prefix: "OutboxClearingPool-"
     is-wait-shutdown: true
 
 scheduled-setting:
-  payment-clearing:
+  request-force-confirming:
     cron: "0 */5 * * * *"
+  request-sender:
+    cron: "*/5 * * * * *"
+  outbox-clearing:
+    cron: "0 0 * * * *"
+
+payment-setting:
+  minutes-to-auto-confirmation: 120

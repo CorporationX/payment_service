@@ -2,7 +2,8 @@ package faang.school.paymentservice.entity;
 
 public enum OperationStatus {
     PENDING,
-    CONFIRMED,
+    FAILED,
+    APPROVED,
     CANCELED,
-    FAILED
+    CONFIRMED,
 }

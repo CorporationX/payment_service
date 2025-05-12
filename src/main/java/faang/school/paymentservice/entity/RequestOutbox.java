@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import jakarta.persistence.Version;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import lombok.AllArgsConstructor;
@@ -31,8 +30,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "payment_operation")
-public class PaymentOperation {
+@Table(name = "request_outbox")
+public class RequestOutbox {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,20 +59,16 @@ public class PaymentOperation {
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
-    @Column(name = "clear_scheduled_at", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime clearScheduledAt;
-
-    @Column(name = "status", nullable = false)
+    @Column(name = "event_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private OperationStatus status;
+    private OperationStatus eventType;
 
-    @Version
-    @Column(name = "version", nullable = false)
-    private Long version;
+    @Column(name = "sending_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OperationType sendingStatus;
 
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 }

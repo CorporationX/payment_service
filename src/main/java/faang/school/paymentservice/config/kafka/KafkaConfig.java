@@ -1,6 +1,6 @@
 package faang.school.paymentservice.config.kafka;
 
-import faang.school.paymentservice.config.properties.KafkaProperties;
+import faang.school.paymentservice.properties.kafka.KafkaProperties;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -29,6 +29,8 @@ public class KafkaConfig {
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.bootstrapServers());
         config.put(ProducerConfig.ACKS_CONFIG, kafkaProperties.producer().acks());
+        config.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, kafkaProperties.producer().deliveryTimeoutMs());
+        config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, kafkaProperties.producer().enableIdempotence());
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         return new DefaultKafkaProducerFactory<>(config);
