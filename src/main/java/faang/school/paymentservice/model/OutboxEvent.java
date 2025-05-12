@@ -25,7 +25,7 @@ import java.util.UUID;
 @Table(name = "outbox_event")
 public class OutboxEvent {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "payment_operation_id", nullable = false)

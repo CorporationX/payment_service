@@ -25,7 +25,7 @@ import java.util.UUID;
 @Table(name = "payment_operations")
 public class PaymentOperation {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "sender_account_id", nullable = false)

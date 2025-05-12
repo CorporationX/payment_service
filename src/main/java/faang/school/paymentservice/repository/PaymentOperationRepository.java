@@ -15,9 +15,11 @@ import java.util.UUID;
 @Repository
 public interface PaymentOperationRepository extends JpaRepository<PaymentOperation, UUID> {
 
-    @Query("SELECT p FROM PaymentOperation p " +
-            "WHERE p.paymentStatus = :status AND p.clearScheduledAt < :time " +
-            "ORDER BY p.clearScheduledAt")
+    @Query("""
+            SELECT p FROM PaymentOperation p
+            WHERE p.paymentStatus = :status AND p.clearScheduledAt < :time
+            ORDER BY p.clearScheduledAt
+            """)
     List<PaymentOperation> findOperationForForcedClearing(
             @Param("status") PaymentStatus status,
             @Param("time") Instant time,

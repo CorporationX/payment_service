@@ -18,11 +18,13 @@ public interface OutboxEventRepository extends JpaRepository<OutboxEvent, UUID> 
     @Query("SELECT e FROM OutboxEvent e WHERE e.outboxStatus = :outboxStatus ORDER BY e.createdAt")
     List<OutboxEvent> findByOutboxStatus(OutboxStatus outboxStatus, Pageable pageable);
 
-    @Query("SELECT NOT EXISTS (SELECT 1 FROM OutboxEvent e " +
-            "WHERE e.paymentOperationId = :paymentOperationId " +
-            "AND e.eventType = :eventType " +
-            "AND e.outboxStatus = :outboxStatus " +
-            "AND e.sentAt IS NOT NULL)")
+    @Query("""
+        SELECT NOT EXISTS (
+        SELECT 1 FROM OutboxEvent e
+        WHERE e.paymentOperationId = :paymentOperationId
+        AND e.eventType = :eventType
+        AND e.outboxStatus = :outboxStatus
+        AND e.sentAt IS NOT NULL)""")
     boolean notExistsSentAuth(@Param("paymentOperationId") UUID paymentOperationId,
                               @Param("eventType") PaymentStatus eventType,
                               @Param("outboxStatus") OutboxStatus outboxStatus);
