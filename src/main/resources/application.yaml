@@ -1,6 +1,17 @@
 server:
   port: 9080
 
+spring:
+  config:
+    import: 'optional:consul:'
+  application:
+    name: payment-service
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery: payment-service-i1
+
 logging:
   level:
     root: info
