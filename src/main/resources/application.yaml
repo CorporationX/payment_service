@@ -4,3 +4,9 @@ server:
 logging:
   level:
     root: info
+
+currency:
+  fetch:
+    cron: "*/30 * * * * *" # каждые 30 сек
+  api:
+    access-key: "здесь персональный ключ, который ты можешь получить после регистрации бесплатно по этому адресу. https://manage.exchangeratesapi.io"
