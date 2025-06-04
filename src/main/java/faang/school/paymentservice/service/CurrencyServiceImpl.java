@@ -35,7 +35,7 @@ public class CurrencyServiceImpl implements  CurrencyService{
             backoff = @Backoff(delay = 2000, multiplier = 2)
     )
     public void fetchAndStoreRates() {
-        log.info("Запрос курсов валют к внешнему API...");
+        log.info("Requesting exchange rates to an external API...");
         ExchangeRatesResponse response = webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/latest")

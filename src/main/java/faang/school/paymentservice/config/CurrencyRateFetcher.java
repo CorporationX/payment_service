@@ -16,7 +16,7 @@ public class CurrencyRateFetcher {
 
     @Scheduled(cron = "${currency.fetch.cron}")
     public void fetchRatesJob() {
-        log.info("Запуск планировщика для обновления курсов валют");
+        log.info("Launching the scheduler to update exchange rates");
         currencyService.fetchAndStoreRates();
     }
 }
