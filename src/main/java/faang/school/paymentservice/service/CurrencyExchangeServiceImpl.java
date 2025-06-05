@@ -15,12 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConfigurationProperties(prefix = "openexchagerates")
+@ConfigurationProperties(prefix = "openexchangerates")
 public class CurrencyExchangeServiceImpl implements CurrencyExchangeService {
     private final static BigDecimal COMISSION = BigDecimal.valueOf(1.01);
     private final OpenexchangeratesServiceClient openexchangeratesServiceClient;
     
-    @Value("${openexchagerates.appId}")
+    @Value("${openexchangerates.appId}")
     private String appId;
 
     @Override

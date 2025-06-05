@@ -5,6 +5,6 @@ logging:
   level:
     root: info
 
-openexchagerates:
+openexchangerates:
   url: "https://openexchangerates.org"
   appId: ${OPEN_EXCHANGE_RATES_APP_ID}

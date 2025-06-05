@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import faang.school.paymentservice.dto.ExchangeRateResponse;
 
-@FeignClient(name = "openexchangerates", url = "${openexchagerates.url}", configuration = FeignConfig.class)
+@FeignClient(name = "openexchangerates", url = "${openexchangerates.url}", configuration = FeignConfig.class)
 public interface OpenexchangeratesServiceClient {
 
     @GetMapping("/api/latest.json")
