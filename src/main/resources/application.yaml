@@ -5,6 +5,7 @@ logging:
   level:
     root: info
 
-openexchangerates:
+open-exchange-rates:
   url: "https://openexchangerates.org"
   appId: ${OPEN_EXCHANGE_RATES_APP_ID}
+  conversion-commission: 1.01
