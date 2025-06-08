@@ -1,4 +1,4 @@
-package faang.school.paymentservice.service.currency;
+package faang.school.paymentservice.scheduler;
 
 import faang.school.paymentservice.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
