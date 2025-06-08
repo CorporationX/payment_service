@@ -4,3 +4,7 @@ server:
 logging:
   level:
     root: info
+
+oxr:
+  app-id : "b16f7ad6bb084c27bd4f0ba4956a6e38"
+  base-url : https://openexchangerates.org/api
