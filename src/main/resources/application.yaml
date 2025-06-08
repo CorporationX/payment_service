@@ -18,6 +18,17 @@ logging:
   level:
     root: info
 
+# Settings for currency rates
+currency:
+  rates:
+    fetch-cron: "0 0 * * * ?"
+    base: "EUR"
+
+exchange_rates_api:
+  key: "e5d671adcbd4a96943009f77522549ab"
+  base_url: "https://api.exchangeratesapi.io/v1/"
+
+
 open_exchange_api:
   base-url: https://openexchangerates.org/api/
   app-id: ${OPEN_EXCHANGE_API_APP_ID}
