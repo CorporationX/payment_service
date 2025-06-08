@@ -1,0 +1,4 @@
+currency-converter-api:
+  url: https://openexchangerates.org/api/
+  auth:
+    token: f2c408f86dfd4751aee7543973ab2770
