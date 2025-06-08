@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.util.Random;
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,10 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public class PaymentController {
 
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
+        log.info("Payment request: {}", dto);
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         String formattedSum = decimalFormat.format(dto.amount());
         int verificationCode = new Random().nextInt(1000, 10000);
