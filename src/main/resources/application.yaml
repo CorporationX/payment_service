@@ -1,3 +1,17 @@
+spring:
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
+app:
+  scheduling:
+    currency-fetch-cron: "0 0 0 * * *"
+
+currency-rates:
+  api:
+    access-key: "5bc8e4d28fe8bca0bdf8a7b1f751fa3f"
+
 server:
   port: 9080
 
