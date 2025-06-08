@@ -4,3 +4,14 @@ server:
 logging:
   level:
     root: info
+
+exchangerateapi:
+  base-url: https://openexchangerates.org/api/
+  app-id: PUT YOUR APP ID!!!!
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
