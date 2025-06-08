@@ -1,4 +1,4 @@
-package faang.school.paymentservice.config;
+package faang.school.paymentservice.job;
 
 
 import faang.school.paymentservice.service.CurrencyService;
@@ -17,6 +17,11 @@ public class CurrencyRateFetcher {
     @Scheduled(cron = "${currency.fetch.cron}")
     public void fetchRatesJob() {
         log.info("Launching the scheduler to update exchange rates");
-        currencyService.fetchAndStoreRates();
+        try {
+            currencyService.fetchAndStoreRates();
+        } catch (Exception e) {
+            log.info("ОШИБКА  Выполнения при получении курса валют!", e);
+        }
     }
+
 }

@@ -2,53 +2,62 @@ package faang.school.paymentservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import faang.school.paymentservice.config.CurrencyApiProperties;
 import faang.school.paymentservice.dto.ExchangeRatesResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
+import org.springframework.http.HttpStatusCode;
+import org.springframework.web.reactive.function.client.ClientResponse;
 @Slf4j
 @Service
-public class CurrencyServiceImpl implements  CurrencyService{
+@RequiredArgsConstructor
+public class CurrencyServiceImpl implements CurrencyService {
+
     private static final Map<String, Double> RATES_CACHE = new ConcurrentHashMap<>();
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private final WebClient webClient;
-
-    @Value("${currency.api.access-key}")
-    private String accessKey;
-
-    public CurrencyServiceImpl(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder
-                .baseUrl("https://api.exchangeratesapi.io/v1")
-                .build();
-    }
+    private final CurrencyApiProperties properties;
+    private final ObjectMapper objectMapper;
 
     @Retryable(
-            maxAttempts = 5,
-            backoff = @Backoff(delay = 2000, multiplier = 2)
+            maxAttemptsExpression = "#{@currencyApiProperties.retry.maxAttempts}",
+            backoff = @Backoff(
+                    delayExpression = "#{@currencyApiProperties.retry.delay}",
+                    multiplierExpression = "#{@currencyApiProperties.retry.multiplier}"
+            )
     )
     public void fetchAndStoreRates() {
-        log.info("Requesting exchange rates to an external API...");
+        log.info("Requesting exchange rates to external API...");
+        log.info("Sending request to url: {}", properties.getUrl());
         ExchangeRatesResponse response = webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/latest")
-                        .queryParam("access_key", accessKey)
-                        .build())
+                .uri(properties.getUrl() + "?access_key=" + properties.getAccessKey())
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+                    HttpStatus status = HttpStatus.valueOf(clientResponse.statusCode().value());
+                    log.error("Client error: {} {}", status.value(), status.getReasonPhrase());
+                    return Mono.error(new RuntimeException("Client Error: " + status.value() + " " + status.getReasonPhrase()));
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
+                    HttpStatus status = HttpStatus.valueOf(clientResponse.statusCode().value());
+                    log.error("Server error: {} {}", status.value(), status.getReasonPhrase());
+                    return Mono.error(new RuntimeException("Server Error: " + status.value() + " " + status.getReasonPhrase()));
+                })
                 .bodyToMono(ExchangeRatesResponse.class)
                 .timeout(Duration.ofSeconds(30))
-                .block();
+                .block();;
 
-        if (response == null || !response.isSuccess() || response.getRates() == null) {
-            log.error("Incorrect response from the API: {}", response);
-            throw new RuntimeException("Error receiving currency exchange rates");
+        if (response == null || response.getRates() == null) {
+            log.error("Invalid API response: {}", response);
+            throw new RuntimeException("Failed to fetch currency rates");
         }
 
         RATES_CACHE.clear();

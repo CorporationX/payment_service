@@ -6,7 +6,12 @@ logging:
     root: info
 
 currency:
-  fetch:
-    cron: "*/30 * * * * *" # каждые 30 сек
   api:
-    access-key: "здесь персональный ключ, который ты можешь получить после регистрации бесплатно по этому адресу. https://manage.exchangeratesapi.io"
+    url: "https://api.exchangeratesapi.io/v1/latest"
+    access-key: "" #"здесь персональный ключ, который ты можешь получить после регистрации бесплатно по этому адресу. https://manage.exchangeratesapi.io"
+    retry:
+      max-attempts: 5
+      delay: 1000
+      multiplier: 2
+  fetch:
+    cron: "*/10 * * * * *"
