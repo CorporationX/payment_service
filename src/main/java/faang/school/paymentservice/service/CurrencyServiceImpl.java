@@ -7,6 +7,7 @@ import faang.school.paymentservice.dto.ExchangeRatesResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,7 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.web.reactive.function.client.ClientResponse;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -53,7 +53,7 @@ public class CurrencyServiceImpl implements CurrencyService {
                 })
                 .bodyToMono(ExchangeRatesResponse.class)
                 .timeout(Duration.ofSeconds(30))
-                .block();;
+                .block();
 
         if (response == null || response.getRates() == null) {
             log.error("Invalid API response: {}", response);

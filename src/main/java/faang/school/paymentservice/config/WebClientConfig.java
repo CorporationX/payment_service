@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
 
     @Bean
-    public WebClient exchangeRatesWebClient(CurrencyApiProperties properties) {
+    public WebClient exchangeRatesWebClient() {
         return WebClient.builder()
                 .build();
     }
