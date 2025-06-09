@@ -4,3 +4,15 @@ server:
 logging:
   level:
     root: info
+
+cron:
+  expression: "0 0 * * * *"
+
+exchange:
+  base_url: "https://openexchangerates.org/"
+  url: "api/latest.json"
+  access_key: "0134aec31a134dec86124871d5fc0cbf"
+#  base: "USD"
+#  symbols: "AUD,GBP,EUR,RUB"
+  base: "RUB"
+  symbol: "USD,EUR"
