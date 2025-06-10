@@ -5,12 +5,15 @@ import faang.school.paymentservice.dto.PaymentRequest;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.NoSuchElementException;
 import java.util.Random;
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
 import faang.school.paymentservice.service.PaymentServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentController {
     private final PaymentServiceImpl paymentService;
     private static final BigDecimal PERCENT = BigDecimal.valueOf(1.01);
-
+    @Retryable(value = {NoSuchElementException.class}, maxAttempts = 5,
+            backoff = @Backoff(value = 2000, multiplier = 2))
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
         BigDecimal percentConverter = dto.amount().multiply(PERCENT);
@@ -47,6 +51,8 @@ public class PaymentController {
         );
     }
 
+    @Retryable(value = {NoSuchElementException.class}, maxAttempts = 5,
+            backoff = @Backoff(value = 2000, multiplier = 2))
     @GetMapping
     public ResponseEntity<ExchangeResponseDto> getAllCurrency() {
         return ResponseEntity.ok().body(paymentService.getLatestRates());

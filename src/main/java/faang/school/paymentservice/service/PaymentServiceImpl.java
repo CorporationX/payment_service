@@ -1,7 +1,6 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.dto.ExchangeResponseDto;
-import faang.school.paymentservice.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -9,6 +8,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +26,9 @@ public class PaymentServiceImpl {
 
     public ExchangeResponseDto getLatestRates() {
         String url = String.format("%s/latest.json?app_id=%s", baseUrl, appId);
+        if(url == null) {
+            throw new IllegalArgumentException("Url null");
+        }
         return restTemplate.getForEntity(url, ExchangeResponseDto.class).getBody();
     }
 
@@ -35,14 +38,14 @@ public class PaymentServiceImpl {
                 .stream()
                 .filter(rate -> rate.getKey().equals(fromCurrency))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException("Currency Not Found " + fromCurrency))
+                .orElseThrow(() -> new NoSuchElementException("Currency Not Found " + fromCurrency))
                 .getValue();
 
         Number to = getLatestRates().getRates().entrySet()
                 .stream()
                 .filter(rate -> rate.getKey().equals(toCurrency))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException("Currency Not Found " + toCurrency))
+                .orElseThrow(() -> new NoSuchElementException("Currency Not Found " + toCurrency))
                 .getValue();
 
         return BigDecimal.valueOf(to.doubleValue()).divide(BigDecimal.valueOf(from.doubleValue()),
