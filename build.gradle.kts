@@ -37,6 +37,9 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.5.3.Final")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final")
 
+    implementation ("org.springframework.retry:spring-retry")
+    implementation ("org.springframework.boot:spring-boot-starter-aop")
+
     /**
      * Tests
      */
