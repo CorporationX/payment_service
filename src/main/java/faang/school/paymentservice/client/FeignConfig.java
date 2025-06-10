@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FeignConfig {
-    @Value("${exchangerateapi.app-id}")
+    @Value("${open_exchange_api.app-id}")
     private String openExchangeRatesAppId;
 
     @Bean

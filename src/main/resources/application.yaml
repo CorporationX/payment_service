@@ -16,7 +16,7 @@ logging:
   level:
     root: info
 
-exchangerateapi:
+open_exchange_api:
   base-url: https://openexchangerates.org/api/
   app-id: PUT YOUR APP ID!!!!
 
