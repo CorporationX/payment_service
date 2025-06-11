@@ -5,6 +5,18 @@ logging:
   level:
     root: info
 
+
+currency:
+  api:
+    url: "https://api.exchangeratesapi.io/v1/latest"
+    access-key: "" #"здесь персональный ключ, который ты можешь получить после регистрации бесплатно по этому адресу. https://manage.exchangeratesapi.io"
+    retry:
+      max-attempts: 5
+      delay: 1000
+      multiplier: 2
+  fetch:
+    cron: "*/10 * * * * *"
+
 open-exchange-rates:
   url: "https://openexchangerates.org"
   appId: ${OPEN_EXCHANGE_RATES_APP_ID}
