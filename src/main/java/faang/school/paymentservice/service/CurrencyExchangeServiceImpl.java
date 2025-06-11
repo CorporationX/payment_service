@@ -2,9 +2,9 @@ package faang.school.paymentservice.service;
 
 import java.math.BigDecimal;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import faang.school.paymentservice.client.OpenexchangeConfig;
 import faang.school.paymentservice.client.OpenexchangeratesServiceClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ExchangeRateResponse;
@@ -16,32 +16,24 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CurrencyExchangeServiceImpl implements CurrencyExchangeService {
     private final OpenexchangeratesServiceClient openexchangeratesServiceClient;
+    private final OpenexchangeConfig openexchangeConfig;
 
-    @Value("${open-exchange-rates.appId}")
-    private String appId;
-
-    @Value("${open-exchange-rates.conversion-commission}")
-    private String commissionSettings;
-    
     @Override
     public BigDecimal exchange(BigDecimal amount, Currency paymentCurrency) {
-        BigDecimal commissionBigDecimal = BigDecimal.valueOf(Double.valueOf(commissionSettings));
-        ExchangeRateResponse response = openexchangeratesServiceClient.getExchangeRates(
-            appId, 
+        BigDecimal commissionBigDecimal = BigDecimal.valueOf(Double.valueOf(openexchangeConfig.conversionCommission()));
+        ExchangeRateResponse exchangeRateData = openexchangeratesServiceClient.getExchangeRates(
+            openexchangeConfig.appId(), 
             paymentCurrency.name(), 
             true
         );
-        log.info("Exchange rate response: {}", response);
+        log.info("Exchange rate response: {}", exchangeRateData);
 
-        BigDecimal convertedAmount = amount;
-        if (response.getRate(paymentCurrency.name()) == null) {
+        if (exchangeRateData.getRate(paymentCurrency.name()) == null) {
             log.error("Exchange rate not found");
             throw new RuntimeException("Exchange rate not found");
         }
 
-        Double exchangeRate = response.getRate(paymentCurrency.name());
-        convertedAmount = amount.multiply(BigDecimal.valueOf(exchangeRate)).multiply(commissionBigDecimal); 
-
-        return convertedAmount;
+        Double exchangeRate = exchangeRateData.getRate(paymentCurrency.name());
+        return amount.multiply(BigDecimal.valueOf(exchangeRate)).multiply(commissionBigDecimal); 
     }
 }
