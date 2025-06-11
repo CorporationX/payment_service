@@ -5,6 +5,7 @@ logging:
   level:
     root: info
 
+
 currency:
   api:
     url: "https://api.exchangeratesapi.io/v1/latest"
@@ -15,3 +16,8 @@ currency:
       multiplier: 2
   fetch:
     cron: "*/10 * * * * *"
+
+open-exchange-rates:
+  url: "https://openexchangerates.org"
+  appId: ${OPEN_EXCHANGE_RATES_APP_ID}
+  conversionCommission: 1.01
