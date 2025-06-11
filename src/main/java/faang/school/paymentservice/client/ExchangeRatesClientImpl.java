@@ -1,4 +1,4 @@
-package faang.school.paymentservice.service;
+package faang.school.paymentservice.client;
 
 import faang.school.paymentservice.config.CurrencyApiProperties;
 import faang.school.paymentservice.dto.ExchangeRatesResponse;
@@ -6,20 +6,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
-@Service
+@Component
 @Slf4j
 @RequiredArgsConstructor
-public class ExchangeRatesClient {
+public class ExchangeRatesClientImpl implements ExchangeRatesClient {
 
     private final WebClient webClient;
     private final CurrencyApiProperties properties;
 
+    @Override
     public ExchangeRatesResponse getResponse() {
         return webClient.get()
                 .uri(properties.getUrl() + "?access_key=" + properties.getAccessKey())

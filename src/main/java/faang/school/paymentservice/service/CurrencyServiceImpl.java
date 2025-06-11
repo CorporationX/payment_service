@@ -2,6 +2,7 @@ package faang.school.paymentservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import faang.school.paymentservice.client.ExchangeRatesClientImpl;
 import faang.school.paymentservice.config.CurrencyApiProperties;
 import faang.school.paymentservice.dto.ExchangeRatesResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CurrencyServiceImpl implements CurrencyService {
 
     private static final Map<String, Double> RATES_CACHE = new ConcurrentHashMap<>();
-    private final ExchangeRatesClient exchangeRatesClient;
+    private final ExchangeRatesClientImpl exchangeRatesClient;
     private final CurrencyApiProperties properties;
     private final ObjectMapper objectMapper;
 
