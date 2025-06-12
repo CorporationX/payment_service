@@ -8,7 +8,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @FeignClient(name = "openExchangeRatesClient",
-        url = "${exchangerateapi.base-url}",
+        url = "${open_exchange_api.base-url}",
         configuration = FeignConfig.class)
 public interface OpenExchangeRatesClient {
     @Retryable(

@@ -97,7 +97,7 @@ class CurrencyConverterServiceTest {
     }
 
     @Test
-    void testGetExchangeRateForUSD_RatesMapIsEmpty() {
+    void testGetExchangeRateForUsdWhenRatesMapIsEmpty() {
         mockResponse.setRates(Map.of());
         when(openExchangeRatesClient.getLatestRates()).thenReturn(mockResponse);
 

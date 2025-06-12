@@ -9,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 import java.math.RoundingMode;
+import java.util.Currency;
 import java.util.Map;
 import java.util.Objects;
 
@@ -33,20 +33,35 @@ public class CurrencyConverterService {
 
     public BigDecimal getExchangeRateForUSD(String fromCurrency) {
         log.info("Start method getExchangeRateFor USD with fromCurrency: {}", fromCurrency);
-        LatestRatesResponseDto latestRates = openExchangeRatesClient.getLatestRates();
 
-        Map<String, BigDecimal> rates = latestRates.getRates();
-        if (!Objects.isNull(rates) && !rates.isEmpty()) {
-            BigDecimal rateFromUsdToFromCurrency = latestRates.getRates().get(fromCurrency.toUpperCase());
-            if (!Objects.isNull(rateFromUsdToFromCurrency)
-                    && rateFromUsdToFromCurrency.compareTo(BigDecimal.ZERO) > 0) {
-                return BigDecimal.ONE.divide(rateFromUsdToFromCurrency, 10, RoundingMode.HALF_UP);
-            }
+        LatestRatesResponseDto latestRatesOnMoment = openExchangeRatesClient.getLatestRates();
+        Map<String, BigDecimal> actualRates = latestRatesOnMoment.getRates();
+        BigDecimal rateFromUsdToFromCurrency = actualRates.get(fromCurrency.toUpperCase());
+
+        if (validateActualRates(actualRates, rateFromUsdToFromCurrency, fromCurrency)) {
+            return BigDecimal.ONE.divide(rateFromUsdToFromCurrency, 10, RoundingMode.HALF_UP);
+        }
+
+        log.error("Server error while fetching exchange rates: {}", latestRatesOnMoment.getDisclaimer());
+        throw new ExchangeServiceApiException("Server error while fetching exchange rates: "
+                + latestRatesOnMoment.getDisclaimer());
+    }
+
+    private boolean validateActualRates(Map<String, BigDecimal> actualRates,
+                                        BigDecimal rateFromUsdToFromCurrency,
+                                        String fromCurrency) {
+        log.info("Start method validateActualRates with actualRates: {}", actualRates);
+
+        if (Objects.isNull(actualRates) || actualRates.isEmpty()) {
+            log.error("Map with actual rates is null or empty for currency: {}!", fromCurrency);
+            return false;
+        }
+        if (Objects.isNull(rateFromUsdToFromCurrency) || rateFromUsdToFromCurrency.compareTo(BigDecimal.ZERO) <= 0) {
             log.error("Exchange rate for {} not found or invalid.", fromCurrency);
             throw new ExchangeRateException("Exchange rate for " + fromCurrency + " not found or invalid.");
         }
-        log.error("Server error while fetching exchange rates: {}", latestRates.getDisclaimer());
-        throw new ExchangeServiceApiException("Server error while fetching exchange rates: "
-                + latestRates.getDisclaimer());
+
+        log.info("Exchange rate for {} is successfully validated with value: {}", fromCurrency, rateFromUsdToFromCurrency);
+        return true;
     }
 }
