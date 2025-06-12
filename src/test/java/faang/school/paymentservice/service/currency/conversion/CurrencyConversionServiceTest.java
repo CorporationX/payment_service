@@ -4,7 +4,7 @@ import faang.school.paymentservice.client.CurrencyConverter.CurrencyConverterCli
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ExchangeRateDto;
 import faang.school.paymentservice.dto.PaymentRequest;
-import faang.school.paymentservice.exception.CurrencyCoversionException;
+import faang.school.paymentservice.exception.CurrencyConversionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,7 +70,7 @@ public class CurrencyConversionServiceTest {
     public void testGetConvertedSum_WithNullCurrency_ShouldThrowException() {
         PaymentRequest request = new PaymentRequest(3L, BigDecimal.valueOf(50), null);
 
-        assertThrows(CurrencyCoversionException.class, () -> {
+        assertThrows(CurrencyConversionException.class, () -> {
             currencyConversionService.getConvertedSum(request);
         });
     }
@@ -79,7 +79,7 @@ public class CurrencyConversionServiceTest {
     public void testGetConvertedSum_WithUnsupportedCurrency_ShouldThrowException() {
         PaymentRequest invalidCurrencyRequest = new PaymentRequest(4L, BigDecimal.valueOf(10), null);
 
-        assertThrows(CurrencyCoversionException.class, () -> {
+        assertThrows(CurrencyConversionException.class, () -> {
             currencyConversionService.getConvertedSum(invalidCurrencyRequest);
         });
     }

@@ -2,7 +2,7 @@ package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ErrorResponse;
-import faang.school.paymentservice.exception.CurrencyCoversionException;
+import faang.school.paymentservice.exception.CurrencyConversionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -44,9 +44,9 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler(CurrencyCoversionException.class)
+    @ExceptionHandler(CurrencyConversionException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleCurrencyConversionException (CurrencyCoversionException e) {
+    public ErrorResponse handleCurrencyConversionException (CurrencyConversionException e) {
         return new ErrorResponse(e.getMessage());
     }
 }
