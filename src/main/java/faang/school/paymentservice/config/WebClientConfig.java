@@ -11,7 +11,6 @@ import reactor.netty.http.client.HttpClient;
 
 import java.time.Duration;
 
-@ConfigurationProperties(prefix = "api")
 @Configuration
 @Slf4j
 public class WebClientConfig {
