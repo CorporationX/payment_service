@@ -15,9 +15,9 @@ import reactor.util.retry.Retry;
 public class CurrencyRateClient {
     private final WebClient webClient;
     private final Retry retry;
-
     @Value("${currency-rates.api.access-key}")
     private String accessKey;
+
     public Mono<CurrencyRateResponse> fetchLatestRates() {
         log.info("Fetching latest exchange rates from external API");
 
