@@ -10,7 +10,15 @@ app:
 
 currency-rates:
   api:
+    base-url: "https://api.exchangeratesapi.io/v1/latest"
+    timeout-seconds: 10
     access-key: "5bc8e4d28fe8bca0bdf8a7b1f751fa3f"
+  retry:
+    max-attempts: 5
+    delay-seconds: 1
+  redis:
+    ttl-hours: 24
+    key: "exchange_rates_latest"
 
 server:
   port: 9080
