@@ -27,6 +27,7 @@ management:
       show-details: always
 
   tracing:
+    enabled: false
     sampling:
       probability: 1.0
   zipkin:
