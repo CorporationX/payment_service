@@ -1,6 +1,6 @@
 package faang.school.paymentservice.config;
 
-import faang.school.paymentservice.entity.CurrencyExchangeResponse;
+import faang.school.paymentservice.dto.CurrencyExchangeResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

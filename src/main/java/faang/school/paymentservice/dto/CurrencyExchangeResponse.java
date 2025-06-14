@@ -1,4 +1,4 @@
-package faang.school.paymentservice.entity;
+package faang.school.paymentservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

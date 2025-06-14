@@ -3,7 +3,7 @@ package faang.school.paymentservice.service;
 import faang.school.paymentservice.config.ConverterClient;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.PaymentRequest;
-import faang.school.paymentservice.entity.CurrencyExchangeResponse;
+import faang.school.paymentservice.dto.CurrencyExchangeResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
