@@ -18,6 +18,17 @@ logging:
   level:
     root: info
 
+open_exchange_api:
+  base-url: https://openexchangerates.org/api/
+  app-id: ${OPEN_EXCHANGE_API_APP_ID}
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+
 management:
   endpoints:
     web:
