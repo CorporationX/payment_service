@@ -1,10 +1,15 @@
 package faang.school.paymentservice.controller;
 
 import faang.school.paymentservice.dto.PaymentRequest;
-import java.text.DecimalFormat;
-import java.util.Random;
+
+import java.math.BigDecimal;
+import java.net.URISyntaxException;
+
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
+import faang.school.paymentservice.service.payment.PaymentService;
+import faang.school.paymentservice.verification.VerificationData;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,25 +18,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api")
 public class PaymentController {
-
+    private final PaymentService paymentService;
+    private final VerificationData verification;
     @PostMapping("/payment")
-    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
-        DecimalFormat decimalFormat = new DecimalFormat("0.00");
-        String formattedSum = decimalFormat.format(dto.amount());
-        int verificationCode = new Random().nextInt(1000, 10000);
-        String message = String.format("Dear friend! Thank you for your purchase! " +
-                        "Your payment on %s %s was accepted.",
-                formattedSum, dto.currency().name());
+    public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto){
+        BigDecimal converter = paymentService.convertCurrency(dto.amount(), dto.fromCurrency().name(),
+                dto.toCurrency().name());
 
         return ResponseEntity.ok(new PaymentResponse(
                 PaymentStatus.SUCCESS,
-                verificationCode,
+                verification.verificationCode(),
                 dto.paymentNumber(),
-                dto.amount(),
-                dto.currency(),
-                message)
+                converter,
+                dto.fromCurrency(),
+                verification.addMessage(dto))
         );
     }
 }

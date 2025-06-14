@@ -19,6 +19,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    implementation("org.springframework.retry:spring-retry:2.0.4")
+    implementation ("org.aspectj:aspectjweaver:1.9.7")
+    implementation ("org.aspectj:aspectjrt:1.9.7")
 
     /**
      * Utils & Logging
