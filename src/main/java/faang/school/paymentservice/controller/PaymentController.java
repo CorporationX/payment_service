@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 import java.util.Random;
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
+import lombok.extern.slf4j.Slf4j;
 import faang.school.paymentservice.service.currency.CurrencyConverterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
+@Slf4j
 @RequiredArgsConstructor
 public class PaymentController {
     private final CurrencyConverterService currencyConverterService;
@@ -25,6 +27,7 @@ public class PaymentController {
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
         BigDecimal convertedCurrency = currencyConverterService.convertCurrency(dto.currency().toString(), dto.amount());
+        log.info("Payment request: {}", dto);
         DecimalFormat decimalFormat = new DecimalFormat("0.00");
         String formattedSum = decimalFormat.format(convertedCurrency);
         int verificationCode = new Random().nextInt(1000, 10000);
