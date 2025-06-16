@@ -1,7 +1,7 @@
 package faang.school.paymentservice.config;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -11,15 +11,13 @@ import java.time.Duration;
 
 @Configuration
 @Slf4j
+@RequiredArgsConstructor
 public class RetryConfig {
-    @Value("${currency-rates.retry.max-attempts}")
-    private int maxAttempts;
-    @Value("${currency-rates.retry.delay-seconds}")
-    private long delaySeconds;
+    private final RetryProperties properties;
 
     @Bean
     public Retry createRetrySpec() {
-        return Retry.fixedDelay(maxAttempts, Duration.ofSeconds(delaySeconds))
+        return Retry.fixedDelay(properties.maxAttempts(), Duration.ofSeconds(properties.delaySeconds()))
                 .filter(ex -> {
                     if (ex instanceof WebClientResponseException webEx) {
                         return webEx.getStatusCode().is4xxClientError() ||

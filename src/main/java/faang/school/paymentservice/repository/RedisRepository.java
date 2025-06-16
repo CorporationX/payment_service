@@ -1,5 +1,4 @@
-package faang.school.paymentservice.util;
-
+package faang.school.paymentservice.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class RedisSaver {
+public class RedisRepository {
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, String> redisTemplate;
 
