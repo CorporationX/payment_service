@@ -3,7 +3,9 @@ server:
 
 spring:
   config:
-    import: 'optional:consul:'
+    import:
+      - "optional:consul:"
+      - "optional:file:.env[.properties]"
   application:
     name: payment-service
   cloud:
@@ -17,11 +19,6 @@ logging:
     name: logs/payment-service.log
   level:
     root: info
-
-spring:
-  config:
-    import:
-      - optional:file:.env[.properties]
 
 # Settings for currency rates
 currency:
