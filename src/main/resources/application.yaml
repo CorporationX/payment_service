@@ -4,3 +4,11 @@ server:
 logging:
   level:
     root: info
+
+url:
+  id: "0134aec31a134dec86124871d5fc0cbf"
+  service: "https://openexchangerates.org/"
+
+exchange:
+  currency: "RUB"
+  commission: 1
