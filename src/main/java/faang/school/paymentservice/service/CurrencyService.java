@@ -10,7 +10,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.net.http.HttpTimeoutException;
-import java.rmi.ServerException;
 import java.time.Duration;
 
 @Service
@@ -30,7 +29,7 @@ public class CurrencyService {
     @Value("${exchange.symbols}")
     private String symbols;
 
-    private String getApiUrl(){
+    private String getApiUrl() {
         return String.format("%s?app_id=%s&base=%s&symbols=%s", url, key, base, symbols);
     }
 
@@ -40,9 +39,10 @@ public class CurrencyService {
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError,
                         response -> response.bodyToMono(HttpTimeoutException.class)
-                                .flatMap(error -> Mono.error(new HttpTimeoutException("Http exception"))))
+                                .flatMap(error -> Mono.error(
+                                        new RuntimeException("Client error: " + response.statusCode()))))
                 .onStatus(HttpStatusCode::is5xxServerError,
-                        response -> Mono.error(new ServerException("Server error")))
+                        response -> Mono.error(new RuntimeException("Server error: " + response.statusCode())))
                 .bodyToMono(ExchangeRateResponseDto.class)
                 .timeout(Duration.ofSeconds(5));
     }

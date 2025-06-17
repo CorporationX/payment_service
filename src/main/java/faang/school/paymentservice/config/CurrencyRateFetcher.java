@@ -20,12 +20,17 @@ public class CurrencyRateFetcher {
 
     @Scheduled(cron = "${cron.expression}")
     @Retryable(retryFor = {RuntimeException.class}, maxAttempts = 5, backoff = @Backoff(delay = 1000, multiplier = 2))
-    public void saveCurrency(){
+    public void saveCurrency() {
         Mono<ExchangeRateResponseDto> jsonMono = currencyService.saveExchangeRate();
 
-        jsonMono.subscribe(response->redisService.setValue("USD", response.getRates().get("USD")));
+//        jsonMono.subscribe(response->redisService.setValue("USD", response.getRates().get("USD")));
 //        jsonMono.subscribe(response->redisService.setValue("AUD", response.getRates().get("AUD")));
-        jsonMono.subscribe(response->redisService.setValue("EUR", response.getRates().get("EUR")));
+//        jsonMono.subscribe(response->redisService.setValue("EUR", response.getRates().get("EUR")));
+        jsonMono.subscribe(response -> {
+                    redisService.setValue("EUR", response.rates().get("EUR"));
+                    redisService.setValue("USD", response.rates().get("USD"));
+                },
+                error -> log.error("Error: {}", error, new RuntimeException()));
         log.info("The USD and EUR exchange rates have been updated");
     }
 }
