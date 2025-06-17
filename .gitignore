@@ -54,4 +54,8 @@ out/
 ### VS Code ###
 .vscode/
 
+# env variables
 .env
+
+# logs
+/logs/*
