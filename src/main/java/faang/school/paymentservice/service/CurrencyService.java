@@ -1,6 +1,7 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.dto.ExchangeRatesResponse;
+import faang.school.paymentservice.exception.FetchRateException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
@@ -42,21 +44,16 @@ public class CurrencyService {
                 .retrieve()
                 .bodyToMono(ExchangeRatesResponse.class)
                 .timeout(Duration.ofSeconds(5))
-                .onErrorMap( throwable -> {
-                    if (throwable instanceof java.util.concurrent.TimeoutException) {
-                        log.error("Timeout while fetching {}", throwable.getMessage());
-                        return new TimeoutException(throwable.getMessage());
-                    }
-                    return throwable;
-                })
-                .block();
+                .onErrorMap(TimeoutException.class, throwable ->
+                        new FetchRateException("Timeout fetching latest rates", throwable)
+                ).block();
 
         if (response == null) {
-            throw new RuntimeException("Could not fetch latest rates");
+            throw new FetchRateException("Could not fetch latest rates");
         }
 
         if (!response.isSuccess()){
-            throw new RuntimeException("Could not fetch latest rates");
+            throw new FetchRateException("Could not fetch latest rates");
         }
 
         log.info("Fetched rates (date={}):{}", response.getDate(), response.getRates());
@@ -66,6 +63,6 @@ public class CurrencyService {
     @Recover
     public Map<String, Double> recoverAfterFail(Exception e) {
         log.error("Could not get rates after retries {}", e.getMessage());
-        return Map.of();
+        return Collections.emptyMap();
     }
 }

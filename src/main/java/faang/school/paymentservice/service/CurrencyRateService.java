@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CurrencyRateFetcher {
+public class CurrencyRateService {
     private final CurrencyService currencyService;
     private final Map<String, Double> latestRates = new ConcurrentHashMap<>();
     @Value("${currency.rates.fetch-cron}")

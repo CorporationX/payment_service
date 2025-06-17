@@ -18,6 +18,11 @@ logging:
   level:
     root: info
 
+spring:
+  config:
+    import:
+      - optional:file:.env[.properties]
+
 # Settings for currency rates
 currency:
   rates:
@@ -25,7 +30,7 @@ currency:
     base: "EUR"
 
 exchange_rates_api:
-  key: "PUT YOUR API KEY HERE"
+  key: ${EXCHANGE_RATES_API_KEY:defaultKey}
   base_url: "https://api.exchangeratesapi.io/v1/"
 
 
