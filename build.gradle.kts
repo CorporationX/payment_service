@@ -37,9 +37,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.2")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-
-    implementation ("com.squareup.okhttp3:okhttp:4.9.3")
-    implementation("org.json:json:20250517")
 }
 
 tasks.withType<Test> {

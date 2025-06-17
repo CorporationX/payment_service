@@ -29,7 +29,7 @@ public class PaymentService {
 
     public BigDecimal convertToRUB(PaymentRequest dto) {
         CurrencyExchangeResponse response =
-                converterClient.getCurrentCurrencyExchangeRate(appId, dto.currency().name(), "RUB");
+                converterClient.getCurrentCurrencyExchangeRate(appId, dto.currency().name(), currency);
 
         BigDecimal rub = BigDecimal.valueOf(response.getRates().get(currency));
 
