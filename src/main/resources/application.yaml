@@ -3,7 +3,9 @@ server:
 
 spring:
   config:
-    import: 'optional:consul:'
+    import:
+      - "optional:consul:"
+      - "optional:file:.env[.properties]"
   application:
     name: payment-service
   cloud:
@@ -17,6 +19,17 @@ logging:
     name: logs/payment-service.log
   level:
     root: info
+
+# Settings for currency rates
+currency:
+  rates:
+    fetch-cron: "0 0 * * * ?"
+    base: "EUR"
+
+exchange_rates_api:
+  key: ${EXCHANGE_RATES_API_KEY:defaultKey}
+  base_url: "https://api.exchangeratesapi.io/v1/"
+
 
 open_exchange_api:
   base-url: https://openexchangerates.org/api/
