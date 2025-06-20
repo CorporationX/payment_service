@@ -33,7 +33,7 @@ exchange_rates_api:
 
 open_exchange_api:
   base-url: https://openexchangerates.org/api/
-  app-id: ${OPEN_EXCHANGE_API_APP_ID}
+  app-id: PUT HERE YOUR APP ID
 
 feign:
   client:
