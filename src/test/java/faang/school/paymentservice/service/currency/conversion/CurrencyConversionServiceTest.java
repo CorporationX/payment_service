@@ -1,6 +1,7 @@
 package faang.school.paymentservice.service.currency.conversion;
 
-import faang.school.paymentservice.client.CurrencyConverter.CurrencyConverterClient;
+import faang.school.paymentservice.client.converter.CurrencyConverterClient;
+import faang.school.paymentservice.config.CurrencyConverterConfigurationProperties;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.ExchangeRateDto;
 import faang.school.paymentservice.dto.PaymentRequest;
@@ -22,6 +23,9 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CurrencyConversionServiceTest {
+
+    @Mock
+    private CurrencyConverterConfigurationProperties configurationProperties;
 
     @Mock
     private CurrencyConverterClient currencyConverterClient;
@@ -60,6 +64,8 @@ public class CurrencyConversionServiceTest {
         BigDecimal expected = BigDecimal.valueOf(100)
                 .multiply(BigDecimal.valueOf(2.00))
                 .multiply(BigDecimal.valueOf(0.99));
+
+        when(configurationProperties.getCommissionPercentage()).thenReturn(0.01);
 
         BigDecimal result = currencyConversionService.getConvertedSum(request);
 

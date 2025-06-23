@@ -1,6 +1,6 @@
-package faang.school.paymentservice.client.CurrencyConverter;
+package faang.school.paymentservice.client.converter;
 
-import faang.school.paymentservice.client.config.CurrencyConverterConfig;
+import faang.school.paymentservice.config.CurrencyConverterConfig;
 import faang.school.paymentservice.dto.ExchangeRateDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
