@@ -19,7 +19,7 @@ public class ExchangeRateFetcher {
             currencyConversionService.getExchangeRates();
             log.info("Exchange rates successfully refreshed");
         } catch (CurrencyConversionException e) {
-            log.warn("Failed to refresh exchange rates: {}", e.getMessage());
+            log.error("Failed to refresh exchange rates: {}", e.getMessage());
         }
     }
 
