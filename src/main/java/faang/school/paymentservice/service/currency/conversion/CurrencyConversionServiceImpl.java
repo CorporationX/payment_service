@@ -23,11 +23,11 @@ public class CurrencyConversionServiceImpl implements CurrencyConversionService 
     private final CurrencyConverterClient currencyConverterClient;
     private final CurrencyConverterConfigurationProperties currencyProperties;
 
-    private Map<String, BigDecimal> rates;
+    private volatile Map<String, BigDecimal> rates;
 
     @PostConstruct
     public void initRates() {
-        this.rates = getExchangeRates();
+        getExchangeRates();
     }
 
     @Override
@@ -38,29 +38,20 @@ public class CurrencyConversionServiceImpl implements CurrencyConversionService 
             log.error("Non-acceptable currency transaction attempt: currency type: {} ", dto.currency());
             throw new CurrencyConversionException(String.format("Currency %s not accepted", dto.currency()));
         }
+        String codeOfUsed = dto.currency().name();
+        return dto.amount()
+                .multiply(rates.get(codeOfUsed))
+                .multiply(BigDecimal.valueOf(1 - currencyProperties.getCommissionPercentage()));
 
-        if (dto.currency() == Currency.USD) {
-            return dto.amount();
-        } else {
-            String codeOfUsed = dto.currency().name();
-            return dto.amount()
-                    .multiply(rates.get(codeOfUsed))
-                    .multiply(BigDecimal.valueOf(1 - currencyProperties.getCommissionPercentage()));
-        }
     }
 
     @Override
-    public Map<String, BigDecimal> getExchangeRates() {
+    public void getExchangeRates() {
         ExchangeRateDto exchangeRateDto = currencyConverterClient.getExchangeRates();
         if (exchangeRateDto == null) {
             throw new CurrencyConversionException("Failed to fetch exchange rates");
         }
-        return exchangeRateDto.getRates();
-    }
-
-    @Override
-    public void updateRates(Map<String, BigDecimal> newRates) {
-        this.rates = newRates;
+        this.rates = exchangeRateDto.getRates();
     }
 
 }

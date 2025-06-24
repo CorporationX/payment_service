@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CurrencyConversionException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleCurrencyConversionException (CurrencyConversionException e) {
+    public ErrorResponse handleCurrencyConversionException(CurrencyConversionException e) {
         return new ErrorResponse(e.getMessage());
     }
 }
