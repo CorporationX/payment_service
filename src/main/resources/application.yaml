@@ -12,9 +12,8 @@ exchange:
   base_url: "https://openexchangerates.org/"
   url: "api/latest.json"
   access_key: "0134aec31a134dec86124871d5fc0cbf"
-
   base: "RUB"
-  symbol: "USD,EUR"
+  symbols: "USD,EUR"
 
 redis:
   host: "localhost"
