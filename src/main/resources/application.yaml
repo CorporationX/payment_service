@@ -5,6 +5,7 @@ logging:
   level:
     root: info
 
+
 cron:
   expression: "0 0 * * * *"
 
@@ -18,3 +19,11 @@ exchange:
 redis:
   host: "localhost"
   port: 6379
+  
+url:
+  id: "0134aec31a134dec86124871d5fc0cbf"
+  service: "https://openexchangerates.org/"
+
+exchange:
+  currency: "RUB"
+  commission: 1
