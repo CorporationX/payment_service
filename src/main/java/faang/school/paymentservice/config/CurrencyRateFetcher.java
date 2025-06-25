@@ -23,9 +23,6 @@ public class CurrencyRateFetcher {
     public void saveCurrency() {
         Mono<ExchangeRateResponseDto> jsonMono = currencyService.saveExchangeRate();
 
-//        jsonMono.subscribe(response->redisService.setValue("USD", response.getRates().get("USD")));
-//        jsonMono.subscribe(response->redisService.setValue("AUD", response.getRates().get("AUD")));
-//        jsonMono.subscribe(response->redisService.setValue("EUR", response.getRates().get("EUR")));
         jsonMono.subscribe(response -> {
                     redisService.setValue("EUR", response.rates().get("EUR"));
                     redisService.setValue("USD", response.rates().get("USD"));
