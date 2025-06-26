@@ -18,8 +18,17 @@ dependencies {
      */
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    implementation("org.springframework.retry:spring-retry:2.0.2")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+    /**
+     * Redis and json
+     */
+    implementation("redis.clients:jedis:5.0.2")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.3")
     /**
      * Utils & Logging
      */

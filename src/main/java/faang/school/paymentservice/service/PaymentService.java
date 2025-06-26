@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 @Slf4j
 public class PaymentService {
-    @Value("${url.id}")
+    @Value("${exchange.access_key}")
     private String appId;
 
     @Value("${exchange.currency}")

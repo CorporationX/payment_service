@@ -30,6 +30,8 @@ class PaymentServiceTest {
     @BeforeEach
     void setUp(){
         ReflectionTestUtils.setField(service, "appId", "0134aec31a134dec86124871d5fc0cbf");
+        ReflectionTestUtils.setField(service, "currency", "RUB");
+        ReflectionTestUtils.setField(service, "commission", 1L);
     }
 
     @Test

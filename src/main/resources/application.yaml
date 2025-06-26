@@ -5,10 +5,18 @@ logging:
   level:
     root: info
 
-url:
-  id: "0134aec31a134dec86124871d5fc0cbf"
-  service: "https://openexchangerates.org/"
+
+cron:
+  expression: "0 0 * * * *"
+
+redis:
+  host: "localhost"
+  port: 6379
 
 exchange:
+  service: "https://openexchangerates.org/"
+  url: "api/latest.json"
+  access_key: "0134aec31a134dec86124871d5fc0cbf"
   currency: "RUB"
   commission: 1
+  symbols: "USD,EUR"
