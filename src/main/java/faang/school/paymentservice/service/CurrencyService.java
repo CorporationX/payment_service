@@ -23,7 +23,7 @@ public class CurrencyService {
     @Value("${exchange.access_key}")
     private String key;
 
-    @Value("${exchange.base}")
+    @Value("${exchange.currency}")
     private String base;
 
     @Value("${exchange.symbols}")

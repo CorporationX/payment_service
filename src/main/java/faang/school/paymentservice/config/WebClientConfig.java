@@ -11,7 +11,7 @@ import java.time.Duration;
 
 @Configuration
 public class WebClientConfig {
-    @Value("${exchange.base_url}")
+    @Value("${exchange.service}")
     private String API_URL;
 
     @Bean

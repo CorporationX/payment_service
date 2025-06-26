@@ -9,21 +9,14 @@ logging:
 cron:
   expression: "0 0 * * * *"
 
-exchange:
-  base_url: "https://openexchangerates.org/"
-  url: "api/latest.json"
-  access_key: "0134aec31a134dec86124871d5fc0cbf"
-  base: "RUB"
-  symbols: "USD,EUR"
-
 redis:
   host: "localhost"
   port: 6379
-  
-url:
-  id: "0134aec31a134dec86124871d5fc0cbf"
-  service: "https://openexchangerates.org/"
 
 exchange:
+  service: "https://openexchangerates.org/"
+  url: "api/latest.json"
+  access_key: "0134aec31a134dec86124871d5fc0cbf"
   currency: "RUB"
   commission: 1
+  symbols: "USD,EUR"
