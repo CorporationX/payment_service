@@ -38,6 +38,9 @@ public class CurrencyConversionServiceImpl implements CurrencyConversionService 
             log.error("Non-acceptable currency transaction attempt: currency type: {} ", dto.currency());
             throw new CurrencyConversionException(String.format("Currency %s not accepted", dto.currency()));
         }
+        if(rates == null) {
+            getExchangeRates();
+        }
         String codeOfUsed = dto.currency().name();
         return dto.amount()
                 .multiply(rates.get(codeOfUsed))
@@ -49,6 +52,7 @@ public class CurrencyConversionServiceImpl implements CurrencyConversionService 
     public void getExchangeRates() {
         ExchangeRateDto exchangeRateDto = currencyConverterClient.getExchangeRates();
         if (exchangeRateDto == null) {
+            log.error("Failed to retrieve exchange rate from currency converter");
             throw new CurrencyConversionException("Failed to fetch exchange rates");
         }
         this.rates = exchangeRateDto.getRates();
