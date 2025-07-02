@@ -14,6 +14,20 @@ public class AccountNumbersSequenceRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
+    public void save(AccountType accountType, long currentNumber) {
+        String sql = """
+        INSERT INTO account_numbers_sequence (account_type, current_number)
+        VALUES (:type, :current)
+        ON CONFLICT (account_type) DO UPDATE
+        SET current_number = EXCLUDED.current_number
+    """;
+
+        jdbcTemplate.update(sql, Map.of(
+                "type", accountType.name(),
+                "current", currentNumber
+        ));
+    }
+
     public boolean incrementIfEquals(AccountType accountType, long expected) {
         String sql = """
             UPDATE account_numbers_sequence

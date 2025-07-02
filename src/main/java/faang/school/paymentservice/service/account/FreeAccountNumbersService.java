@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 @Service
@@ -22,13 +23,9 @@ public class FreeAccountNumbersService {
 
     @Transactional
     public <T> T useAccountNumber(AccountType accountType, Function<String, T> consumer) {
+        Optional<String> optionalNumber = accountNumbersRepository.fetchAndRemoveNextFreeNumber(accountType);
 
-        String accountNumber = accountNumbersRepository.fetchAndRemoveNextFreeNumber(accountType)
-                .orElseThrow(() -> new IllegalArgumentException("Account not found for type: " + accountType));
-
-        if (accountNumber == null) {
-            accountNumber = generateNewNumber(accountType);
-        }
+        String accountNumber = optionalNumber.orElseGet(() -> generateNewNumber(accountType));
 
         return consumer.apply(accountNumber);
     }

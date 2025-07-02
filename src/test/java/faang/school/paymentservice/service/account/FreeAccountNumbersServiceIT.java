@@ -6,9 +6,13 @@ import faang.school.paymentservice.model.account.AccountType;
 import faang.school.paymentservice.repository.account.AccountNumbersSequenceRepository;
 import faang.school.paymentservice.repository.account.FreeAccountNumbersRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,8 +27,8 @@ public class FreeAccountNumbersServiceIT extends TestContainersConfig {
     @Autowired
     private FreeAccountNumbersRepository accountNumbersRepository;
 
-    @Autowired
-    private AccountNumbersSequenceRepository sequenceRepository;
+    @MockBean
+    private AccountNumbersSequenceRepository spyRepository;
 
     @Test
     void shouldReturnAndRemoveFreeAccountNumber() {
@@ -35,6 +39,25 @@ public class FreeAccountNumbersServiceIT extends TestContainersConfig {
 
         assertThat(usedNumber).isEqualTo(expectedNumber);
         assertThat(accountNumbersRepository.findById(expectedNumber)).isEmpty();
+    }
+
+    @Test
+    void shouldRetryOnOptimisticLockFailureAndEventuallySucceed() {
+        AccountType accountType = AccountType.DEBIT;
+        long initialNumber = 123L;
+        String expectedAccountNumber = accountType.getPrefix() + String.format("%012d", initialNumber + 1);
+
+        Mockito.doReturn(Optional.of(initialNumber))
+                .when(spyRepository).getCurrentNumber(accountType);
+
+        AtomicInteger counter = new AtomicInteger();
+        Mockito.doAnswer(inv -> counter.incrementAndGet() >= 3)
+                .when(spyRepository).incrementIfEquals(accountType, initialNumber);
+
+        String result = accountNumbersService.useAccountNumber(accountType, Function.identity());
+
+        assertThat(result).isEqualTo(expectedAccountNumber);
+        Mockito.verify(spyRepository, Mockito.times(3)).incrementIfEquals(accountType, initialNumber);
     }
 
     @Test
