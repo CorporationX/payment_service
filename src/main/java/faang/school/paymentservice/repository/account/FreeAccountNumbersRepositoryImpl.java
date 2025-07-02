@@ -18,24 +18,30 @@ public class FreeAccountNumbersRepositoryImpl implements FreeAccountNumbersRepos
 
     @Override
     public void save(FreeAccountNumber account) {
-        jdbc.update("""
+        String sql = """
             INSERT INTO free_account_numbers (account_number, account_type)
             VALUES (:number, :type)
-        """, Map.of(
-                "number", account.getAccountNumber(),
-                "type", account.getAccountType().name()
+        """;
+
+        jdbc.update(sql,
+            Map.of(
+            "number", account.getAccountNumber(),
+            "type", account.getAccountType().name()
         ));
     }
 
     @Override
     public Optional<FreeAccountNumber> findById(String accountNumber) {
-        List<FreeAccountNumber> result = jdbc.query("""
+        String sql = """
             SELECT account_number, account_type
             FROM free_account_numbers
             WHERE account_number = :number
-        """, Map.of("number", accountNumber), (rs, rowNum) -> new FreeAccountNumber(
-                rs.getString("account_number"),
-                AccountType.valueOf(rs.getString("account_type"))
+        """;
+
+        List<FreeAccountNumber> result = jdbc.query(sql,
+                Map.of("number", accountNumber), (resultSet, rowNum) -> new FreeAccountNumber(
+                resultSet.getString("account_number"),
+                AccountType.valueOf(resultSet.getString("account_type"))
         ));
 
         return result.stream().findFirst();
@@ -43,12 +49,18 @@ public class FreeAccountNumbersRepositoryImpl implements FreeAccountNumbersRepos
 
     @Override
     public Optional<String> fetchAndRemoveNextFreeNumber(AccountType accountType) {
-        return jdbc.query("""
+        String sql = """
             DELETE FROM free_account_numbers
             WHERE account_type = :type
             RETURNING account_number
-        """, Map.of("type", accountType.name()), resultSet -> {
-            return resultSet.next() ? Optional.of(resultSet.getString("account_number")) : Optional.empty();
+        """;
+
+        return jdbc.query(sql, Map.of("type", accountType.name()), resultSet -> {
+            if (resultSet.next()) {
+                return Optional.of(resultSet.getString("account_number"));
+            }
+
+            return Optional.empty();
         });
     }
 }

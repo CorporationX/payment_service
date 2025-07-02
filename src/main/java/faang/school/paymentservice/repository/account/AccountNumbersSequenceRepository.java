@@ -16,11 +16,11 @@ public class AccountNumbersSequenceRepository {
 
     public void save(AccountType accountType, long currentNumber) {
         String sql = """
-        INSERT INTO account_numbers_sequence (account_type, current_number)
-        VALUES (:type, :current)
-        ON CONFLICT (account_type) DO UPDATE
-        SET current_number = EXCLUDED.current_number
-    """;
+            INSERT INTO account_numbers_sequence (account_type, current_number)
+            VALUES (:type, :current)
+            ON CONFLICT (account_type) DO UPDATE
+            SET current_number = EXCLUDED.current_number
+        """;
 
         jdbcTemplate.update(sql, Map.of(
                 "type", accountType.name(),
@@ -45,8 +45,14 @@ public class AccountNumbersSequenceRepository {
     }
 
     public Optional<Long> getCurrentNumber(AccountType accountType) {
+        String sql = """
+            SELECT current_number
+            FROM account_numbers_sequence
+            WHERE account_type = :type
+        """;
+
         return Optional.ofNullable(jdbcTemplate.queryForObject(
-                "SELECT current_number FROM account_numbers_sequence WHERE account_type = :type",
+                sql,
                 Map.of("type", accountType.name()),
                 Long.class
         ));
