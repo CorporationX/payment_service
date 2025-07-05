@@ -1,0 +1,18 @@
+package faang.school.paymentservice.dto;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.math.BigDecimal;
+import java.util.Map;
+
+@Getter
+@Setter
+@ToString
+public class ExchangeRateResponseDto {
+    private boolean success;
+    private long timestamp;
+    private String source;
+    private Map<String, BigDecimal> quotes;
+}
