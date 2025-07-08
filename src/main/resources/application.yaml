@@ -8,3 +8,59 @@ logging:
 oxr:
   app-id : "b16f7ad6bb084c27bd4f0ba4956a6e38"
   base-url : https://openexchangerates.org/api
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: transfer-event-group
+    topics:
+      transfer:
+        publish:
+          authorization-request-topic:
+            name: authorize-request
+          clear-request-topic:
+            name: clear-request
+          cancellation-request-topic:
+            name: cancel-request
+        consume:
+          authorization-success-topic:
+            name: authorization-success
+            consumer-pool-size: 5
+          authorization-failed-topic:
+            name: authorization-failed
+            consumer-pool-size: 5
+          clearing-success-topic:
+            name: clearing-success
+            consumer-pool-size: 5
+          clearing-failed-topic:
+            name: clearing-failed
+            consumer-pool-size: 5
+          cancellation-success-topic:
+            name: cancellation-success
+            consumer-pool-size: 5
+          cancellation-failed-topic:
+            name: cancellation-failed
+            consumer-pool-size: 5
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
