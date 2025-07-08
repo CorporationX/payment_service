@@ -33,22 +33,19 @@ public class PaymentController {
     @PostMapping("/transfer")
     public ResponseEntity<TransferResponse> startTransferAuthorization(@RequestBody TransferRequest dto) {
         TransferResponse response = paymentService.startTransferAuthorization(dto);
-
-        return ResponseEntity.ok();
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/transfer/cancellation")
     public ResponseEntity<TransferResponse> cancelTransferAuthorization(@RequestBody CancelTransferRequest dto) {
-
-
-        return ResponseEntity.ok();
+        TransferResponse response = paymentService.cancelTransferAuthorization(dto);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/transfer/forced-clearing")
     public ResponseEntity<TransferResponse> forceTransferAuthorization(@RequestBody ForceClearingTransferRequest dto) {
-
-
-        return ResponseEntity.ok();
+        TransferResponse response = paymentService.forceTransferAuthorization(dto);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/convert")

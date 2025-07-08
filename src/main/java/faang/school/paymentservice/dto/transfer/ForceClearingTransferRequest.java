@@ -6,9 +6,6 @@ import java.util.UUID;
 
 public record ForceClearingTransferRequest(
         @NotNull
-        UUID sourceAccountId,
-
-        @NotNull
         UUID transferId
 ) {
 }

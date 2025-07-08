@@ -1,7 +1,6 @@
 package faang.school.paymentservice.listener;
 
 import faang.school.paymentservice.event.CancelTransferFailEventResponse;
-import faang.school.paymentservice.event.CancelTransferSuccessEventResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;

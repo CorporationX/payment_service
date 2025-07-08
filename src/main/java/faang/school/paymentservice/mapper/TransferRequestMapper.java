@@ -13,6 +13,9 @@ public interface TransferRequestMapper {
 
     TransferEventRequest dtoToEvent(TransferRequest dto);
 
-    @Mapping(target = "active", defaultValue = "true")
+    @Mapping(target = "transferStatus", defaultValue = "ACTIVE")
+    @Mapping(target = "paymentStatus", defaultValue = "AUTHORIZATION_PENDING")
+    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "updatedAt", expression = "java(java.time.LocalDateTime.now())")
     Transfer dtoToEntity(TransferRequest dto);
 }

@@ -1,6 +1,7 @@
 package faang.school.paymentservice.dto.transfer;
 
 import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.dto.TransactionType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
@@ -19,6 +20,9 @@ public record TransferRequest(
         BigInteger withdrawalAmount,
 
         @NotNull
-        Currency currency
+        Currency currency,
+
+        @NotNull
+        TransactionType transactionType
 ) {
 }
