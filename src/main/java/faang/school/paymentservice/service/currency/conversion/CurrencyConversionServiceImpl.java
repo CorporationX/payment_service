@@ -25,11 +25,6 @@ public class CurrencyConversionServiceImpl implements CurrencyConversionService 
 
     private volatile Map<String, BigDecimal> rates;
 
-    @PostConstruct
-    public void initRates() {
-        getExchangeRates();
-    }
-
     @Override
     public BigDecimal getConvertedSum(PaymentRequest dto) {
         boolean notAcceptedCurrency = Arrays.stream(Currency.values())
