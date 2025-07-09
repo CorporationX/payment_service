@@ -3,6 +3,7 @@ server:
 
 logging:
   level:
+    liquibase: DEBUG
     root: info
 
 
@@ -20,3 +21,38 @@ exchange:
   currency: "RUB"
   commission: 1
   symbols: "USD,EUR"
+
+kafka:
+  host: "localhost:9092"
+  topics:
+    topic1: "sd"
+  groups:
+    group1: "sdf"
+  num-partitions: 2
+  replication-factor: 1
+  concurrency: 3
+  default_class_deserializer: "faang.school.analytics.dto.AnalyticsEventDto"
+  properties:
+    security.protocol: SSL
+    ssl.truststore.location: /path/to/truststore.jks
+    ssl.truststore.password: password
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
