@@ -16,6 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class PaymentOperationResponseDto {
     // TODO: не уверен что нужно отдавать оба
+    // TODO: мб вообще operationToken PK
     private UUID id;
     private UUID operationToken;
     private UUID accountFromId;
