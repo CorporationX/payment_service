@@ -1,14 +1,16 @@
 package faang.school.paymentservice.service.payment;
 
+import faang.school.paymentservice.config.job.JobClearingPaymentConfig;
 import faang.school.paymentservice.entity.payment.PaymentOperation;
 import faang.school.paymentservice.entity.payment.PaymentOperationStatus;
-import faang.school.paymentservice.facade.payment.PaymentOperationKafkaFacade;
+import faang.school.paymentservice.model.payment.OperationTokenResult;
 import faang.school.paymentservice.repository.payment.PaymentOperationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -17,22 +19,44 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PaymentOperationService {
     private final PaymentOperationRepository paymentOperationRepository;
-    private final PaymentOperationKafkaFacade paymentOperationKafkaFacade;
-
+    private final OperationTokenRedisService operationTokenRedisService;
+    private final JobClearingPaymentConfig jobClearingPaymentConfig;
     @Transactional
     public PaymentOperation authorizePayment(PaymentOperation paymentOperation) {
+        UUID redisToken = buildRedisToken(paymentOperation);
 
-        // TODO: логика валидации идемпотентности
-        paymentOperation.setOperationToken(UUID.randomUUID());
+        OperationTokenResult tokenResult = operationTokenRedisService.saveOperationToken(redisToken);
+
+        UUID operationToken = buildDbToken(paymentOperation, tokenResult.tokenModel().getCreatedAt());
+        if (tokenResult.wasAlreadyPresent()) {
+            // TODO: исключение
+            return paymentOperationRepository.findByOperationToken(operationToken)
+                    .orElseThrow();
+        }
+
+        paymentOperation.setOperationToken(operationToken);
         paymentOperation.setStatus(PaymentOperationStatus.PENDING);
-        // TODO: в конфиг
-        paymentOperation.setClearScheduledAt(LocalDateTime.now().plusMinutes(15));
+        paymentOperation.setClearScheduledAt(
+                tokenResult.tokenModel().getCreatedAt().
+                        minusSeconds(jobClearingPaymentConfig.getScheduledAt())
+        );
 
-        PaymentOperation savedPaymentOperation = paymentOperationRepository.save(paymentOperation);
-        log.info("Payment operation {} has been save", savedPaymentOperation);
+        PaymentOperation saved = paymentOperationRepository.save(paymentOperation);
+        log.info("Payment operation {} has been saved", saved);
 
-        paymentOperationKafkaFacade.createPaymentOperationEvent(savedPaymentOperation);
+        return saved;
+    }
 
-        return savedPaymentOperation;
+    // TODO: поправить
+    private UUID buildRedisToken(PaymentOperation paymentOperation) {
+        String raw = paymentOperation.getAccountFromId() + ":" +
+                paymentOperation.getAccountToId()   + ":" +
+                paymentOperation.getCurrencyId()    + ":" +
+                paymentOperation.getAmount();
+        return UUID.nameUUIDFromBytes(raw.getBytes(StandardCharsets.UTF_8));
+    }
+    private UUID buildDbToken(PaymentOperation paymentOperation, LocalDateTime createAt) {
+        String raw = buildRedisToken(paymentOperation) + ":" + createAt;
+        return UUID.nameUUIDFromBytes(raw.getBytes(StandardCharsets.UTF_8));
     }
 }

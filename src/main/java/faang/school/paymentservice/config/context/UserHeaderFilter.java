@@ -1,6 +1,6 @@
 package faang.school.paymentservice.config.context;
 
-import faang.school.paymentservice.dto.authorization.UserUnauthorizedException;
+import faang.school.paymentservice.exception.authorization.UserUnauthorizedException;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,43 +1,50 @@
-datasource:
-  driver-class-name: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5433/postgres
-  username: user
-  password: password
-
-jpa:
-  database-platform: org.hibernate.dialect.PostgreSQLDialect
-  hibernate:
-    ddl-auto: none
-  show-sql: false
-  properties:
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: user
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      format_sql: true
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
 
-liquibase:
-  change-log: classpath:db/changelog/db.changelog-master.yaml
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
 
-kafka:
-  bootstrap-servers: localhost:29092
-  producer:
-    key-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    acks: 1
-    retries: 5
-  consumer:
-    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    auto-offset-reset: earliest
-    enable-auto-commit: false
-  topic:
-    payment-authorization-request:
-      name: payment-authorization-request
-      partitions: 1
-    success-payment-authorization-response:
-      name: success-payment-authorization-response
-      partitions: 1
-    failed-payment-authorization-response:
-      name: failed-payment-authorization-response
-      partitions: 1
+  data:
+    redis:
+      port: 6379
+      host: localhost
+      ttl:
+        operation-token: 30 # 30 секунд
+
+  kafka:
+    bootstrap-servers: localhost:29092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: 1
+      retries: 5
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+    topic:
+      payment-authorization-request:
+        name: payment_authorization_request_topic
+        partitions: 1
+      success-payment-authorization-response:
+        name: success_payment_authorization_response_topic
+        partitions: 1
+      failed-payment-authorization-response:
+        name: failed_payment_authorization_response_topic
+        partitions: 1
 
 server:
   port: 9080
@@ -45,3 +52,10 @@ server:
 logging:
   level:
     root: info
+
+jobs:
+  payment-operation:
+    clearing:
+      scheduled-at: 900 # 15 минут (в секундах)
+      cron: "*/15 * * * * *"
+      # Каждые 15 секунд

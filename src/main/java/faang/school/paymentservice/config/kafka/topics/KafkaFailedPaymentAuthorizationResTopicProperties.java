@@ -1,4 +1,4 @@
-package faang.school.paymentservice.kafka.topics;
+package faang.school.paymentservice.config.kafka.topics;
 
 import lombok.Getter;
 import lombok.Setter;

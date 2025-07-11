@@ -1,4 +1,4 @@
-package faang.school.paymentservice.kafka;
+package faang.school.paymentservice.config.kafka;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

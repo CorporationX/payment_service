@@ -1,7 +1,7 @@
 package faang.school.paymentservice.publisher.payment;
 
 import faang.school.paymentservice.event.payment.PaymentAuthorizationEventDto;
-import faang.school.paymentservice.kafka.topics.KafkaPaymentAuthorizationReqTopicProperties;
+import faang.school.paymentservice.config.kafka.topics.KafkaPaymentAuthorizationReqTopicProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;

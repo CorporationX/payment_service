@@ -38,13 +38,13 @@ public class PaymentOperation {
     @Column(name = "operation_token", nullable = false, updatable = false, unique = true)
     private UUID operationToken;
 
-    @Column(name = "operation_token", nullable = false, updatable = false)
+    @Column(name = "account_from_id", nullable = false, updatable = false)
     private UUID accountFromId;
 
-    @Column(name = "operation_token", nullable = false, updatable = false)
+    @Column(name = "account_to_id", nullable = false, updatable = false)
     private UUID accountToId;
 
-    @Column(name = "operation_token", nullable = false, updatable = false)
+    @Column(name = "currency_id", nullable = false, updatable = false)
     private UUID currencyId;
 
     @Column(name = "amount", nullable = false, updatable = false)
