@@ -18,6 +18,5 @@ public class PaymentAuthorizationEventDto {
     private UUID accountToId;
     private UUID currencyId;
     private BigDecimal amount;
-    //TODO: видимо тот, что from
     private Long userId;
 }

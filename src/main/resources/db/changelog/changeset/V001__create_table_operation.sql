@@ -15,5 +15,7 @@ CREATE TABLE payment_operation (
     status             VARCHAR(32) NOT NULL,
     created_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at         TIMESTAMP NOT NULL,
-    clear_scheduled_at TIMESTAMP NOT NULL
+    clear_scheduled_at TIMESTAMP NOT NULL,
+    timestamp_at       TIMESTAMP,
+    detail             VARCHAR(4000)
 );

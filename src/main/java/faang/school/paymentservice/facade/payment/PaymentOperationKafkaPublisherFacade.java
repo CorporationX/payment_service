@@ -12,16 +12,15 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class PaymentOperationKafkaFacade {
+public class PaymentOperationKafkaPublisherFacade {
     private final PaymentKafkaPublisher paymentKafkaPublisher;
     private final PaymentOperationKafkaMapper paymentOperationKafkaMapper;
 
     @Async("sendKafkaMessageExecutor")
-    // TODO: нейминг
-    public void createPaymentOperationEvent(PaymentOperation paymentOperation) {
+    public void createPaymentAuthorizationEvent(PaymentOperation paymentOperation) {
         PaymentAuthorizationEventDto paymentAuthorizationEventDto =
                 paymentOperationKafkaMapper.toPaymentAuthorizationEventDto(paymentOperation);
-        log.debug("Mapping PaymentOperation entity to PaymentAuthorizationEventDto." +
+        log.info("Mapping PaymentOperation entity to PaymentAuthorizationEventDto." +
                         "Entity content: {}. DTO content: {}.", paymentOperation, paymentAuthorizationEventDto);
 
         paymentKafkaPublisher.sendMessage(paymentAuthorizationEventDto);

@@ -1,8 +1,12 @@
 package faang.school.paymentservice.event.payment;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
-public record FailedPaymentAuthorizationEventDto (UUID operationToken) {
+public record FailedPaymentAuthorizationEventDto (UUID operationToken,
+                                                  UUID operationId,
+                                                  LocalDateTime timestamp,
+                                                  String detail) {
 }
 

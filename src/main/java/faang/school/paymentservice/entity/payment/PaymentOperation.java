@@ -38,6 +38,9 @@ public class PaymentOperation {
     @Column(name = "operation_token", nullable = false, updatable = false, unique = true)
     private UUID operationToken;
 
+    @Column(name = "operation_id")
+    private UUID operationId;
+
     @Column(name = "account_from_id", nullable = false, updatable = false)
     private UUID accountFromId;
 
@@ -51,7 +54,7 @@ public class PaymentOperation {
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, updatable = false)
+    @Column(name = "status", nullable = false)
     private PaymentOperationStatus status;
 
     @CreatedDate
@@ -67,4 +70,11 @@ public class PaymentOperation {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "clear_scheduled_at", nullable = false)
     private LocalDateTime clearScheduledAt;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "timestamp_at")
+    private LocalDateTime timestamp;
+
+    @Column(name = "detail", length = 4000)
+    private String detail;
 }

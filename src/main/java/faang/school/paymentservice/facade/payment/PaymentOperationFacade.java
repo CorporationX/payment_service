@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class PaymentOperationFacade {
     private final PaymentOperationService paymentOperationService;
     private final PaymentOperationMapper paymentOperationMapper;
-    private final PaymentOperationKafkaFacade paymentOperationKafkaFacade;
+    private final PaymentOperationKafkaPublisherFacade paymentOperationKafkaPublisherFacade;
 
     public PaymentOperationResponseDto authorizePayment(PaymentOperationAuthorizeRequestDto requestDto) {
         PaymentOperation paymentOperation = paymentOperationMapper.toPaymentOperationEntity(requestDto);
@@ -30,7 +30,7 @@ public class PaymentOperationFacade {
                         "Entity content: {}. DTO content: {}.", paymentOperation, responseDto);
 
         // TODO: не нужно отправлять в кафку, если вернулась уже созданная операция
-        paymentOperationKafkaFacade.createPaymentOperationEvent(paymentOperation);
+        paymentOperationKafkaPublisherFacade.createPaymentAuthorizationEvent(paymentOperation);
 
         return responseDto;
     }

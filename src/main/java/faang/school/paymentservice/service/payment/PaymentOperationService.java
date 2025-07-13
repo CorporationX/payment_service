@@ -3,6 +3,7 @@ package faang.school.paymentservice.service.payment;
 import faang.school.paymentservice.config.job.JobClearingPaymentConfig;
 import faang.school.paymentservice.entity.payment.PaymentOperation;
 import faang.school.paymentservice.entity.payment.PaymentOperationStatus;
+import faang.school.paymentservice.exception.payment.PaymentOperationNotFoundException;
 import faang.school.paymentservice.model.payment.OperationTokenResult;
 import faang.school.paymentservice.repository.payment.PaymentOperationRepository;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +59,28 @@ public class PaymentOperationService {
     private UUID buildDbToken(PaymentOperation paymentOperation, LocalDateTime createAt) {
         String raw = buildRedisToken(paymentOperation) + ":" + createAt;
         return UUID.nameUUIDFromBytes(raw.getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Transactional
+    public PaymentOperation updatePaymentOperationStatus(UUID operationToken, UUID operationId, LocalDateTime timestamp,
+                                                         PaymentOperationStatus status, String detail) {
+        PaymentOperation paymentOperation = paymentOperationRepository.findByOperationTokenForUpdate(operationToken)
+                .orElseThrow(() -> {
+                    String errorMsg = String.format("Payment operation with operation token %s not found",
+                            operationToken);
+                    log.error(errorMsg);
+                    return new PaymentOperationNotFoundException(errorMsg);
+                });
+
+        if (paymentOperation.getTimestamp() != null && timestamp.isAfter(paymentOperation.getTimestamp())) {
+            return paymentOperation;
+        }
+        paymentOperation.setOperationId(operationId);
+        paymentOperation.setStatus(status);
+        paymentOperation.setDetail(detail);
+
+        log.info("Payment operation {} has been updated", paymentOperation);
+
+        return paymentOperation;
     }
 }

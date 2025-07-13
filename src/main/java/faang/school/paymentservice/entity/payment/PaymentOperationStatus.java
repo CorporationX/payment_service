@@ -4,7 +4,9 @@ public enum PaymentOperationStatus {
     PENDING,
     AUTHORIZED,
     CLEARED,
-    CANCELLED,
-    FAILED
+    CANCELED,
+    AUTHORIZATION_FAILED,
+    CLEAR_FAILED,
+    CANCELLATION_FAILED
     // TODO: если лок занят, то надо вернуть в авторизацию, а не статус ошибки
 }
