@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-public class ClearDueTransferConfig {
+public class ClearTransferConfig {
     private String cron;
     private int batchSize;
     private int threadPoolSize;

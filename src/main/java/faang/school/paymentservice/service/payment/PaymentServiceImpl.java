@@ -85,7 +85,7 @@ public class PaymentServiceImpl implements PaymentService{
         transfer.setTransferStage(event.getTransferStage());
         transfer.setDescription(event.getDescription());
         transfer.setAccountEventId(event.getTransactionId());
-        transfer.setClearedAt(LocalDateTime.now().plusMinutes(5));
+        transfer.setClearedAfter(LocalDateTime.now().plusMinutes(5));
         transfer.setUpdatedAt(LocalDateTime.now());
 
         transferRepository.save(transfer);
@@ -144,7 +144,19 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
     @Transactional
-    public List<Transfer> getDueTransfers() {
-        return transferRepository.getDueTransfers();
+    public List<Transfer> clearTransfer(int batchSize) {
+        List<Transfer> transfers = transferRepository.getTransfersForAutoClearing(batchSize);
+
+        transfers.forEach(transfer -> {
+            transfer.setTransferStage(TransferStage.CLEARING_PENDING);
+        });
+
+        return transfers;
     }
+
+    @Transactional(readOnly = true)
+    public int getNotClearedAtTimeTransfers() {
+        return transferRepository.countTransfersForAutoClearing();
+    }
+
 }

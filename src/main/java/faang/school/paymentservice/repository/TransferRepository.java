@@ -23,9 +23,17 @@ public interface TransferRepository extends JpaRepository<Transfer, UUID> {
 
     @Query(nativeQuery = true, value = """
             SELECT * FROM transfer t
-            WHERE t.transfer_status = 'ACTIVE' and transaction_status = 'AUTHORIZED' and cleared_at <= NOW()
-            FOR UPDATE SKIP LOCKED
-            LIMIT 1000
+            WHERE t.transfer_status = 'ACTIVE' and transfer_stage = 'AUTHORIZED' and to_be_cleared_after <= NOW()
+            FOR UPDATE
+            SKIP LOCKED
+            LIMIT :limit
             """)
-    List<Transfer> getDueTransfers();
+    List<Transfer> getTransfersForAutoClearing(int limit);
+
+    @Query(nativeQuery = true, value = """
+            SELECT COUNT(*) FROM transfer t
+            WHERE t.transfer_status = 'ACTIVE' and transfer_stage = 'AUTHORIZED' and to_be_cleared_after <= NOW()
+            """)
+    int countTransfersForAutoClearing();
+
 }

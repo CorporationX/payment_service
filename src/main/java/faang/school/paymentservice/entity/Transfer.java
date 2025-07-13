@@ -56,7 +56,7 @@ public class Transfer {
     @Enumerated(EnumType.STRING)
     private TransferStatus transferStatus;
 
-    @Column(name = "transaction_status", nullable = false)
+    @Column(name = "transfer_stage", nullable = false)
     @Enumerated(EnumType.STRING)
     private TransferStage transferStage;
 
@@ -78,8 +78,8 @@ public class Transfer {
     private LocalDateTime updatedAt;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "cleared_at", nullable = false)
-    private LocalDateTime clearedAt;
+    @Column(name = "to_be_cleared_after", nullable = false)
+    private LocalDateTime clearedAfter;
 
     @Version
     private Integer version;

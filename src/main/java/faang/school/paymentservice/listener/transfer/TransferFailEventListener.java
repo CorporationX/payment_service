@@ -44,8 +44,7 @@ public class TransferFailEventListener extends AbstractTransferEventListener<Tra
                 event,
                 event::getAuthorizationId,
                 event::getTransferStage,
-                event::getDescription,
-                event::getTransactionId
+                event::getDescription
         );
     }
 }

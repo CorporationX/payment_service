@@ -26,5 +26,7 @@ public interface PaymentService {
 
     void handleClearTransferEvent(ClearTransferEventResponse event);
 
-    List<Transfer> getDueTransfers();
+    List<Transfer> clearTransfer(int batchSize);
+
+    int getNotClearedAtTimeTransfers();
 }
