@@ -13,16 +13,16 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: transfer-event-group
+      group-id: account-group
     topics:
       transfer:
         publish:
           authorization-request-topic:
-            name: authorize-request
+            name: authorize-requests
           clear-request-topic:
-            name: clear-request
+            name: clear-requests
           cancellation-request-topic:
-            name: cancel-request
+            name: cancellation-requests
         consume:
           authorization-success-topic:
             name: authorization-success
@@ -31,10 +31,10 @@ spring:
             name: authorization-failed
             consumer-pool-size: 5
           clearing-success-topic:
-            name: clearing-success
+            name: clear-success
             consumer-pool-size: 5
           clearing-failed-topic:
-            name: clearing-failed
+            name: clear-failed
             consumer-pool-size: 5
           cancellation-success-topic:
             name: cancellation-success
@@ -42,6 +42,11 @@ spring:
           cancellation-failed-topic:
             name: cancellation-failed
             consumer-pool-size: 5
+      dead-letters:
+        transfer-dead-letters-topic:
+          name: transfer-dead-letters
+          default-attempts: 1
+          default-interval-millis: 100
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -64,3 +69,11 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 50MB
+
+clearing:
+  transfers:
+    cron: "*/15 * * * * *"
+    batch_size: 200
+  executor:
+    thread_pool_max_size: 1000
+    thread_pool_core_size: 500

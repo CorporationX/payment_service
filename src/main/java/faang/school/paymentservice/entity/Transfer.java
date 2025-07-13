@@ -1,7 +1,6 @@
 package faang.school.paymentservice.entity;
 
-import faang.school.paymentservice.dto.Currency;
-import faang.school.paymentservice.dto.PaymentStatus;
+import faang.school.paymentservice.dto.TransferStage;
 import faang.school.paymentservice.dto.TransactionType;
 import faang.school.paymentservice.dto.TransferStatus;
 import jakarta.persistence.Column;
@@ -59,11 +58,14 @@ public class Transfer {
 
     @Column(name = "transaction_status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
+    private TransferStage transferStage;
 
     @Column(name = "transaction_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
+
+    @Column(name = "description")
+    private String description;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

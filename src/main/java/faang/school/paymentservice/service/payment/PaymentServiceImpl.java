@@ -1,29 +1,28 @@
 package faang.school.paymentservice.service.payment;
 
 import faang.school.paymentservice.config.context.UserContext;
-import faang.school.paymentservice.dto.PaymentRequest;
-import faang.school.paymentservice.dto.PaymentStatus;
+import faang.school.paymentservice.dto.TransferStage;
+import faang.school.paymentservice.dto.TransferStatus;
 import faang.school.paymentservice.dto.transfer.CancelTransferRequest;
 import faang.school.paymentservice.dto.transfer.ForceClearingTransferRequest;
 import faang.school.paymentservice.dto.transfer.TransferRequest;
-import faang.school.paymentservice.dto.transfer.TransferResponse;
 import faang.school.paymentservice.entity.Transfer;
-import faang.school.paymentservice.event.CancelTransferEventRequest;
-import faang.school.paymentservice.event.TransferEventRequest;
+import faang.school.paymentservice.event.transfer.CancelTransferEventResponse;
+import faang.school.paymentservice.event.transfer.ClearTransferEventResponse;
+import faang.school.paymentservice.event.transfer.TransferEventResponse;
 import faang.school.paymentservice.exception.common.RecordNotFoundException;
 import faang.school.paymentservice.mapper.TransferRequestMapper;
-import faang.school.paymentservice.publisher.CancelTransferEventPublisher;
-import faang.school.paymentservice.publisher.ForceClearingEventPublisher;
-import faang.school.paymentservice.publisher.TransferEventPublisher;
 import faang.school.paymentservice.repository.TransferRepository;
 import faang.school.paymentservice.service.oxr.OxrService;
 import faang.school.paymentservice.validation.TransferValidation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -39,82 +38,86 @@ public class PaymentServiceImpl implements PaymentService{
     private final OxrService oxrConfig;
     private static final BigDecimal PERCENT = BigDecimal.valueOf(0.99);
 
-    private final TransferEventPublisher transferEventPublisher;
-    private final CancelTransferEventPublisher cancelTransferEventPublisher;
-    private final ForceClearingEventPublisher forceClearingEventPublisher;
-
-    public TransferResponse startTransferAuthorization(TransferRequest dto) {
+    @Transactional
+    public Transfer startTransferAuthorization(TransferRequest dto) {
         Long userId = userContext.getUserId();
+        Long activeTransactions = transferRepository.countUserActiveTransactions(userId);
 
-        TransferEventRequest eventRequest = transferRequestMapper.dtoToEvent(dto);
-        eventRequest.setUserId(userId);
-        eventRequest.setId(UUID.randomUUID());
+        transferValidation.validateNoActiveTransactions(activeTransactions, userId);
 
         Transfer transfer = transferRequestMapper.dtoToEntity(dto);
-        transfer.setId(eventRequest.getId());
         transfer.setInitiatorId(userId);
 
-        transferEventPublisher.publish(eventRequest);
-        transferRepository.save(transfer);
-
-        return TransferResponse.builder()
-                .paymentStatus(transfer.getPaymentStatus())
-                .transferId(transfer.getId())
-                .transferStatus(transfer.getTransferStatus())
-                .build();
+        return transferRepository.save(transfer);
     }
 
-    public TransferResponse cancelTransferAuthorization(CancelTransferRequest dto) {
+    @Transactional
+    public Transfer cancelTransfer(CancelTransferRequest dto) {
         Long userId = userContext.getUserId();
-        Transfer transfer = getValidTransfer(dto.transferId());
+        Transfer transfer = transferRepository.findByAccountEventId(dto.transferId());
 
         transferValidation.validateTransferInitiator(userId, transfer);
-        transferValidation.validateCancelTransferEntityStatus(transfer);
+        transferValidation.validateTransferAuthorized(transfer);
 
-        CancelTransferEventRequest request = CancelTransferEventRequest.builder()
-                .accountEventId(transfer.getAccountEventId())
-                .build();
+        transfer.setTransferStage(TransferStage.CANCELLATION_PENDING);
+        transfer.setUpdatedAt(LocalDateTime.now());
 
-        cancelTransferEventPublisher.publish(request);
+        return transferRepository.save(transfer);
+    }
 
-        transfer.setPaymentStatus(PaymentStatus.CANCELLATION_PENDING);
+    @Transactional
+    public Transfer forceTransferClearing(ForceClearingTransferRequest dto) {
+        Long userId = userContext.getUserId();
+        Transfer transfer = transferRepository.findByAccountEventId(dto.transferId());
+
+        transferValidation.validateTransferInitiator(userId, transfer);
+        transferValidation.validateTransferAuthorized(transfer);
+
+        transfer.setTransferStage(TransferStage.CLEARING_PENDING);
+        transfer.setUpdatedAt(LocalDateTime.now());
+
+        return transferRepository.save(transfer);
+    }
+
+    @Transactional
+    public void handleTransferEvent(TransferEventResponse event) {
+        Transfer transfer = getValidTransfer(event.getAuthorizationId());
+        transfer.setTransferStage(event.getTransferStage());
+        transfer.setDescription(event.getDescription());
+        transfer.setAccountEventId(event.getTransactionId());
+        transfer.setClearedAt(LocalDateTime.now().plusMinutes(5));
         transfer.setUpdatedAt(LocalDateTime.now());
 
         transferRepository.save(transfer);
-
-        return TransferResponse.builder()
-                .paymentStatus(transfer.getPaymentStatus())
-                .transferId(transfer.getId())
-                .transferStatus(transfer.getTransferStatus())
-                .build();
     }
 
-    public TransferResponse forceTransferAuthorization(ForceClearingTransferRequest dto) {
-        Long userId = userContext.getUserId();
-        Transfer transfer = getValidTransfer(dto.transferId());
-
-        transferValidation.validateTransferInitiator(userId, transfer);
-        transferValidation.validateTransferAvailableForClearing(transfer);
-
-        CancelTransferEventRequest request = CancelTransferEventRequest.builder()
-                .accountEventId(transfer.getAccountEventId())
-                .build();
-
-        cancelTransferEventPublisher.publish(request);
-
-        transfer.setPaymentStatus(PaymentStatus.CANCELLATION_PENDING);
+    @Transactional
+    public void handleCancelTransferEvent(CancelTransferEventResponse event) {
+        Transfer transfer = transferRepository.findByAccountEventId(event.getTransactionId());
+        transfer.setTransferStage(event.getTransferStage());
+        transfer.setDescription(event.getDescription());
         transfer.setUpdatedAt(LocalDateTime.now());
 
-        transferRepository.save(transfer);
+        if (event.getTransferStage() == TransferStage.CANCELED) {
+            transfer.setTransferStatus(TransferStatus.CLOSED);
+        }
 
-        return TransferResponse.builder()
-                .paymentStatus(transfer.getPaymentStatus())
-                .transferId(transfer.getId())
-                .transferStatus(transfer.getTransferStatus())
-                .build();
+        transferRepository.save(transfer);
     }
 
+    @Transactional
+    public void handleClearTransferEvent(ClearTransferEventResponse event) {
+        Transfer transfer = transferRepository.findByAccountEventId(event.getTransactionId());
+        transfer.setTransferStage(event.getTransferStage());
+        transfer.setDescription(event.getDescription());
+        transfer.setUpdatedAt(LocalDateTime.now());
 
+        if (event.getTransferStage() == TransferStage.CLEARED) {
+            transfer.setTransferStatus(TransferStatus.CLOSED);
+        }
+
+        transferRepository.save(transfer);
+    }
 
     @Override
     public BigDecimal convertCurrency(BigDecimal amount, String fromCurrency, String toCurrency) {
@@ -138,5 +141,10 @@ public class PaymentServiceImpl implements PaymentService{
                 .orElseThrow(() -> new RecordNotFoundException(
                         String.format("There is no transfer with id %s", transferId)
                 ));
+    }
+
+    @Transactional
+    public List<Transfer> getDueTransfers() {
+        return transferRepository.getDueTransfers();
     }
 }

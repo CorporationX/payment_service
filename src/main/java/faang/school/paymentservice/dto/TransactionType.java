@@ -1,7 +1,7 @@
 package faang.school.paymentservice.dto;
 
 public enum TransactionType {
-    OTHER,
+    NO_CATEGORY,
     TRAVEL,
     STUDYING,
     SPORT

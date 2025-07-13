@@ -6,11 +6,12 @@ CREATE TABLE transfer (
     account_event_id UUID DEFAULT uuid_generate_v4(),
     source_account_id UUID DEFAULT uuid_generate_v4(),
     target_account_id UUID DEFAULT uuid_generate_v4(),
-    transfer_status varchar(16),
-    transaction_status varchar(16),
-    transaction_type varchar(16),
+    transfer_status varchar(32),
+    transaction_status varchar(32),
+    transaction_type varchar(32),
     created_at TIMESTAMP NOT NULL DEFAULT current_timestamp,
     updated_at TIMESTAMP NOT NULL,
-    cleared_at TIMESTAMP NOT NULL,
-    version INTEGER NOT NULL DEFAULT 1,
+    cleared_at TIMESTAMP,
+    description varchar(128),
+    version INTEGER NOT NULL DEFAULT 1
 );

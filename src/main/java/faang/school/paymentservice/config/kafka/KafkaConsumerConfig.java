@@ -1,8 +1,11 @@
 package faang.school.paymentservice.config.kafka;
 
-import faang.school.paymentservice.event.CancelTransferEventRequest;
-import faang.school.paymentservice.event.ClearingTransferEventRequest;
-import faang.school.paymentservice.event.TransferEventRequest;
+import faang.school.paymentservice.event.transfer.CancelTransferFailEventResponse;
+import faang.school.paymentservice.event.transfer.CancelTransferSuccessEventResponse;
+import faang.school.paymentservice.event.transfer.ClearingTransferFailEventResponse;
+import faang.school.paymentservice.event.transfer.ClearingTransferSuccessEventResponse;
+import faang.school.paymentservice.event.transfer.TransferFailEventResponse;
+import faang.school.paymentservice.event.transfer.TransferSuccessEventResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -24,33 +27,33 @@ public class KafkaConsumerConfig {
     private final KafkaProperties kafkaProperties;
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, ClearingTransferEventRequest> kafkaClearTransferSuccessEventListener() {
-        return concurrentKafkaListenerJsonFactory(ClearingTransferEventRequest.class);
+    public ConcurrentKafkaListenerContainerFactory<String, ClearingTransferSuccessEventResponse> kafkaClearTransferSuccessEventListener() {
+        return concurrentKafkaListenerJsonFactory(ClearingTransferSuccessEventResponse.class);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, CancelTransferEventRequest> kafkaCancelTransferSuccessEventListener() {
-        return concurrentKafkaListenerJsonFactory(CancelTransferEventRequest.class);
+    public ConcurrentKafkaListenerContainerFactory<String, CancelTransferSuccessEventResponse> kafkaCancelTransferSuccessEventListener() {
+        return concurrentKafkaListenerJsonFactory(CancelTransferSuccessEventResponse.class);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, TransferEventRequest> kafkaTransferSuccessEventListener() {
-        return concurrentKafkaListenerJsonFactory(TransferEventRequest.class);
+    public ConcurrentKafkaListenerContainerFactory<String, TransferSuccessEventResponse> kafkaTransferSuccessEventListener() {
+        return concurrentKafkaListenerJsonFactory(TransferSuccessEventResponse.class);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, ClearingTransferEventRequest> kafkaClearTransferFailEventListener() {
-        return concurrentKafkaListenerJsonFactory(ClearingTransferEventRequest.class);
+    public ConcurrentKafkaListenerContainerFactory<String, ClearingTransferFailEventResponse> kafkaClearTransferFailEventListener() {
+        return concurrentKafkaListenerJsonFactory(ClearingTransferFailEventResponse.class);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, CancelTransferEventRequest> kafkaCancelTransferFailEventListener() {
-        return concurrentKafkaListenerJsonFactory(CancelTransferEventRequest.class);
+    public ConcurrentKafkaListenerContainerFactory<String, CancelTransferFailEventResponse> kafkaCancelTransferFailEventListener() {
+        return concurrentKafkaListenerJsonFactory(CancelTransferFailEventResponse.class);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, TransferEventRequest> kafkaTransferFailEventListener() {
-        return concurrentKafkaListenerJsonFactory(TransferEventRequest.class);
+    public ConcurrentKafkaListenerContainerFactory<String, TransferFailEventResponse> kafkaTransferFailEventListener() {
+        return concurrentKafkaListenerJsonFactory(TransferFailEventResponse.class);
     }
 
     private <T> ConcurrentKafkaListenerContainerFactory<String, T> concurrentKafkaListenerJsonFactory(Class<T> tClass) {

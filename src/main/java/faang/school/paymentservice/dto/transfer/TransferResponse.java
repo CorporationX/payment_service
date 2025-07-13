@@ -1,6 +1,6 @@
 package faang.school.paymentservice.dto.transfer;
 
-import faang.school.paymentservice.dto.PaymentStatus;
+import faang.school.paymentservice.dto.TransferStage;
 import faang.school.paymentservice.dto.TransferStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -16,6 +16,6 @@ public record TransferResponse(
         TransferStatus transferStatus,
 
         @NotNull
-        PaymentStatus paymentStatus
+        TransferStage transferStage
 ) {
 }

@@ -10,19 +10,19 @@ import java.util.UUID;
 
 public record TransferRequest(
         @NotNull
-        UUID sourceAccountId,
+        UUID sourceId,
 
         @NotNull
-        UUID targetAccountId,
+        UUID targetId,
 
         @Min(1)
         @NotNull
-        BigInteger withdrawalAmount,
+        BigInteger amount,
 
         @NotNull
         Currency currency,
 
         @NotNull
-        TransactionType transactionType
+        TransactionType category
 ) {
 }

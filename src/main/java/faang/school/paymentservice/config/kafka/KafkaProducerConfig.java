@@ -1,8 +1,9 @@
 package faang.school.paymentservice.config.kafka;
 
-import faang.school.paymentservice.event.CancelTransferEventRequest;
-import faang.school.paymentservice.event.ClearingTransferEventRequest;
-import faang.school.paymentservice.event.TransferEventRequest;
+import faang.school.paymentservice.event.DeadLetterMessage;
+import faang.school.paymentservice.event.transfer.CancelTransferEventRequest;
+import faang.school.paymentservice.event.transfer.ClearingTransferEventRequest;
+import faang.school.paymentservice.event.transfer.TransferEventRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -37,6 +38,17 @@ public class KafkaProducerConfig {
     public KafkaTemplate<String, ClearingTransferEventRequest> clearTransferEventKafkaTemplate() {
         return new KafkaTemplate<>(jsonProducerFactory());
     }
+
+    @Bean
+    public KafkaTemplate<String, DeadLetterMessage> brokenTransfersTemplate() {
+        return new KafkaTemplate<>(jsonProducerFactory());
+    }
+
+    @Bean
+    public KafkaTemplate<String, String> deadLetterTemplate() {
+        return new KafkaTemplate<>(jsonProducerFactory());
+    }
+
 
     private <T> ProducerFactory<String, T> jsonProducerFactory() {
         Map<String, Object> config = new HashMap<>();

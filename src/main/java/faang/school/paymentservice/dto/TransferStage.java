@@ -1,11 +1,14 @@
 package faang.school.paymentservice.dto;
 
-public enum PaymentStatus {
+public enum TransferStage {
     SUCCESS,
     AUTHORIZATION_PENDING,
     AUTHORIZED,
     AUTHORIZATION_FAILED,
     CLEAR_FAILED,
+    CLEARING_PENDING,
+    CLEARED,
     CANCELLATION_PENDING,
+    CANCELLATION_FAILED,
     CANCELED
 }
