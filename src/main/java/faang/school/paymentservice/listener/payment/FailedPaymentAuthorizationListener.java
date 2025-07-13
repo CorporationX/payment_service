@@ -1,7 +1,7 @@
 package faang.school.paymentservice.listener.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import faang.school.paymentservice.config.kafka.topics.KafkaSuccessPaymentAuthorizationResTopicProperties;
+import faang.school.paymentservice.config.kafka.topics.KafkaFailedPaymentAuthorizationResTopicProperties;
 import faang.school.paymentservice.event.payment.FailedPaymentAuthorizationEventDto;
 import faang.school.paymentservice.facade.payment.PaymentOperationKafkaListenerFacade;
 import faang.school.paymentservice.listener.AbstractKafkaListener;
@@ -13,24 +13,23 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class FailedPaymentAuthorizationListener extends AbstractKafkaListener<FailedPaymentAuthorizationEventDto> {
     private final PaymentOperationKafkaListenerFacade paymentOperationKafkaListenerFacade;
-    private final KafkaSuccessPaymentAuthorizationResTopicProperties paymentProps;
+    private final KafkaFailedPaymentAuthorizationResTopicProperties paymentProps;
 
     public FailedPaymentAuthorizationListener(ObjectMapper objectMapper,
-                                               Class<FailedPaymentAuthorizationEventDto> eventClass,
-                                               PaymentOperationKafkaListenerFacade paymentOperationKafkaListenerFacade,
-                                               KafkaSuccessPaymentAuthorizationResTopicProperties paymentProp) {
-        super(objectMapper, eventClass);
+                                              PaymentOperationKafkaListenerFacade paymentOperationKafkaListenerFacade,
+                                              KafkaFailedPaymentAuthorizationResTopicProperties paymentProp) {
+        super(objectMapper, FailedPaymentAuthorizationEventDto.class);
         this.paymentOperationKafkaListenerFacade = paymentOperationKafkaListenerFacade;
         this.paymentProps = paymentProp;
     }
 
     @KafkaListener(
-            topics = "${spring.kafka.topic.payment-authorization-request.name}",
+            topics = "${spring.kafka.topic.failed-payment-authorization-response.name}",
             containerFactory = "kafkaListenerContainerFactory"
     )
     public void listenPaymentAuthorizationTopic(String message) {
         FailedPaymentAuthorizationEventDto event = getEvent(message);
         log.info("Received a message from {}: {}", paymentProps.getName(), event);
-        paymentOperationKafkaListenerFacade.cancelAuthorization(event);
+        paymentOperationKafkaListenerFacade.onAuthorizationFailed(event);
     }
 }

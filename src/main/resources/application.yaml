@@ -31,6 +31,7 @@ spring:
       acks: 1
       retries: 5
     consumer:
+      group-id: payment-service
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       auto-offset-reset: earliest
@@ -45,6 +46,24 @@ spring:
       failed-payment-authorization-response:
         name: failed_payment_authorization_response_topic
         partitions: 1
+      payment-clearing-request:
+        name: payment_clearing_request_topic
+        partitions: 1
+      success-payment-clearing-response:
+        name: success_payment_clearing_response_topic
+        partitions: 1
+      failed-payment-clearing-response:
+        name: failed_payment_clearing_response_topic
+        partitions: 1
+      payment-cancel-request:
+        name: payment_canceled_request_topic
+        partitions: 1
+      success-payment-cancel-response:
+        name: success_payment_canceled_response_topic
+        partitions: 1
+      failed-payment-cancel-response:
+        name: failed_payment_canceled_response_topic
+        partitions: 1
 
 server:
   port: 9080
@@ -57,5 +76,5 @@ jobs:
   payment-operation:
     clearing:
       scheduled-at: 900 # 15 минут (в секундах)
-      cron: "*/15 * * * * *"
-      # Каждые 15 секунд
+      cron: "*/15 * * * * *" # Каждые 15 секунд
+      threads: 10

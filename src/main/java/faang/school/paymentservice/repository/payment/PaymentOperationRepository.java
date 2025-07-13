@@ -20,4 +20,21 @@ public interface PaymentOperationRepository extends JpaRepository<PaymentOperati
             FOR UPDATE
             """)
     Optional<PaymentOperation> findByOperationTokenForUpdate(@Param("operationToken") UUID operationToken);
+
+    @Query(nativeQuery = true, value = """
+            SELECT *
+            FROM payment_operation
+            WHERE id = :paymentOperationId
+            FOR UPDATE
+            """)
+    Optional<PaymentOperation> findByIdForUpdate(@Param("paymentOperationId") UUID paymentOperationId);
+
+    @Query(nativeQuery = true, value = """
+                    SELECT * FROM payment_operation
+                    WHERE status = 'AUTHORIZED' AND clear_scheduled_at >= now()
+                    ORDER BY clear_scheduled_at DESC
+                    LIMIT 1
+                    FOR UPDATE SKIP LOCKED
+            """)
+    Optional<PaymentOperation> findOperationReadyToClear();
 }

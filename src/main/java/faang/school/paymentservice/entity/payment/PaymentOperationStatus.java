@@ -8,5 +8,4 @@ public enum PaymentOperationStatus {
     AUTHORIZATION_FAILED,
     CLEAR_FAILED,
     CANCELLATION_FAILED
-    // TODO: если лок занят, то надо вернуть в авторизацию, а не статус ошибки
 }

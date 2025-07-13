@@ -5,7 +5,6 @@ import java.util.UUID;
 
 
 public record FailedPaymentAuthorizationEventDto (UUID operationToken,
-                                                  UUID operationId,
                                                   LocalDateTime timestamp,
                                                   String detail) {
 }

@@ -16,21 +16,20 @@ public class SuccessPaymentAuthorizationListener extends AbstractKafkaListener<S
     private final KafkaSuccessPaymentAuthorizationResTopicProperties paymentProps;
 
     public SuccessPaymentAuthorizationListener(ObjectMapper objectMapper,
-                                               Class<SuccessPaymentAuthorizationEventDto> eventClass,
                                                PaymentOperationKafkaListenerFacade paymentOperationKafkaListenerFacade,
                                                KafkaSuccessPaymentAuthorizationResTopicProperties paymentProp) {
-        super(objectMapper, eventClass);
+        super(objectMapper, SuccessPaymentAuthorizationEventDto.class);
         this.paymentOperationKafkaListenerFacade = paymentOperationKafkaListenerFacade;
         this.paymentProps = paymentProp;
     }
 
     @KafkaListener(
-            topics = "${spring.kafka.topic.payment-authorization-request.name}",
+            topics = "${spring.kafka.topic.success-payment-authorization-response.name}",
             containerFactory = "kafkaListenerContainerFactory"
     )
     public void listenPaymentAuthorizationTopic(String message) {
         SuccessPaymentAuthorizationEventDto event = getEvent(message);
         log.info("Received a message from {}: {}", paymentProps.getName(), event);
-        paymentOperationKafkaListenerFacade.completeAuthorization(event);
+        paymentOperationKafkaListenerFacade.onAuthorizationCompleted(event);
     }
 }

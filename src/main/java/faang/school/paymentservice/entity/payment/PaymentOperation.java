@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -37,9 +38,6 @@ public class PaymentOperation {
 
     @Column(name = "operation_token", nullable = false, updatable = false, unique = true)
     private UUID operationToken;
-
-    @Column(name = "operation_id")
-    private UUID operationId;
 
     @Column(name = "account_from_id", nullable = false, updatable = false)
     private UUID accountFromId;
@@ -77,4 +75,7 @@ public class PaymentOperation {
 
     @Column(name = "detail", length = 4000)
     private String detail;
+
+    @Transient
+    private boolean wasAlreadyPresent;
 }
