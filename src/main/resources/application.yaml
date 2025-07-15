@@ -9,6 +9,7 @@ logging:
 
 cron:
   expression: "0 0 * * * *"
+  clearing: "0 0 * * * *"
 
 redis:
   host: "localhost"
@@ -25,13 +26,18 @@ exchange:
 kafka:
   host: "localhost:9092"
   topics:
-    topic1: "sd"
+    pending-topic: "pending_request"
   groups:
-    group1: "sdf"
-  num-partitions: 2
+    group1: "requests"
+  num-partitions: 4
+  partitions:
+    partition-request: 1
+    partition-status: 2
+    partition-open-request: 3
+    partition-clearing: 4
+    partition-clearing-response: 0
   replication-factor: 1
   concurrency: 3
-  default_class_deserializer: "faang.school.analytics.dto.AnalyticsEventDto"
   properties:
     security.protocol: SSL
     ssl.truststore.location: /path/to/truststore.jks
@@ -56,3 +62,6 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
+user-service:
+  host: localhost
+  port: 8080

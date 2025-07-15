@@ -1,7 +1,6 @@
 package faang.school.paymentservice.config.kafka;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -23,9 +22,6 @@ public class KafkaProducerConfig {
 
     @Value("${kafka.host}")
     private String bootstrapAddress;
-
-    @Value("${kafka.topics.topic1}")
-    private String topicName;
 
     @Value("${kafka.num-partitions}")
     private int numPartitions;

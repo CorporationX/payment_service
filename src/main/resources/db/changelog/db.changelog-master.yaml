@@ -1,3 +1,7 @@
 databaseChangeLog:
   - include:
       file: db/changelog/changeset/V001__payment-service_pending.sql
+  - include:
+      file: db/changelog/changeset/V002__payment-service_operation_id_unique.sql
+  - include:
+      file: db/changelog/changeset/V003__payment-service_operation_id_is_varchar.sql
