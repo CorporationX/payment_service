@@ -1,6 +1,80 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: user
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  data:
+    redis:
+      port: 6379
+      host: localhost
+      ttl:
+        operation-token: 30 # 30 секунд
+
+  kafka:
+    bootstrap-servers: localhost:29092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: 1
+      retries: 5
+    consumer:
+      group-id: payment-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+    topic:
+      payment-authorization-request:
+        name: payment_authorization_request_topic
+        partitions: 1
+      success-payment-authorization-response:
+        name: success_payment_authorization_response_topic
+        partitions: 1
+      failed-payment-authorization-response:
+        name: failed_payment_authorization_response_topic
+        partitions: 1
+      payment-clearing-request:
+        name: payment_clearing_request_topic
+        partitions: 1
+      success-payment-clearing-response:
+        name: success_payment_clearing_response_topic
+        partitions: 1
+      failed-payment-clearing-response:
+        name: failed_payment_clearing_response_topic
+        partitions: 1
+      payment-cancel-request:
+        name: payment_canceled_request_topic
+        partitions: 1
+      success-payment-cancel-response:
+        name: success_payment_canceled_response_topic
+        partitions: 1
+      failed-payment-cancel-response:
+        name: failed_payment_canceled_response_topic
+        partitions: 1
+
 server:
   port: 9080
 
 logging:
   level:
     root: info
+
+jobs:
+  payment-operation:
+    clearing:
+      scheduled-at: 900 # 15 минут (в секундах)
+      cron: "*/15 * * * * *" # Каждые 15 секунд
+      threads: 10
