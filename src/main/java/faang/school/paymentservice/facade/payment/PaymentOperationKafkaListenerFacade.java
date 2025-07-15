@@ -8,13 +8,15 @@ import faang.school.paymentservice.event.payment.SuccessPaymentAuthorizationEven
 import faang.school.paymentservice.event.payment.SuccessPaymentCancelEventDto;
 import faang.school.paymentservice.event.payment.SuccessPaymentClearingEventDto;
 import faang.school.paymentservice.service.payment.PaymentOperationService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class PaymentOperationKafkaListenerFacade {
-    private PaymentOperationService paymentOperationService;
+    private final PaymentOperationService paymentOperationService;
     public void onAuthorizationCompleted(SuccessPaymentAuthorizationEventDto paymentEvent) {
         paymentOperationService.updatePaymentOperationStatus(
                 paymentEvent.operationToken(),
