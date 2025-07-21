@@ -4,6 +4,7 @@ import faang.school.paymentservice.dto.pending.PendingResponseDto;
 import faang.school.paymentservice.dto.pending.RequestOpenDto;
 import faang.school.paymentservice.service.PendingService;
 import faang.school.paymentservice.storage.StatusStoragePendingResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.TopicPartition;
@@ -24,7 +25,7 @@ public class KafkaConsumerService {
             groupId = "${kafka.groups.group1}",
             containerFactory = "pendingResponseKafkaListenerContainerFactory"
     )
-    public void listenerPendingResponse(PendingResponseDto responseDto){
+    public void listenerPendingResponse(@Valid PendingResponseDto responseDto){
         statusStoragePendingResponseDto.updateResponse(responseDto, responseDto.getOperationId());
     }
 
@@ -36,7 +37,7 @@ public class KafkaConsumerService {
             groupId = "${kafka.groups.group1}",
             containerFactory = "requestOpenKafkaListenerContainerFactory"
     )
-    public void listenerOpenRequest(RequestOpenDto openDto){
+    public void listenerOpenRequest(@Valid RequestOpenDto openDto){
         pendingService.openRequest(openDto);
     }
 

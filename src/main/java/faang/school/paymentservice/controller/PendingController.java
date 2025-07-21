@@ -4,6 +4,7 @@ import faang.school.paymentservice.dto.pending.PendingDto;
 import faang.school.paymentservice.dto.pending.PendingResponseDto;
 import faang.school.paymentservice.service.PendingService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,7 +25,7 @@ public class PendingController {
     }
 
     @PutMapping
-    public PendingResponseDto forcedClearing(@RequestBody String operationId){
+    public PendingResponseDto forcedClearing(@RequestBody @NotBlank String operationId){
         return pendingService.forcedClearing(operationId);
     }
 }

@@ -18,5 +18,5 @@ public class PendingRequestDto {
     private String token;
     private RequestType requestType;
     private Map<String, String> requestInputData;
-    private String addictionalDetail;
+    private String additionalDetails;
 }

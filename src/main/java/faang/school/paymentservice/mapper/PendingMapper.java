@@ -4,6 +4,7 @@ import faang.school.paymentservice.dto.pending.PendingDto;
 import faang.school.paymentservice.dto.pending.PendingRequestDto;
 import faang.school.paymentservice.dto.pending.ResponseClearingDto;
 import faang.school.paymentservice.model.Pending;
+import jakarta.validation.constraints.NotNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -14,12 +15,12 @@ public interface PendingMapper {
     @Mapping(target = "requestStatus", ignore = true)
     @Mapping(target = "reason", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    Pending toEntity(PendingDto dto);
+    Pending toEntity(@NotNull PendingDto dto);
 
     @Mapping(target = "token", ignore = true)
-    PendingDto toDto(Pending pending);
+    PendingDto toDto(@NotNull Pending pending);
 
-    PendingRequestDto toRequest(PendingDto dto);
+    PendingRequestDto toRequest(@NotNull PendingDto dto);
 
-    ResponseClearingDto toClearing(Pending pending);
+    ResponseClearingDto toClearing(@NotNull Pending pending);
 }

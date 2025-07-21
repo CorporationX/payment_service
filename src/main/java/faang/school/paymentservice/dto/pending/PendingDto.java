@@ -20,6 +20,6 @@ public record PendingDto(
         @NotBlank @NotNull String token,
         LocalDateTime completionDate,
         Map<String, String> requestInputData,
-        String addictionalDetails
+        String additionalDetails
 ) {
 }
