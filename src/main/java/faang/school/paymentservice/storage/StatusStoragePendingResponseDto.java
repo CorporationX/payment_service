@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 public class StatusStoragePendingResponseDto extends StatusStorage<PendingResponseDto> {
 
     public PendingResponseDto saveStatus(String operationId) {
-        return awaitStatus(operationId, (e, id) -> {
-            return new PendingResponseDto(RequestStatus.FAILED, e, id);
+        return awaitStatus(operationId, (exp, id) -> {
+            return new PendingResponseDto(RequestStatus.FAILED, exp, id);
         });
     }
 }
