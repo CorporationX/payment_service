@@ -3,11 +3,13 @@ server:
 
 logging:
   level:
+    liquibase: DEBUG
     root: info
 
 
 cron:
   expression: "0 0 * * * *"
+  clearing: "0 0 * * * *"
 
 redis:
   host: "localhost"
@@ -20,3 +22,46 @@ exchange:
   currency: "RUB"
   commission: 1
   symbols: "USD,EUR"
+
+kafka:
+  host: "localhost:9092"
+  topics:
+    pending-topic: "pending_request"
+  groups:
+    group1: "requests"
+  num-partitions: 4
+  partitions:
+    partition-request: 1
+    partition-status: 2
+    partition-open-request: 3
+    partition-clearing: 4
+    partition-clearing-response: 0
+  replication-factor: 1
+  concurrency: 3
+  properties:
+    security.protocol: SSL
+    ssl.truststore.location: /path/to/truststore.jks
+    ssl.truststore.password: password
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+user-service:
+  host: localhost
+  port: 8080

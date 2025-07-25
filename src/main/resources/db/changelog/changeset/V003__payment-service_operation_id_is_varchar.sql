@@ -1,0 +1,2 @@
+ALTER TABLE pending ALTER COLUMN operation_id TYPE VARCHAR(64);
+
