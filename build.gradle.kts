@@ -21,6 +21,12 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     /**
+     * Broker
+     */
+    implementation("org.springframework.kafka:spring-kafka")
+    testImplementation("org.springframework.kafka:spring-kafka-test")
+
+    /**
      * Utils & Logging
      */
     implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
