@@ -29,6 +29,8 @@ exchangerates:
     baseUrl: http://api.exchangeratesapi.io/v1
     baseCurrency: EUR
     cacheName: exchangeRates
+    connectTimeoutMs: 5000
+    responseTimeoutMs: 5000
     uri:
       latest: /latest
     retry:

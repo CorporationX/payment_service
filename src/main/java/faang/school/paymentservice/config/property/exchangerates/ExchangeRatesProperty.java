@@ -13,6 +13,8 @@ public record ExchangeRatesProperty(
         String baseCurrency,
         @DefaultValue("exchangerates")
         String cacheName,
+        @DefaultValue("5000") int connectTimeoutMs,
+        @DefaultValue("5000") int responseTimeoutMs,
         @NestedConfigurationProperty
         UriProperty uri,
         @NestedConfigurationProperty

@@ -3,6 +3,7 @@ package faang.school.paymentservice.client.currency;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import faang.school.paymentservice.config.RetryConfig;
 import faang.school.paymentservice.config.property.exchangerates.ExchangeRatesProperty;
 import faang.school.paymentservice.config.property.exchangerates.RetryProperty;
 import faang.school.paymentservice.config.property.exchangerates.UriProperty;
@@ -24,6 +25,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.test.StepVerifier;
+import reactor.util.retry.Retry;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -38,11 +41,14 @@ class ExchangeRatesApiTest {
     private MockWebServer mockWebServer;
     private ExchangeRatesApi exchangeRatesApi;
     private ExchangeRatesProperty property;
+    private Retry exchangeRatesRetry;
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String BASE_URL = "/";
     private static final String KEY = "key";
     private static final String BASE_CURRENCY = "EUR";
+    private static final int CONNECT_TIMEOUT_MS = 5000;
+    private static final int RESPONSE_TIMEOUT_MS = 5000;
 
     @BeforeAll
     static void init() {
@@ -53,8 +59,7 @@ class ExchangeRatesApiTest {
     void setUp() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
-        property = prepareProperty();
-        exchangeRatesApi = new ExchangeRatesApi(prepareWebClient(), property);
+        exchangeRatesApi = createApi();
     }
 
     @AfterEach
@@ -175,15 +180,26 @@ class ExchangeRatesApiTest {
 
     // ------------------------------
 
+    private ExchangeRatesApi createApi() {
+        property = createApiProperty();
+        exchangeRatesRetry = new RetryConfig(createRetryProperty()).exchangeRatesRetry();
+        return new ExchangeRatesApi(prepareWebClient(), exchangeRatesRetry, property);
+    }
+
     private WebClient prepareWebClient() {
         String baseUrl = mockWebServer.url(BASE_URL).toString();
         return WebClient.builder().baseUrl(baseUrl).build();
     }
 
-    private ExchangeRatesProperty prepareProperty() {
+    private ExchangeRatesProperty createApiProperty() {
         UriProperty uriProperty = new UriProperty("/latest");
-        RetryProperty retryProperty = new RetryProperty(3, 1000, ChronoUnit.MILLIS, 0.0);
-        return new ExchangeRatesProperty(KEY, BASE_URL, BASE_CURRENCY, "testCache", uriProperty, retryProperty);
+        RetryProperty retryProperty = createRetryProperty();
+        return new ExchangeRatesProperty(KEY, BASE_URL, BASE_CURRENCY, "testCache", CONNECT_TIMEOUT_MS,
+                                         RESPONSE_TIMEOUT_MS, uriProperty, retryProperty);
+    }
+
+    private RetryProperty createRetryProperty() {
+        return new RetryProperty(3, 1000, ChronoUnit.MILLIS, 0.0);
     }
 
     private String toJson(Object object) throws JsonProcessingException {

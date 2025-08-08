@@ -7,7 +7,6 @@ import faang.school.paymentservice.exception.ApiRequestException;
 import faang.school.paymentservice.exception.EmptyApiResponseException;
 import faang.school.paymentservice.exception.ExternalApiException;
 import faang.school.paymentservice.exception.InvalidApiResponseException;
-import faang.school.paymentservice.exception.RetryExhaustedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
@@ -18,13 +17,13 @@ import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import java.net.URI;
-import java.time.Duration;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ExchangeRatesApi implements CurrencyClient {
     private final WebClient exchangeRatesWebClient;
+    private final Retry exchangeRatesRetry;
     private final ExchangeRatesProperty property;
 
     @Override
@@ -34,12 +33,11 @@ public class ExchangeRatesApi implements CurrencyClient {
         return exchangeRatesWebClient.get()
                 .uri(this::buildUri)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, this::processHttpErrorCodeResponse)
-                .onStatus(HttpStatusCode::is5xxServerError, this::processHttpErrorCodeResponse)
+                .onStatus(HttpStatusCode::isError, this::processHttpErrorCodeResponse)
                 .bodyToMono(CurrencyRateDto.class)
                 .switchIfEmpty(Mono.error(new EmptyApiResponseException("Empty response body from API")))
                 .flatMap(this::processResponse)
-                .retryWhen(prepareBehaviorRetry());
+                .retryWhen(exchangeRatesRetry);
     }
 
     private Mono<? extends Throwable> processHttpErrorCodeResponse(ClientResponse response) {
@@ -71,27 +69,12 @@ public class ExchangeRatesApi implements CurrencyClient {
 
     private URI buildUri(UriBuilder uriBuilder) {
         String currencies = Currency.getCurrenciesAsString();
-        log.info("Currency list: {}", currencies);
+        log.info("Currency list for requesting rate in request 'symbols' param: {}", currencies);
         return uriBuilder
                 .path(property.uri().latest())
                 .queryParam("access_key", property.accessKey())
                 .queryParam("base", property.baseCurrency())
                 .queryParam("symbols", currencies)
                 .build();
-    }
-
-    private Retry prepareBehaviorRetry() {
-        return Retry.backoff(property.retry().maxAttempts(),
-                             Duration.of(property.retry().delay(),
-                                         property.retry().delayTimeUnit()))
-                .jitter(property.retry().jitter())
-                .filter(throwable -> throwable instanceof ExternalApiException)
-                .doBeforeRetry(retrySignal -> log.info(
-                        "Attempt #{}, cause: {}", (retrySignal.totalRetries() + 1), retrySignal.failure().getMessage()))
-                .onRetryExhaustedThrow((spec, signal) ->
-                                               new RetryExhaustedException("Retries exhausted: {}/{}",
-                                                                           signal.failure(),
-                                                                           property.retry().maxAttempts(),
-                                                                           signal.totalRetries()));
     }
 }
