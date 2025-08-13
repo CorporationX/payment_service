@@ -3,6 +3,7 @@ package faang.school.paymentservice.client.currency;
 import faang.school.paymentservice.config.property.exchangerates.ExchangeRatesProperty;
 import faang.school.paymentservice.dto.Currency;
 import faang.school.paymentservice.dto.CurrencyRateDto;
+import faang.school.paymentservice.dto.ErrorType;
 import faang.school.paymentservice.exception.ApiRequestException;
 import faang.school.paymentservice.exception.EmptyApiResponseException;
 import faang.school.paymentservice.exception.ExternalApiException;
@@ -35,7 +36,7 @@ public class ExchangeRatesApi implements CurrencyClient {
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, this::processHttpErrorCodeResponse)
                 .bodyToMono(CurrencyRateDto.class)
-                .switchIfEmpty(Mono.error(new EmptyApiResponseException("Empty response body from API")))
+                .switchIfEmpty(Mono.error(new EmptyApiResponseException(ErrorType.EMPTY_RESPONSE_BODY)))
                 .flatMap(this::processResponse)
                 .retryWhen(exchangeRatesRetry);
     }
@@ -57,7 +58,7 @@ public class ExchangeRatesApi implements CurrencyClient {
         log.info("Processing response from API: {}", response);
         if (!response.success()) {
             if (response.error() == null) {
-                return Mono.error(new InvalidApiResponseException("Field 'success' is false, but error is null"));
+                return Mono.error(new InvalidApiResponseException(ErrorType.SUCCESS_FALSE_ERROR_NULL));
             }
 
             return Mono.error(new ApiRequestException(
