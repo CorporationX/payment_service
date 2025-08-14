@@ -4,3 +4,37 @@ server:
 logging:
   level:
     root: info
+
+spring:
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+redis:
+  ttl: 1
+  ttlUnit: DAYS
+  defaultTtl: 60
+  defaultTtlUnit: MINUTES
+
+currency:
+  rate:
+    cron: 0 0 * * * ?
+
+exchangerates:
+  api:
+    accessKey: <key>
+    baseUrl: http://api.exchangeratesapi.io/v1
+    baseCurrency: EUR
+    cacheName: exchangeRates
+    connectTimeoutMs: 5000
+    responseTimeoutMs: 5000
+    uri:
+      latest: /latest
+    retry:
+      maxAttempts: 3
+      delay: 2
+      delayTimeUnit: SECONDS
+      jitter: 0.0
