@@ -25,11 +25,16 @@ public class CurrencyRateFetcher {
      */
     @Scheduled(cron = "${currency.rates.cron}")
     private void ratesCron() {
-        service.getRatesApiResponse()
-                .subscribe(responseRates -> {
-                    log.info("Курсы валют: {}", getActualRates());
-                    cacheService.cacheRates("currency_rates", responseRates.rates);
-                });
+        try {
+            service.getRatesApiResponse()
+                    .subscribe(responseRates -> {
+                        log.info("Курсы валют: {}", getActualRates());
+                        cacheService.cacheRates("currency_rates", responseRates.rates);
+                    });
+        } catch (Exception e) {
+            log.warn("Ошибка получения актуального курса валют.", e);
+        }
+
     }
 
     /**

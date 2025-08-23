@@ -8,3 +8,7 @@ logging:
 currency:
   rates:
     cron: "0 0 0 * * *"
+
+webclient:
+  currency-rates:
+    key: 65cc367cc0c62b9d9fc43775ea68aa51

@@ -3,6 +3,7 @@ package faang.school.paymentservice.webclient;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -14,9 +15,11 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class WebClientConfiguration {
+    @Value("${webclient.currency-rates.key}")
+    private static String accessKey;
     private static final String BASE_URL = "http://data.fixer.io/api/latest?" +
-            "access_key=65cc367cc0c62b9d9fc43775ea68aa51&" +
-            "symbols=USD,AUD,CAD,PLN,MXN,JPY,KRW,RUB,CNY&format=1";
+            "access_key=" + accessKey +
+            "&symbols=USD,AUD,CAD,PLN,MXN,JPY,KRW,RUB,CNY&format=1";
     public static final int TIMEOUT = 1000;
 
     @Bean
