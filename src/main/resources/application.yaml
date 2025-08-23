@@ -4,3 +4,7 @@ server:
 logging:
   level:
     root: info
+
+currency:
+  rates:
+    cron: "0 0 0 * * *"
