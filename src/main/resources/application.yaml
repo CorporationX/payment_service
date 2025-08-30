@@ -19,14 +19,6 @@ spring:
 
   kafka:
     bootstrap-servers: localhost:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    properties:
-      acks: all
-      retries: 3
-      linger.ms: 5
-      enable.idempotence: true
 
 app:
   kafka:
