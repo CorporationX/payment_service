@@ -7,7 +7,7 @@ import faang.school.paymentservice.model.dto.PaymentRequestDto;
 import faang.school.paymentservice.model.dto.PaymentResponseDto;
 import faang.school.paymentservice.model.enums.PaymentStages;
 import faang.school.paymentservice.repository.PaymentRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

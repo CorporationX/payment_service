@@ -19,6 +19,12 @@ spring:
 
   kafka:
     bootstrap-servers: localhost:9092
+    producer:
+      transaction-id-prefix: tx-payment-
+      retries: 3
+      acks: all
+      properties:
+        enable.idempotence: true
 
 app:
   kafka:
@@ -26,7 +32,6 @@ app:
       authorization: payment-authorization-requests
       cancel: payment-cancel-requests
       clearing: payment-clearing-requests
-
 
 server:
   port: 9090
