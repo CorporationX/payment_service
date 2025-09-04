@@ -24,7 +24,7 @@ public class CurrencyRateFetcher {
      * Шедулер для получения и кэширования курса валют. Запуск производится раз в сутки.
      */
     @Scheduled(cron = "${currency.rates.cron}")
-    private void ratesCron() {
+    public void ratesCron() {
         try {
             service.getRatesApiResponse()
                     .subscribe(responseRates -> {
@@ -34,7 +34,6 @@ public class CurrencyRateFetcher {
         } catch (Exception e) {
             log.warn("Ошибка получения актуального курса валют.", e);
         }
-
     }
 
     /**
