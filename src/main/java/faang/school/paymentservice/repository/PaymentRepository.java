@@ -21,6 +21,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     List<Payment> findByStatus(PaymentStages status);
 
-    @Query("SELECT p FROM Payment p WHERE p.status = 'PENDING' AND p.clearScheduledAt <= :now")
-    List<Payment> findPendingWithScheduledBefore(LocalDateTime now);
+    @Query("SELECT p FROM Payment p WHERE p.status = 'PENDING' AND p.clearScheduledAt <= CURRENT_TIMESTAMP")
+    List<Payment> findPendingWithScheduledBefore();
 }

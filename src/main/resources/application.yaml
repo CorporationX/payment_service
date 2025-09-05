@@ -47,3 +47,7 @@ currency:
 webclient:
   currency-rates:
     key: 65cc367cc0c62b9d9fc43775ea68aa51
+
+payment:
+  clearing:
+    fixed-delay-ms: 30000

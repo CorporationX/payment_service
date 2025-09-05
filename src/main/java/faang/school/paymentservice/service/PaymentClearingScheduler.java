@@ -1,7 +1,6 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.model.Payment;
-import faang.school.paymentservice.model.enums.PaymentStages;
 import faang.school.paymentservice.repository.PaymentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +19,19 @@ public class PaymentClearingScheduler {
     private final PaymentRepository paymentRepository;
     private final PaymentService paymentService;
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelayString = "${payment.clearing.fixed-delay-ms}")
     @Transactional
     public void processScheduledClearings() {
-        List<Payment> toClear = paymentRepository.findPendingWithScheduledBefore(LocalDateTime.now());
+        List<Payment> toClear = paymentRepository.findPendingWithScheduledBefore();
 
         for (Payment payment : toClear) {
-            if (payment.getStatus() != PaymentStages.PENDING) continue;
-
-            log.info("Scheduled clearing for idempotencyToken={}", payment.getIdempotencyToken());
+            log.debug("Scheduled clearing for idempotencyToken={}", payment.getIdempotencyToken());
 
             try {
                 paymentService.confirmPayment(payment.getIdempotencyToken());
             } catch (Exception ex) {
-                log.error("Failed to confirm payment for idempotencyToken={}: {}", payment.getIdempotencyToken(), ex.getMessage(), ex);
+                log.error("Не удалось подтвердить оплату для idempotencyToken={}: {}",
+                        payment.getIdempotencyToken(), ex.getMessage(), ex);
             }
         }
     }

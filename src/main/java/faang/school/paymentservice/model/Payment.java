@@ -53,7 +53,8 @@ public class Payment {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private PaymentStages status;
+    @Builder.Default
+    private PaymentStages status = PaymentStages.PENDING;
 
     @Column(name = "clear_scheduled_at")
     private LocalDateTime clearScheduledAt;
@@ -66,6 +67,9 @@ public class Payment {
 
     @PrePersist
     public void prePersist() {
+        if (idempotencyToken == null) {
+            idempotencyToken = UUID.randomUUID();
+        }
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

@@ -1,6 +1,7 @@
 package faang.school.paymentservice.model.dto;
 
 import faang.school.paymentservice.dto.Currency;
+import faang.school.paymentservice.model.enums.PaymentMessageType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,4 +22,5 @@ public class PaymentMessageDto {
     private BigDecimal amount;
     private Currency currency;
     private LocalDateTime scheduledAt;
+    private PaymentMessageType type;
 }

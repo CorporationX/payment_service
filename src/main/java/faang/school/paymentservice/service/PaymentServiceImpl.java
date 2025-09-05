@@ -1,17 +1,20 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.kafka.PaymentProducer;
+import faang.school.paymentservice.mapper.PaymentMapper;
 import faang.school.paymentservice.model.Payment;
 import faang.school.paymentservice.model.dto.PaymentMessageDto;
 import faang.school.paymentservice.model.dto.PaymentRequestDto;
 import faang.school.paymentservice.model.dto.PaymentResponseDto;
+import faang.school.paymentservice.model.enums.PaymentMessageType;
 import faang.school.paymentservice.model.enums.PaymentStages;
 import faang.school.paymentservice.repository.PaymentRepository;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -20,38 +23,19 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentProducer paymentProducer;
+    @Qualifier("paymentMapper")
+    private final PaymentMapper mapper;
 
     @Override
     @Transactional
     public PaymentResponseDto initiatePayment(PaymentRequestDto request) {
-        validateRequest(request);
 
-        UUID idempotencyToken = UUID.randomUUID();
-
-        Payment payment = Payment.builder()
-                .idempotencyToken(idempotencyToken)
-                .fromAccountId(request.getFromAccountId())
-                .toAccountId(request.getToAccountId())
-                .amount(request.getAmount())
-                .currency(request.getCurrency())
-                .status(PaymentStages.PENDING)
-                .clearScheduledAt(request.getClearScheduledAt())
-                .build();
-
+        Payment payment = mapper.toPayment(request);
         paymentRepository.save(payment);
 
-        PaymentMessageDto message = PaymentMessageDto.builder()
-                .idempotencyToken(payment.getIdempotencyToken())
-                .fromAccountId(payment.getFromAccountId())
-                .toAccountId(payment.getToAccountId())
-                .amount(payment.getAmount())
-                .currency(payment.getCurrency())
-                .scheduledAt(payment.getClearScheduledAt())
-                .build();
+        sendPaymentMessage(payment, PaymentMessageType.AUTHORIZATION, payment.getClearScheduledAt());
 
-        paymentProducer.sendAuthorization(message);
-
-        return buildResponse(payment);
+        return mapper.toResponse(payment);
     }
 
     @Override
@@ -60,24 +44,15 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.getByIdempotencyTokenOrThrow(idempotencyToken);
 
         if (payment.getStatus() == PaymentStages.CANCELED || payment.getStatus() == PaymentStages.CLEARED) {
-            return buildResponse(payment);
+            return mapper.toResponse(payment);
         }
 
         payment.setStatus(PaymentStages.CANCELED);
         paymentRepository.save(payment);
 
-        PaymentMessageDto message = PaymentMessageDto.builder()
-                .idempotencyToken(payment.getIdempotencyToken())
-                .fromAccountId(payment.getFromAccountId())
-                .toAccountId(payment.getToAccountId())
-                .amount(payment.getAmount())
-                .currency(payment.getCurrency())
-                .scheduledAt(null)
-                .build();
+        sendPaymentMessage(payment, PaymentMessageType.CANCEL, null);
 
-        paymentProducer.sendCancel(message);
-
-        return buildResponse(payment);
+        return mapper.toResponse(payment);
     }
 
     @Override
@@ -86,54 +61,39 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.getByIdempotencyTokenOrThrow(idempotencyToken);
 
         if (payment.getStatus() == PaymentStages.CLEARED) {
-            return buildResponse(payment);
+            return mapper.toResponse(payment);
         }
 
         payment.setStatus(PaymentStages.CLEARED);
         paymentRepository.save(payment);
 
-        PaymentMessageDto message = PaymentMessageDto.builder()
-                .idempotencyToken(payment.getIdempotencyToken())
-                .fromAccountId(payment.getFromAccountId())
-                .toAccountId(payment.getToAccountId())
-                .amount(payment.getAmount())
-                .currency(payment.getCurrency())
-                .scheduledAt(null)
-                .build();
+        sendPaymentMessage(payment, PaymentMessageType.CLEARING, null);
 
-        paymentProducer.sendClearing(message);
-
-        return buildResponse(payment);
+        return mapper.toResponse(payment);
     }
 
     @Override
     @Transactional
     public PaymentResponseDto getPaymentByIdempotencyToken(UUID idempotencyToken) {
         Payment payment = paymentRepository.getByIdempotencyTokenOrThrow(idempotencyToken);
-        return buildResponse(payment);
+        return mapper.toResponse(payment);
     }
 
-    private void validateRequest(PaymentRequestDto request) {
-        if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Amount must be greater than zero");
-        }
-        if (request.getFromAccountId() == null || request.getToAccountId() == null) {
-            throw new IllegalArgumentException("fromAccountId and toAccountId must be not null");
-        }
-        if (request.getFromAccountId().equals(request.getToAccountId())) {
-            throw new IllegalArgumentException("fromAccountId and toAccountId cannot be the same");
-        }
-        if (request.getCurrency() == null) {
-            throw new IllegalArgumentException("Currency must not be null");
-        }
-    }
-
-    private PaymentResponseDto buildResponse(Payment payment) {
-        return PaymentResponseDto.builder()
+    private void sendPaymentMessage(Payment payment, PaymentMessageType type, LocalDateTime scheduledAt) {
+        PaymentMessageDto message = PaymentMessageDto.builder()
                 .idempotencyToken(payment.getIdempotencyToken())
-                .status(payment.getStatus())
-                .createdAt(payment.getCreatedAt())
-                .updatedAt(payment.getUpdatedAt())
+                .fromAccountId(payment.getFromAccountId())
+                .toAccountId(payment.getToAccountId())
+                .amount(payment.getAmount())
+                .currency(payment.getCurrency())
+                .scheduledAt(scheduledAt)
+                .type(type)
                 .build();
+
+        switch (type) {
+            case AUTHORIZATION -> paymentProducer.sendAuthorization(message);
+            case CANCEL -> paymentProducer.sendCancel(message);
+            case CLEARING -> paymentProducer.sendClearing(message);
+        }
     }
 }
