@@ -36,6 +36,8 @@ public class PaymentClearingScheduler {
     public void processScheduledClearings() {
         List<Payment> toClear = paymentRepository.findPendingWithScheduledBefore();
 
+        log.info("Найдено платежей для проведения клиринга: {}", toClear.size());
+
         for (Payment payment : toClear) {
             log.debug("Запланированное проведение платежа для idempotencyToken={}", payment.getIdempotencyToken());
 

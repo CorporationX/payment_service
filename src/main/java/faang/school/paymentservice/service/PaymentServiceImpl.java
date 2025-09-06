@@ -30,6 +30,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public PaymentResponseDto initiatePayment(PaymentRequestDto request) {
         Payment payment = mapper.toPayment(request);
+        if (payment.getClearScheduledAt() == null) {
+            payment.setClearScheduledAt(LocalDateTime.now());
+        }
         paymentRepository.save(payment);
         log.info("Создан платеж idempotencyToken={}: {} → {}, сумма={}, валюта={}",
                 payment.getIdempotencyToken(),
@@ -57,7 +60,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         payment.setStatus(PaymentStages.CANCELED);
         paymentRepository.save(payment);
-        sendPaymentMessage(payment, PaymentMessageType.CANCEL, null);
+        sendPaymentMessage(payment, PaymentMessageType.CANCEL, payment.getClearScheduledAt());
         log.info("Платеж отменен и отправлено сообщение CANCEL для idempotencyToken={}", idempotencyToken);
 
         return mapper.toResponse(payment);
@@ -76,7 +79,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         payment.setStatus(PaymentStages.CLEARED);
         paymentRepository.save(payment);
-        sendPaymentMessage(payment, PaymentMessageType.CLEARING, null);
+        sendPaymentMessage(payment, PaymentMessageType.CLEARING, payment.getClearScheduledAt());
         log.info("Платеж подтвержден и отправлено сообщение CLEARING для idempotencyToken={}", idempotencyToken);
 
         return mapper.toResponse(payment);
