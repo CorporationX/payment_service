@@ -5,12 +5,11 @@ import faang.school.paymentservice.model.dto.PaymentRequestDto;
 import faang.school.paymentservice.model.dto.PaymentResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PaymentMapper {
-
-    PaymentMapper INSTANCE = Mappers.getMapper(PaymentMapper.class);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "idempotencyToken", ignore = true)

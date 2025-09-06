@@ -36,7 +36,7 @@ public class TransactionConfig {
     /**
      * Создаёт комбинированный менеджер транзакций для JPA и Kafka.
      *
-     * @param emf          фабрика EntityManager для JPA
+     * @param emf            фабрика EntityManager для JPA
      * @param kafkaTxManager менеджер транзакций Kafka
      * @return {@link PlatformTransactionManager}, объединяющий JPA и Kafka транзакции
      */

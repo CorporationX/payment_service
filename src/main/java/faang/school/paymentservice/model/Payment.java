@@ -22,6 +22,15 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Сущность платежа.
+ * <p>
+ * Представляет запись о платеже между двумя аккаунтами, включая сумму, валюту, этап платежа
+ * и метки времени создания/обновления.
+ * <p>
+ * Используется JPA для сохранения в базу данных, с автоматическим управлением idempotencyToken,
+ * createdAt и updatedAt через методы {@link #prePersist()} и {@link #preUpdate()}.
+ */
 @Entity
 @Table(name = "payment")
 @Getter

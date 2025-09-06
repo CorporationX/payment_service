@@ -27,15 +27,21 @@ public class PaymentProducer {
 
     private final KafkaTemplate<String, PaymentMessageDto> kafkaTemplate;
 
-    /** Топик для сообщений авторизации платежа */
+    /**
+     * Топик для сообщений авторизации платежа
+     */
     @Value("${app.kafka.topics.authorization}")
     private String authorizationTopic;
 
-    /** Топик для сообщений отмены платежа */
+    /**
+     * Топик для сообщений отмены платежа
+     */
     @Value("${app.kafka.topics.cancel}")
     private String cancelTopic;
 
-    /** Топик для сообщений проведения платежа */
+    /**
+     * Топик для сообщений проведения платежа
+     */
     @Value("${app.kafka.topics.clearing}")
     private String clearingTopic;
 
@@ -75,6 +81,6 @@ public class PaymentProducer {
      */
     private void sendMessage(String topic, PaymentMessageDto message) {
         kafkaTemplate.send(topic, message.getIdempotencyToken().toString(), message);
-        log.info("Message sent successfully to topic {}: {}", topic, message);
+        log.info("Сообщение успешно отправлено в топик {}: {}", topic, message);
     }
 }

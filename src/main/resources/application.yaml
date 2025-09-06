@@ -25,6 +25,9 @@ spring:
       acks: all
       properties:
         enable.idempotence: true
+    consumer:
+      group-id: payment-service-group
+      auto-offset-reset: earliest
 
 app:
   kafka:
@@ -32,6 +35,7 @@ app:
       authorization: payment-authorization-requests
       cancel: payment-cancel-requests
       clearing: payment-clearing-requests
+      failed: payment-failed-requests
 
 server:
   port: 9090
