@@ -15,6 +15,12 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Конфигурация Kafka Consumer для обработки сообщений {@link PaymentMessageDto}.
+ * <p>
+ * Настраивает фабрику консьюмеров и контейнер для прослушивания топиков Kafka.
+ * Использует десериализацию JSON для сообщений типа {@link PaymentMessageDto}.
+ */
 @Configuration
 public class KafkaConsumerConfig {
 
