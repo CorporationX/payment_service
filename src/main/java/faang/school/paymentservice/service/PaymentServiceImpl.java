@@ -26,23 +26,46 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentProducer paymentProducer;
     private final PaymentMapper mapper;
 
+    /**
+     * Создаёт платеж со статусом PENDING.
+     */
     @Override
     @Transactional
     public PaymentResponseDto initiatePayment(PaymentRequestDto request) {
         Payment payment = mapper.toPayment(request);
+
         if (payment.getClearScheduledAt() == null) {
             payment.setClearScheduledAt(LocalDateTime.now());
         }
+        payment.setStatus(PaymentStages.PENDING);
         paymentRepository.save(payment);
-        log.info("Создан платеж idempotencyToken={}: {} → {}, сумма={}, валюта={}",
+
+        log.info("Создан платеж PENDING idempotencyToken={}: {} → {}, сумма={}, валюта={}",
                 payment.getIdempotencyToken(),
                 payment.getFromAccountId(),
                 payment.getToAccountId(),
                 payment.getAmount(),
                 payment.getCurrency());
 
+        PaymentMessageDto message = mapper.toMessage(payment);
+        paymentProducer.sendAuthorization(message);
+
+        return mapper.toResponse(payment);
+    }
+
+    @Transactional
+    public PaymentResponseDto authorizePayment(PaymentMessageDto message) {
+        Payment payment = paymentRepository.getByIdempotencyTokenOrThrow(message.getIdempotencyToken());
+        if (payment.getStatus() != PaymentStages.PENDING) {
+            log.warn("Платеж {} не в статусе PENDING, пропускаем авторизацию", payment.getIdempotencyToken());
+            return mapper.toResponse(payment);
+        }
+
+        payment.setStatus(PaymentStages.AUTHORIZED);
+        paymentRepository.save(payment);
+
         sendPaymentMessage(payment, PaymentMessageType.AUTHORIZATION, payment.getClearScheduledAt());
-        log.info("Отправлено сообщение AUTHORIZATION для idempotencyToken={}", payment.getIdempotencyToken());
+        log.info("Платеж {} авторизован и отправлено сообщение AUTHORIZATION", payment.getIdempotencyToken());
 
         return mapper.toResponse(payment);
     }

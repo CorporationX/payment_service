@@ -1,6 +1,7 @@
 package faang.school.paymentservice.mapper;
 
 import faang.school.paymentservice.model.Payment;
+import faang.school.paymentservice.model.dto.PaymentMessageDto;
 import faang.school.paymentservice.model.dto.PaymentRequestDto;
 import faang.school.paymentservice.model.dto.PaymentResponseDto;
 import org.mapstruct.Mapper;
@@ -18,4 +19,7 @@ public interface PaymentMapper {
     Payment toPayment(PaymentRequestDto request);
 
     PaymentResponseDto toResponse(Payment payment);
+
+    @Mapping(target = "scheduledAt", source = "clearScheduledAt")
+    PaymentMessageDto toMessage(Payment payment);
 }
