@@ -1,3 +1,42 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      transaction-id-prefix: tx-payment-
+      retries: 3
+      acks: all
+      properties:
+        enable.idempotence: true
+    consumer:
+      group-id: payment-service-group
+      auto-offset-reset: earliest
+
+app:
+  kafka:
+    topics:
+      authorization: payment-authorization-requests
+      cancel: payment-cancel-requests
+      clearing: payment-clearing-requests
+      failed: payment-failed-requests
+
 server:
   port: 9090
 
@@ -12,3 +51,7 @@ currency:
 webclient:
   currency-rates:
     key: 65cc367cc0c62b9d9fc43775ea68aa51
+
+payment:
+  clearing:
+    fixed-delay-ms: 30000

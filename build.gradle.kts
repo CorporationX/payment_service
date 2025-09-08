@@ -19,12 +19,24 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.retry:spring-retry:2.0.12")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-webflux:3.5.4")
     implementation("org.springframework.boot:spring-boot-starter-data-redis:3.5.4")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.19.2")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.aspectj:aspectjweaver:1.9.7")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
+    /**
+     * Database
+     */
+    implementation("org.postgresql:postgresql")
+    implementation("org.liquibase:liquibase-core")
+
+    /**
+     * kafka
+     */
+    implementation("org.springframework.kafka:spring-kafka")
 
     /**
      * Utils & Logging
