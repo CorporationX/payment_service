@@ -15,6 +15,13 @@ logging:
   level:
     root: info
 
+current-rate:
+  time-to-invoke: 0 0 12 * * *
+  base-url-rate: "https://www.cbr-xml-daily.ru/daily"
+  retry-delay: 2000
+  count-invoke: 3
+
+
 openexchangerates:
   url: https://openexchangerates.org
   app-id: ${OPEN_EXCHANGE_APP_ID}
