@@ -16,10 +16,11 @@ logging:
     root: info
 
 current-rate:
-  time-to-invoke: 0 0 12 * * *
-  base-url-rate: "https://www.cbr-xml-daily.ru/daily"
-  retry-delay: 2000
   count-invoke: 3
+  retry-delay: 2000
+  time-to-invoke: "0 0 12 * * *"
+  base-url-rate: "https://www.cbr-xml-daily.ru/daily"
+
 
 
 openexchangerates:
