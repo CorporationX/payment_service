@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("api/v1/currency-rate")
+@RequestMapping("api/v1/currency-rates")
 @RequiredArgsConstructor
 public class CurrencyController {
 
