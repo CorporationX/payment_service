@@ -4,3 +4,7 @@ server:
 logging:
   level:
     root: info
+
+feign:
+  currency-rates:
+    url: https://openexchangerates.org/api/latest.json?app_id=3d393b0fc31d4337a001c0fa1c34a37f
