@@ -1,9 +1,25 @@
 server:
   port: 9080
+  servlet:
+    context-path: /api
 
 logging:
   level:
     root: info
+
+openexchangerates:
+  url: https://openexchangerates.org
+  app-id: YOUR_APP_ID_HERE
+
+payment:
+  commission-rate: 0.01
+  default-currency: USD
+  rounding:
+    converted-amount: 6
+    final-amount: 2
+  verification-code:
+    lower-limit: 1000
+    upper-limit: 10000
 
 currency:
   fetch:
