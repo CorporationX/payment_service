@@ -4,3 +4,23 @@ server:
 logging:
   level:
     root: info
+
+currency:
+  fetch:
+    cron: "0 0 12 * * ?"
+    base: "EUR"
+
+external:
+  exchangeratesapi:
+    base-url: "https://open.er-api.com/v6"
+
+resilience4j:
+  retry:
+    instances:
+      currencyRetry:
+        maxAttempts: 5
+        waitDuration: 2s
+        retryExceptions:
+          - java.lang.Exception
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
