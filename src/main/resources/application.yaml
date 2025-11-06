@@ -4,3 +4,16 @@ server:
 logging:
   level:
     root: info
+
+currency:
+  scheduled:
+    daily-task: "0 0 9 * * ?"
+
+  retry:
+    max-attempts: 3
+    backoff: 1000
+
+  api-key: "your-api-key"
+  base:
+    url: "https://api.exchangeratesapi.io/v1"
+  base-currency: "RUR"
