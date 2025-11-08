@@ -2,6 +2,7 @@ package faang.school.paymentservice.service.currency;
 
 import faang.school.paymentservice.client.ExternalCurrencyClient;
 import faang.school.paymentservice.dto.ExchangeRatesResponse;
+import faang.school.paymentservice.exception.CurrencyApiException;
 import faang.school.paymentservice.store.currencyRate.CurrencyRateStore;
 import faang.school.paymentservice.store.currencyRate.CurrencySnapshot;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -26,7 +27,7 @@ public class CurrencyServiceImpl implements CurrencyService {
 
         if (response == null || response.rates() == null) {
             log.warn("Can't get new rates - keeping old ones");
-            throw new RuntimeException("Empty external Api response");
+            throw new CurrencyApiException("Empty external Api response");
         }
 
         CurrencySnapshot snapshot = new CurrencySnapshot(Instant.now(),
@@ -36,7 +37,7 @@ public class CurrencyServiceImpl implements CurrencyService {
         log.info("Rates have updated: base = {}, ratesCount = {}, fetchedAt={}",
                 response.base(),
                 response.rates().size(),
-                snapshot.getFetchedAt());
+                snapshot.fetchedAt());
     }
 
     public void fallbackRates(String base, Throwable exception) {

@@ -7,6 +7,8 @@ import faang.school.paymentservice.store.currencyRate.CurrencyRateStore;
 import faang.school.paymentservice.store.currencyRate.CurrencySnapshot;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -14,8 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Instant;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,6 +27,7 @@ import static org.mockito.Mockito.when;
 public class CurrencyServiceTest {
     String base = "EUR";
     Map<String, Double> rates = Map.of("USD", 1.1);
+    CurrencySnapshot updatedSnapshot;
     ExchangeRatesResponse exchangeRatesResponse = new ExchangeRatesResponse(
             "success",
             "EUR",
@@ -46,12 +49,18 @@ public class CurrencyServiceTest {
     @Mock
     private CurrencyRateStore currencyRateStore;
 
+    @Captor
+    ArgumentCaptor<CurrencySnapshot> snapshotArgumentCaptor;
+
     @Test
     void testSuccessfullyCurrencyRateUpdate() {
         when(externalCurrencyClient.fetchLatestRates(base)).thenReturn(exchangeRatesResponse);
         currencyService.refreshRates(base);
         verify(externalCurrencyClient, times(1)).fetchLatestRates(eq(base));
-        verify(currencyRateStore, times(1)).update(any(CurrencySnapshot.class));
+        verify(currencyRateStore, times(1)).update(snapshotArgumentCaptor.capture());
+        updatedSnapshot = snapshotArgumentCaptor.getValue();
+        assertEquals("EUR", updatedSnapshot.base());
+        assertEquals(rates, updatedSnapshot.rates());
     }
 
     @Test

@@ -19,8 +19,7 @@ public class CurrencyRateFetcher {
     }
 
     @Scheduled(cron = "${currency.fetch.cron}", zone = "Asia/Almaty")
-    public void fetchAndStoreRates() {
-        log.info("Fetch and store rates for base = {}", base);
+    public void scheduleRatesRefresh() {
         currencyService.refreshRates(base);
     }
 }

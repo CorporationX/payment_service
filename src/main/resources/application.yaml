@@ -13,6 +13,8 @@ currency:
 external:
   exchangeratesapi:
     base-url: "https://open.er-api.com/v6"
+    connect-timeout: 5000
+    read-timeout: 10000
 
 resilience4j:
   retry:
@@ -21,6 +23,8 @@ resilience4j:
         maxAttempts: 5
         waitDuration: 2s
         retryExceptions:
-          - java.lang.Exception
+          - org.springframework.web.client.HttpServerErrorException
+          - org.springframework.web.client.ResourceAccessException
+          - java.net.SocketTimeoutException
         enableExponentialBackoff: true
         exponentialBackoffMultiplier: 2
