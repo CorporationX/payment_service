@@ -4,14 +4,14 @@ import java.time.Instant;
 import java.util.Map;
 
 public record CurrencySnapshot (Instant fetchedAt,
-        String base,
+        String baseCurrency,
         Map<String, Double> rates) {
 
     public CurrencySnapshot(Instant fetchedAt,
-                            String base,
+                            String baseCurrency,
                             Map<String, Double> rates) {
         this.fetchedAt = fetchedAt;
-        this.base = base;
+        this.baseCurrency = baseCurrency;
         this.rates = Map.copyOf(rates);
     }
 }

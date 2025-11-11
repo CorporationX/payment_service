@@ -10,16 +10,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class CurrencyRateFetcher {
     private final CurrencyService currencyService;
-    private final String base;
+    private final String baseCurrency;
 
     public CurrencyRateFetcher(CurrencyService currencyService,
-                             @Value("${currency.fetch.base}") String base) {
+                             @Value("${currency.fetch.base-currency}") String baseCurrency) {
         this.currencyService = currencyService;
-        this.base = base;
+        this.baseCurrency = baseCurrency;
     }
 
     @Scheduled(cron = "${currency.fetch.cron}", zone = "Asia/Almaty")
     public void scheduleRatesRefresh() {
-        currencyService.refreshRates(base);
+        currencyService.refreshRates(baseCurrency);
     }
 }

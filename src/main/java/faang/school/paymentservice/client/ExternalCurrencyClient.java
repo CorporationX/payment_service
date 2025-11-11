@@ -14,6 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 )
 public interface ExternalCurrencyClient {
 
-    @GetMapping("/latest/{base}")
-    ExchangeRatesResponse fetchLatestRates(@PathVariable("base") String base);
+    @GetMapping("/latest/{base-currency}")
+    ExchangeRatesResponse fetchLatestRates(@PathVariable("base-currency") String base);
 }

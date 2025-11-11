@@ -8,7 +8,7 @@ logging:
 currency:
   fetch:
     cron: "0 0 12 * * ?"
-    base: "EUR"
+    base-currency: "EUR"
 
 external:
   exchangeratesapi:

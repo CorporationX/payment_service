@@ -21,9 +21,9 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     @Retry(name = "currencyRetry", fallbackMethod = "fallbackRates")
-    public void refreshRates(String base) {
-        log.info("Request for update rate for a base = {}", base);
-        ExchangeRatesResponse response = currencyClient.fetchLatestRates(base);
+    public void refreshRates(String baseCurrency) {
+        log.info("Request for update rate for a base currency = {}", baseCurrency);
+        ExchangeRatesResponse response = currencyClient.fetchLatestRates(baseCurrency);
 
         if (response == null || response.rates() == null) {
             log.warn("Can't get new rates - keeping old ones");
@@ -31,16 +31,16 @@ public class CurrencyServiceImpl implements CurrencyService {
         }
 
         CurrencySnapshot snapshot = new CurrencySnapshot(Instant.now(),
-                response.base(),
+                response.baseCurrency(),
                 response.rates());
         currencyStore.update(snapshot);
-        log.info("Rates have updated: base = {}, ratesCount = {}, fetchedAt={}",
-                response.base(),
+        log.info("Rates have updated: base currency = {}, ratesCount = {}, fetchedAt={}",
+                response.baseCurrency(),
                 response.rates().size(),
                 snapshot.fetchedAt());
     }
 
-    public void fallbackRates(String base, Throwable exception) {
-        log.warn("Retry failed for base = {}, reason: {}", base, exception.getMessage());
+    public void fallbackRates(String baseCurrency, Throwable exception) {
+        log.warn("Retry failed for base currency = {}, reason: {}", baseCurrency, exception.getMessage());
     }
 }

@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CurrencyServiceTest {
-    String base = "EUR";
+    String baseCurrency = "EUR";
     Map<String, Double> rates = Map.of("USD", 1.1);
     CurrencySnapshot updatedSnapshot;
     ExchangeRatesResponse exchangeRatesResponse = new ExchangeRatesResponse(
@@ -54,12 +54,12 @@ public class CurrencyServiceTest {
 
     @Test
     void testSuccessfullyCurrencyRateUpdate() {
-        when(externalCurrencyClient.fetchLatestRates(base)).thenReturn(exchangeRatesResponse);
-        currencyService.refreshRates(base);
-        verify(externalCurrencyClient, times(1)).fetchLatestRates(eq(base));
+        when(externalCurrencyClient.fetchLatestRates(baseCurrency)).thenReturn(exchangeRatesResponse);
+        currencyService.refreshRates(baseCurrency);
+        verify(externalCurrencyClient, times(1)).fetchLatestRates(eq(baseCurrency));
         verify(currencyRateStore, times(1)).update(snapshotArgumentCaptor.capture());
         updatedSnapshot = snapshotArgumentCaptor.getValue();
-        assertEquals("EUR", updatedSnapshot.base());
+        assertEquals("EUR", updatedSnapshot.baseCurrency());
         assertEquals(rates, updatedSnapshot.rates());
     }
 
