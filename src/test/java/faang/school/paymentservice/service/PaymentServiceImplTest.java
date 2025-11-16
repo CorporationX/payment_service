@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,12 +19,14 @@ import static org.mockito.Mockito.when;
 class PaymentServiceImplTest {
 
     private CurrencyConverterService converterService;
+    private ThreadLocal<DecimalFormat> formatter;
     private PaymentServiceImpl paymentService;
 
     @BeforeEach
     void setUp() {
         converterService = mock(CurrencyConverterService.class);
-        paymentService = new PaymentServiceImpl(converterService);
+        formatter = ThreadLocal.withInitial(() -> new DecimalFormat("0.00"));
+        paymentService = new PaymentServiceImpl(converterService, formatter);
 
         ReflectionTestUtils.setField(paymentService, "targetCurrency", "RUB");
         ReflectionTestUtils.setField(paymentService, "verificationCodeMin", 100);

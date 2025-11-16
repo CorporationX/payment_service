@@ -1,6 +1,7 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.client.ExchangeClient;
+import faang.school.paymentservice.dto.ExchangeRatesResponse;
 import faang.school.paymentservice.exception.CurrencyConversionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,10 +35,18 @@ class CurrencyConverterServiceTest {
 
     @Test
     void convertToRub_givenValidRates_shouldReturnConvertedAmountWithCommission() {
-        Map<String, Object> ratesMap = Map.of(
-                "rates", Map.of("USD", 1.0, "RUB", 75.0)
+        ExchangeRatesResponse dto = new ExchangeRatesResponse(
+                "disc",
+                "lic",
+                123L,
+                "USD",
+                Map.of(
+                        "USD", BigDecimal.valueOf(1.0),
+                        "RUB", BigDecimal.valueOf(75.0)
+                )
         );
-        when(exchangeClient.getLatestRates("dummy_app_id")).thenReturn(ratesMap);
+
+        when(exchangeClient.getLatestRates("dummy_app_id")).thenReturn(dto);
 
         BigDecimal result = converterService.convertToRub("USD", BigDecimal.valueOf(100));
 
@@ -46,8 +55,15 @@ class CurrencyConverterServiceTest {
 
     @Test
     void convertToRub_givenMissingTargetRate_shouldThrowCurrencyConversionException() {
-        Map<String, Object> ratesMap = Map.of("rates", Map.of("USD", 1.0));
-        when(exchangeClient.getLatestRates("dummy_app_id")).thenReturn(ratesMap);
+        ExchangeRatesResponse dto = new ExchangeRatesResponse(
+                "disc",
+                "lic",
+                123L,
+                "USD",
+                Map.of("USD", BigDecimal.valueOf(1.0))
+        );
+
+        when(exchangeClient.getLatestRates("dummy_app_id")).thenReturn(dto);
 
         assertThrows(CurrencyConversionException.class, () ->
                 converterService.convertToRub("USD", BigDecimal.valueOf(100))
@@ -56,8 +72,15 @@ class CurrencyConverterServiceTest {
 
     @Test
     void convertToRub_givenMissingSourceRate_shouldThrowCurrencyConversionException() {
-        Map<String, Object> ratesMap = Map.of("rates", Map.of("RUB", 75.0));
-        when(exchangeClient.getLatestRates("dummy_app_id")).thenReturn(ratesMap);
+        ExchangeRatesResponse dto = new ExchangeRatesResponse(
+                "disc",
+                "lic",
+                123L,
+                "USD",
+                Map.of("RUB", BigDecimal.valueOf(75.0))
+        );
+
+        when(exchangeClient.getLatestRates("dummy_app_id")).thenReturn(dto);
 
         assertThrows(CurrencyConversionException.class, () ->
                 converterService.convertToRub("USD", BigDecimal.valueOf(100))

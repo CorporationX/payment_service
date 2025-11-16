@@ -17,6 +17,7 @@ import java.util.Random;
 public class PaymentServiceImpl implements PaymentService {
 
     private final CurrencyConverterService converterService;
+    private final ThreadLocal<DecimalFormat> moneyFormatter;
     @Value("${app.target-currency}")
     private String targetCurrency;
     @Value("${app.verification-code.min}")
@@ -28,8 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentResponse processPayment(PaymentRequest dto) {
         BigDecimal convertedAmount = converterService.convertToRub(dto.currency().name(), dto.amount());
 
-        DecimalFormat decimalFormat = new DecimalFormat("0.00");
-        String formattedSum = decimalFormat.format(convertedAmount);
+        String formattedSum = moneyFormatter.get().format(convertedAmount);
 
         int verificationCode = new Random().nextInt(verificationCodeMin, verificationCodeMax);
         String message = String.format(

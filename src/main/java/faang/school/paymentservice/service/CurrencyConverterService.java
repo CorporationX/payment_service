@@ -1,6 +1,7 @@
 package faang.school.paymentservice.service;
 
 import faang.school.paymentservice.client.ExchangeClient;
+import faang.school.paymentservice.dto.ExchangeRatesResponse;
 import faang.school.paymentservice.exception.CurrencyConversionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,32 +30,23 @@ public class CurrencyConverterService {
     private final ExchangeClient exchangeClient;
 
     public BigDecimal convertToRub(String fromCurrency, BigDecimal amount) {
-        Map<String, Object> response = exchangeClient.getLatestRates(appId);
+        ExchangeRatesResponse response = exchangeClient.getLatestRates(appId);
 
-        Object ratesObj = response.get("rates");
-        if (!(ratesObj instanceof Map<?, ?> rawRates)) {
-            log.error("Rates data is missing or invalid: {}", ratesObj);
+        Map<String, BigDecimal> rates = response.rates();
+        if (rates == null || rates.isEmpty()) {
+            log.error("Rates data is missing or invalid: {}", response);
             throw new CurrencyConversionException("Rates data is missing or invalid");
         }
 
-        Map<String, Double> rates = rawRates.entrySet().stream()
-                .collect(Collectors.toMap(
-                        e -> e.getKey().toString(),
-                        e -> {
-                            Object val = e.getValue();
-                            if (val instanceof Number number) return number.doubleValue();
-                            log.error("Invalid rate value for {}: {}", e.getKey(), val);
-                            throw new CurrencyConversionException("Invalid rate value for ".formatted(e.getKey()));
-                        }
-                ));
-
         if (!rates.containsKey(fromCurrency) || !rates.containsKey(targetCurrency)) {
             log.error("Exchange rate not found for {} or {}", fromCurrency, targetCurrency);
-            throw new CurrencyConversionException("Exchange rate not available for currency: ".formatted(fromCurrency));
+            throw new CurrencyConversionException(
+                    "Exchange rate not available for currency: %s".formatted(fromCurrency)
+            );
         }
 
-        BigDecimal fromRate = BigDecimal.valueOf(rates.get(fromCurrency));
-        BigDecimal rubRate = BigDecimal.valueOf(rates.get(targetCurrency));
+        BigDecimal fromRate = rates.get(fromCurrency);
+        BigDecimal rubRate = rates.get(targetCurrency);
 
         BigDecimal amountInUsd = amount.divide(fromRate, DIVIDE_SCALE, RoundingMode.HALF_UP);
         BigDecimal amountInRub = amountInUsd.multiply(rubRate);
