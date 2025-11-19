@@ -18,13 +18,13 @@ import static org.mockito.Mockito.when;
 
 class PaymentServiceImplTest {
 
-    private CurrencyConverterService converterService;
+    private CurrencyConverterServiceImpl converterService;
     private ThreadLocal<DecimalFormat> formatter;
     private PaymentServiceImpl paymentService;
 
     @BeforeEach
     void setUp() {
-        converterService = mock(CurrencyConverterService.class);
+        converterService = mock(CurrencyConverterServiceImpl.class);
         formatter = ThreadLocal.withInitial(() -> new DecimalFormat("0.00"));
         paymentService = new PaymentServiceImpl(converterService, formatter);
 
@@ -37,7 +37,7 @@ class PaymentServiceImplTest {
     void processPayment_givenValidRequest_shouldReturnPaymentResponseWithConvertedAmountAndRUB() {
         PaymentRequest request = new PaymentRequest(12345L, BigDecimal.valueOf(100), Currency.USD);
 
-        when(converterService.convertToRub("USD", BigDecimal.valueOf(100)))
+        when(converterService.convertToTargetCurrency("USD", BigDecimal.valueOf(100)))
                 .thenReturn(BigDecimal.valueOf(7500));
 
         PaymentResponse response = paymentService.processPayment(request);

@@ -16,7 +16,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
-    private final CurrencyConverterService converterService;
+    private final CurrencyConverterServiceImpl converterService;
     private final ThreadLocal<DecimalFormat> moneyFormatter;
     @Value("${app.target-currency}")
     private String targetCurrency;
@@ -27,7 +27,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentResponse processPayment(PaymentRequest dto) {
-        BigDecimal convertedAmount = converterService.convertToRub(dto.currency().name(), dto.amount());
+        BigDecimal convertedAmount = converterService.convertToTargetCurrency(dto.currency().name(), dto.amount());
 
         String formattedSum = moneyFormatter.get().format(convertedAmount);
 

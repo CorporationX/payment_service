@@ -22,11 +22,11 @@ class CurrencyConverterServiceTest {
 
     @Mock
     private ExchangeClient exchangeClient;
-    private CurrencyConverterService converterService;
+    private CurrencyConverterServiceImpl converterService;
 
     @BeforeEach
     void setUp() {
-        converterService = new CurrencyConverterService(exchangeClient);
+        converterService = new CurrencyConverterServiceImpl(exchangeClient);
 
         ReflectionTestUtils.setField(converterService, "targetCurrency", "RUB");
         ReflectionTestUtils.setField(converterService, "commissionRate", BigDecimal.valueOf(0.05));
@@ -48,7 +48,7 @@ class CurrencyConverterServiceTest {
 
         when(exchangeClient.getLatestRates("dummy_app_id")).thenReturn(dto);
 
-        BigDecimal result = converterService.convertToRub("USD", BigDecimal.valueOf(100));
+        BigDecimal result = converterService.convertToTargetCurrency("USD", BigDecimal.valueOf(100));
 
         assertEquals(BigDecimal.valueOf(7875.00).setScale(2), result);
     }
@@ -66,7 +66,7 @@ class CurrencyConverterServiceTest {
         when(exchangeClient.getLatestRates("dummy_app_id")).thenReturn(dto);
 
         assertThrows(CurrencyConversionException.class, () ->
-                converterService.convertToRub("USD", BigDecimal.valueOf(100))
+                converterService.convertToTargetCurrency("USD", BigDecimal.valueOf(100))
         );
     }
 
@@ -83,7 +83,7 @@ class CurrencyConverterServiceTest {
         when(exchangeClient.getLatestRates("dummy_app_id")).thenReturn(dto);
 
         assertThrows(CurrencyConversionException.class, () ->
-                converterService.convertToRub("USD", BigDecimal.valueOf(100))
+                converterService.convertToTargetCurrency("USD", BigDecimal.valueOf(100))
         );
     }
 }
