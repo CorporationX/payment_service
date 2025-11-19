@@ -1,4 +1,4 @@
-package faang.school.paymentservice.service;
+package faang.school.paymentservice.service.currency;
 
 public interface CurrencyService {
 

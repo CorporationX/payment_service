@@ -1,6 +1,7 @@
 package faang.school.paymentservice.service;
 
-import faang.school.paymentservice.config.CurrencyRateFetcher;
+import faang.school.paymentservice.config.currencyRate.CurrencyRateFetcherConfig;
+import faang.school.paymentservice.service.currency.CurrencyServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,7 +19,7 @@ import static org.mockito.Mockito.when;
 class CurrencyServiceImplTest {
 
     @Mock
-    private CurrencyRateFetcher currencyRateFetcher;
+    private CurrencyRateFetcherConfig currencyRateFetcherConfig;
     @InjectMocks
     CurrencyServiceImpl currencyService;
 
@@ -28,7 +29,7 @@ class CurrencyServiceImplTest {
         Map<String, Double> map = new HashMap<>();
         map.put("EUR", 1.111);
         map.put("RUB", 2.222);
-        when(currencyRateFetcher.getMapCurrentRate()).thenReturn(map);
+        when(currencyRateFetcherConfig.getMapCurrentRate()).thenReturn(map);
 
         String currentCurrency = currencyService.getCurrencyRate();
         List<String> lines = currentCurrency.lines().toList();

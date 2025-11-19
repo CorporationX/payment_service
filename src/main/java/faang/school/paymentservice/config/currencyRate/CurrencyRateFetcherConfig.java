@@ -1,17 +1,18 @@
-package faang.school.paymentservice.config;
+package faang.school.paymentservice.config.currencyRate;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import faang.school.paymentservice.config.webClient.WebClientConfig;
 import faang.school.paymentservice.exception.WebClientException;
+import faang.school.paymentservice.service.currency.MapCurrencyServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -21,33 +22,36 @@ import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
-@Component
-public class CurrencyRateFetcher {
-    private final WebClient.Builder webClientBuilder;
+@Configuration
+public class CurrencyRateFetcherConfig {
+    private final WebClientConfig webClientConfig;
+    private final ObjectMapper getObjectMapper;
+    private final MapCurrencyServiceImpl mapCurrencyServiceImpl;
     @Value("${current-rate.base-url-rate}")
-    private String BASE_URL_RATE;
-    private Map<String, Double> mapCurrentRate;
+    private String baseUrl;
+    @Value("${current-rate.header}")
+    private String header;
+    @Value("${current-rate.values}")
+    private String values;
 
-    @Retryable(retryFor = {WebClientRequestException.class, WebClientResponseException.class},
-            backoff = @Backoff(delayExpression = "${current-rate.retry-delay}",
+
+    @Retryable(
+            retryFor = {WebClientRequestException.class, WebClientResponseException.class},
+            maxAttemptsExpression = "${current-rate.max-attempts}",
+            backoff = @Backoff(delayExpression = "${current-rate.count-invoke}",
                     multiplierExpression = "${current-rate.count-invoke}"))
-    @Scheduled(cron = "${current-rate.time-to-invoke}")
-    public void currentRate() {
+    public Map<String, Double> getCurrentRate() {
         log.debug("Starting update current rate");
-        WebClient webClient = webClientBuilder
-                .baseUrl(BASE_URL_RATE)
-                .defaultHeader("Accept", "application/json")
-                .build();
+        WebClient webClient = webClientConfig.getWebClient(baseUrl, header, values);
         String json = webClient.get()
                 .uri("_json.js")
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
 
-        ObjectMapper mapper = new ObjectMapper();
         JsonNode root;
         try {
-            root = mapper.readTree(json);
+            root = getObjectMapper.readTree(json);
         } catch (JsonProcessingException e) {
             log.error("Error on invoke current rate");
             throw new WebClientException("Error json parsing current rate");
@@ -63,13 +67,7 @@ public class CurrencyRateFetcher {
         if (!result.isEmpty()) {
             log.debug("Update success current rate");
         }
-        mapCurrentRate = result;
-    }
-
-    public Map<String, Double> getMapCurrentRate() {
-        if (mapCurrentRate == null || mapCurrentRate.isEmpty()) {
-            currentRate();
-        }
-        return mapCurrentRate;
+        mapCurrencyServiceImpl.setMapCurrentRate(result);
+        return result;
     }
 }

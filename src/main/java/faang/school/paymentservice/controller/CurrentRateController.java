@@ -1,7 +1,7 @@
 package faang.school.paymentservice.controller;
 
 
-import faang.school.paymentservice.service.CurrencyServiceImpl;
+import faang.school.paymentservice.service.currency.CurrencyServiceImpl;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

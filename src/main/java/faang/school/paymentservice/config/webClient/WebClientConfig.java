@@ -1,4 +1,4 @@
-package faang.school.paymentservice.config;
+package faang.school.paymentservice.config.webClient;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,5 +10,12 @@ public class WebClientConfig {
     @Bean
     public WebClient.Builder webClientBuilder() {
         return WebClient.builder();
+    }
+
+    public WebClient getWebClient(String baseUrl, String header, String values) {
+        return webClientBuilder()
+                .baseUrl(baseUrl)
+                .defaultHeader(header, values)
+                .build();
     }
 }
