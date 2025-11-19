@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import faang.school.paymentservice.config.webClient.WebClientConfig;
 import faang.school.paymentservice.exception.WebClientException;
-import faang.school.paymentservice.service.currency.MapCurrencyServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +26,6 @@ import java.util.Map;
 public class CurrencyRateFetcherConfig {
     private final WebClientConfig webClientConfig;
     private final ObjectMapper getObjectMapper;
-    private final MapCurrencyServiceImpl mapCurrencyServiceImpl;
     @Value("${current-rate.base-url-rate}")
     private String baseUrl;
     @Value("${current-rate.header}")
@@ -34,13 +33,11 @@ public class CurrencyRateFetcherConfig {
     @Value("${current-rate.values}")
     private String values;
 
-
     @Retryable(
             retryFor = {WebClientRequestException.class, WebClientResponseException.class},
-            maxAttemptsExpression = "${current-rate.max-attempts}",
-            backoff = @Backoff(delayExpression = "${current-rate.count-invoke}",
+            backoff = @Backoff(delayExpression = "${current-rate.retry-delay}",
                     multiplierExpression = "${current-rate.count-invoke}"))
-    public Map<String, Double> getCurrentRate() {
+    public Map<String, BigDecimal> getCurrentRate() {
         log.debug("Starting update current rate");
         WebClient webClient = webClientConfig.getWebClient(baseUrl, header, values);
         String json = webClient.get()
@@ -58,16 +55,14 @@ public class CurrencyRateFetcherConfig {
         }
         JsonNode currency = root.get("Valute");
 
-        Map<String, Double> result = new HashMap<>();
+        Map<String, BigDecimal> result = new HashMap<>();
         currency.fields().forEachRemaining(entry -> {
             String currentCode = entry.getKey();
-            double rate = entry.getValue().get("Value").asDouble();
+            BigDecimal rate = BigDecimal.valueOf(entry.getValue().get("Value").asDouble());
             result.put(currentCode, rate);
         });
-        if (!result.isEmpty()) {
-            log.debug("Update success current rate");
-        }
-        mapCurrencyServiceImpl.setMapCurrentRate(result);
+        result.put("RUB", BigDecimal.ONE);
+        log.info("Successfully updated {} currency rates", result.size());
         return result;
     }
 }

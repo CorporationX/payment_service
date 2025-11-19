@@ -1,40 +1,89 @@
 package faang.school.paymentservice.service;
 
-import faang.school.paymentservice.config.currencyRate.CurrencyRateFetcherConfig;
+import faang.school.paymentservice.service.currency.CurrencyRateCache;
 import faang.school.paymentservice.service.currency.CurrencyServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashMap;
-import java.util.List;
+import java.math.BigDecimal;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class CurrencyServiceImplTest {
+class CurrencyRateServiceTest {
 
     @Mock
-    private CurrencyRateFetcherConfig currencyRateFetcherConfig;
-    @InjectMocks
-    CurrencyServiceImpl currencyService;
+    private CurrencyRateCache currencyRateCache;
 
+    @InjectMocks
+    private CurrencyServiceImpl service;
+
+    private Map<String, BigDecimal> fakeRates;
+
+    @BeforeEach
+    void setUp() {
+        fakeRates = Map.of(
+                "USD", new BigDecimal("95.500000"),
+                "EUR", new BigDecimal("103.200000"),
+                "CNY", new BigDecimal("13.450000"),
+                "RUB", BigDecimal.ONE
+        );
+    }
 
     @Test
-    public void getCurrencyRate_responseString_shouldResponseString(){
-        Map<String, Double> map = new HashMap<>();
-        map.put("EUR", 1.111);
-        map.put("RUB", 2.222);
-        when(currencyRateFetcherConfig.getMapCurrentRate()).thenReturn(map);
+    void getCurrencyRate_returnsCorrectlyFormattedString() {
+        when(currencyRateCache.getAllRates()).thenReturn(fakeRates);
 
-        String currentCurrency = currencyService.getCurrencyRate();
-        List<String> lines = currentCurrency.lines().toList();
+        String result = service.getCurrencyRate();
 
-        assertEquals("EUR-1.111000", lines.get(0));
-        assertEquals("RUB-2.222000", lines.get(1));
+        String expected = """
+                CNY-13.450000
+                EUR-103.200000
+                RUB-1.000000
+                USD-95.500000""";
+
+        assertThat(result)
+                .contains("USD-95.500000")
+                .contains("EUR-103.200000")
+                .contains("CNY-13.450000")
+                .contains("RUB-1.000000");
+
+        assertThat(result.lines().count()).isEqualTo(4);
+    }
+
+    @Test
+    void getCurrencyRate_withSortedOutput_ifYouWantStableOrder() {
+        when(currencyRateCache.getAllRates()).thenReturn(fakeRates);
+
+        String result = service.getCurrencyRate();
+
+        assertThat(result).isNotBlank();
+        assertThat(result).contains("USD-95.500000", "RUB-1.000000");
+    }
+
+    @Test
+    void clearRates_callsInvalidateOnCache() {
+        service.clearRates();
+
+        verify(currencyRateCache, times(1)).invalidateAll();
+        verifyNoMoreInteractions(currencyRateCache);
+    }
+
+    @Test
+    void getCurrencyRate_handlesEmptyMap() {
+        when(currencyRateCache.getAllRates()).thenReturn(Map.of());
+
+        String result = service.getCurrencyRate();
+
+        assertThat(result).isEmpty();
     }
 }

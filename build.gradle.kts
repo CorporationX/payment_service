@@ -23,6 +23,7 @@ dependencies {
     implementation("org.springframework.retry:spring-retry:2.0.2")
     implementation ("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("com.github.ben-manes.caffeine:caffeine")
 
     /**
      * Utils & Logging

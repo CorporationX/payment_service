@@ -1,21 +1,25 @@
 package faang.school.paymentservice.schedule;
 
-import faang.school.paymentservice.config.currencyRate.CurrencyRateFetcherConfig;
+import faang.school.paymentservice.service.currency.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 
 @RequiredArgsConstructor
 @Slf4j
 public class ScheduledCurrencyRateFetcher {
-    private final CurrencyRateFetcherConfig currencyRateFetcherConfig;
+    private final CurrencyService currencyService;
+    @Value("${current-rate.refresh-after-write}")
+    private int refreshAfterWrite;
 
     @Scheduled(cron = "${schedule.current-rate-cron}")
-    public void scheduleRate(){
-        log.info("Launch scheduled current rate fetcher");
+    public void scheduleRate() {
+        log.info("Forced update of exchange rates");
         try {
-            currencyRateFetcherConfig.getCurrentRate();
-        }catch (Exception e) {
+            currencyService.clearRates();
+            log.info("Update completed successfully, next update every {} minutes", refreshAfterWrite);
+        } catch (Exception e) {
             log.error("Error to current rate fetcher", e);
         }
     }
