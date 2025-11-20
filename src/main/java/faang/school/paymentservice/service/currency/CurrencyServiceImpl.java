@@ -23,4 +23,9 @@ public class CurrencyServiceImpl implements CurrencyService {
     public void clearRates() {
         currencyRateCache.invalidateAll();
     }
+
+    @Override
+    public BigDecimal getRate(String currency) {
+        return currencyRateCache.getRates(currency);
+    }
 }

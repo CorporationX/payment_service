@@ -1,7 +1,5 @@
-package faang.school.paymentservice.service;
+package faang.school.paymentservice.service.currency;
 
-import faang.school.paymentservice.service.currency.CurrencyRateCache;
-import faang.school.paymentservice.service.currency.CurrencyServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +17,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class CurrencyRateServiceTest {
+class CurrencyServiceImplTest {
 
     @Mock
     private CurrencyRateCache currencyRateCache;

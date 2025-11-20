@@ -23,7 +23,7 @@ current-rate:
   retry-delay: 2000
   maximum-size: 1
   expire-after-write: 30
-  refresh-after-write: 2
+  refresh-after-write: 1
   base-url-rate: "https://www.cbr-xml-daily.ru/daily"
 
 
