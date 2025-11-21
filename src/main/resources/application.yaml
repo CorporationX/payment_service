@@ -14,3 +14,14 @@ server:
 logging:
   level:
     root: info
+
+openexchangerates:
+  url: https://openexchangerates.org
+  app-id: ${OPEN_EXCHANGE_APP_ID}
+
+app:
+  commission-rate: 0.01
+  target-currency: RUB
+  verification-code:
+    min: 1000
+    max: 10000
