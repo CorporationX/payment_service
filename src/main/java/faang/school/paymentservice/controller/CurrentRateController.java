@@ -1,7 +1,7 @@
 package faang.school.paymentservice.controller;
 
 
-import faang.school.paymentservice.service.currency.CurrencyService;
+import faang.school.paymentservice.service.currency.CurrencyRateCache;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,26 +11,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 @Hidden
 @RequestMapping("api/v1/currency")
 @RestController
 @RequiredArgsConstructor
 public class CurrentRateController {
-    private final CurrencyService currencyService;
+    private final CurrencyRateCache cache;
 
     @GetMapping
-    public String getCurrency() {
-        return currencyService.getCurrencyRate();
+    public Map<String, BigDecimal> getCurrency() {
+        return cache.getAllRates();
     }
 
     @PostMapping
     public void clearCache() {
-        currencyService.clearRates();
+        cache.invalidateAll();
     }
 
     @GetMapping("/{currency}")
     public BigDecimal getRate(@PathVariable String currency) {
-       return currencyService.getRate(currency);
+        return cache.getRate(currency);
     }
 }

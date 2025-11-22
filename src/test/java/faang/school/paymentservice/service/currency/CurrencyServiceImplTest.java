@@ -1,6 +1,12 @@
 package faang.school.paymentservice.service.currency;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import faang.school.paymentservice.config.currencyRate.CurrencyRateFetcherConfig;
+import faang.school.paymentservice.dto.CurrencyDto;
+import faang.school.paymentservice.dto.ValuteInfo;
+import faang.school.paymentservice.exception.JsonParsingException;
+import faang.school.paymentservice.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -8,80 +14,72 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class CurrencyServiceImplTest {
+public class CurrencyServiceImplTest {
 
     @Mock
-    private CurrencyRateCache currencyRateCache;
+    private CurrencyRateFetcherConfig fetcherConfig;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @InjectMocks
-    private CurrencyServiceImpl service;
+    private CurrencyServiceImpl currencyService;
 
-    private Map<String, BigDecimal> fakeRates;
+    @Test
+    public void getCurrencyRate_ValidData_shouldReturnCorrectCurrencyRates() {
+        String json = "{\"Valute\":{\"USD\":{\"Nominal\":1,\"Value\":95.5}}}";
+        Map<String, ValuteInfo> valuteMap = new HashMap<>();
+        valuteMap.put("USD", new ValuteInfo(1, new BigDecimal("95.5")));
+        CurrencyDto currencyDto = new CurrencyDto(valuteMap);
 
-    @BeforeEach
-    void setUp() {
-        fakeRates = Map.of(
-                "USD", new BigDecimal("95.500000"),
-                "EUR", new BigDecimal("103.200000"),
-                "CNY", new BigDecimal("13.450000"),
-                "RUB", BigDecimal.ONE
-        );
+        when(fetcherConfig.getCurrentRate()).thenReturn(json);
+        try {
+            when(objectMapper.readValue(json, CurrencyDto.class)).thenReturn(currencyDto);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        Map<String, BigDecimal> result = currencyService.getCurrencyRate();
+
+        assertEquals(2, result.size());
+        assertEquals(0, new BigDecimal("95.5").compareTo(result.get("USD")));
+        assertEquals(BigDecimal.ONE, result.get("RUB"));
     }
 
     @Test
-    void getCurrencyRate_returnsCorrectlyFormattedString() {
-        when(currencyRateCache.getAllRates()).thenReturn(fakeRates);
+    public void getCurrencyRate_InvalidJson_shouldThrowJsonParsingException() {
+        String json = "invalid json";
 
-        String result = service.getCurrencyRate();
+        when(fetcherConfig.getCurrentRate()).thenReturn(json);
+        try {
+            when(objectMapper.readValue(json, CurrencyDto.class)).thenThrow(new RuntimeException());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-        String expected = """
-                CNY-13.450000
-                EUR-103.200000
-                RUB-1.000000
-                USD-95.500000""";
-
-        assertThat(result)
-                .contains("USD-95.500000")
-                .contains("EUR-103.200000")
-                .contains("CNY-13.450000")
-                .contains("RUB-1.000000");
-
-        assertThat(result.lines().count()).isEqualTo(4);
+        assertThrows(JsonParsingException.class, () -> currencyService.getCurrencyRate());
     }
 
     @Test
-    void getCurrencyRate_withSortedOutput_ifYouWantStableOrder() {
-        when(currencyRateCache.getAllRates()).thenReturn(fakeRates);
+    public void getCurrencyRate_nullValute_shouldThrowNotFoundException() {
+        String json = "{}";
+        CurrencyDto currencyDto = new CurrencyDto(null);
 
-        String result = service.getCurrencyRate();
+        when(fetcherConfig.getCurrentRate()).thenReturn(json);
+        try {
+            when(objectMapper.readValue(json, CurrencyDto.class)).thenReturn(currencyDto);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-        assertThat(result).isNotBlank();
-        assertThat(result).contains("USD-95.500000", "RUB-1.000000");
-    }
-
-    @Test
-    void clearRates_callsInvalidateOnCache() {
-        service.clearRates();
-
-        verify(currencyRateCache, times(1)).invalidateAll();
-        verifyNoMoreInteractions(currencyRateCache);
-    }
-
-    @Test
-    void getCurrencyRate_handlesEmptyMap() {
-        when(currencyRateCache.getAllRates()).thenReturn(Map.of());
-
-        String result = service.getCurrencyRate();
-
-        assertThat(result).isEmpty();
+        assertThrows(NotFoundException.class, () -> currencyService.getCurrencyRate());
     }
 }

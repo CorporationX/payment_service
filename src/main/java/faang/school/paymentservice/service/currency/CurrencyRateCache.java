@@ -2,7 +2,6 @@ package faang.school.paymentservice.service.currency;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import faang.school.paymentservice.config.currencyRate.CurrencyRateFetcherConfig;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +23,8 @@ public class CurrencyRateCache {
     private int expireAfterWriteMinutes;
     @Value("${current-rate.refresh-after-write}")
     private int refreshAfterWriteMinutes;
-    private final CurrencyRateFetcherConfig fetcher;
+    private final CurrencyService currencyService;
     private LoadingCache<String, Map<String, BigDecimal>> ratesCache;
-
 
     @PostConstruct
     private void initCache() {
@@ -35,11 +33,10 @@ public class CurrencyRateCache {
                 .expireAfterWrite(expireAfterWriteMinutes, TimeUnit.MINUTES)
                 .refreshAfterWrite(refreshAfterWriteMinutes, TimeUnit.MINUTES)
                 .recordStats()
-                .build(key -> fetcher.getCurrentRate());
-        ratesCache.get("ALL_RATES");
+                .build(key -> loadCurrency());
     }
 
-    public BigDecimal getRates(String currency) {
+    public BigDecimal getRate(String currency) {
         String code = currency.toUpperCase();
         return ratesCache.get("ALL_RATES")
                 .getOrDefault(code, BigDecimal.ONE);
@@ -54,4 +51,7 @@ public class CurrencyRateCache {
         log.info("Currency rate cache is clear");
     }
 
+    private Map<String, BigDecimal> loadCurrency() {
+        return currencyService.getCurrencyRate();
+    }
 }

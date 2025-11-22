@@ -1,12 +1,10 @@
 package faang.school.paymentservice.service.currency;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 public interface CurrencyService {
 
-    String getCurrencyRate();
+    Map<String, BigDecimal> getCurrencyRate();
 
-    void clearRates();
-
-    BigDecimal getRate(String currency);
 }
