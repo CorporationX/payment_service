@@ -1,6 +1,14 @@
 server:
   port: 9080
 
+commission: 1.01
+default-currency: USD
+
 logging:
   level:
     root: info
+
+services:
+  open-exchange:
+    host: https://openexchangerates.org
+    app-id: ${OPENEXCHANGERATES_TOKEN}
