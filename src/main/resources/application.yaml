@@ -4,3 +4,9 @@ server:
 logging:
   level:
     root: info
+
+spring:
+  data:
+    redis:
+      host: master_redis
+      port: 6379
