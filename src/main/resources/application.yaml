@@ -8,5 +8,19 @@ logging:
 spring:
   data:
     redis:
-      host: master_redis
+      host: localhost
       port: 6379
+
+external:
+  currency:
+    redis-cache:
+      key: latest_currency_rates
+    scheduler:
+      cron: 0 * * * * *
+    api:
+      url: https://api.exchangeratesapi.io/v1/
+      key: ${CURRENCY_API_KEY:dummy_currency_api_key}
+      timeout-seconds: 5
+      maxAttempts: 3
+      backoff-delay-millis: 2000
+    base-currency: EUR
