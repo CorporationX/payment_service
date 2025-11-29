@@ -3,10 +3,20 @@ package faang.school.paymentservice.controller;
 import faang.school.paymentservice.dto.PaymentRequest;
 import java.text.DecimalFormat;
 import java.util.Random;
+import java.util.UUID;
+
 import faang.school.paymentservice.dto.PaymentResponse;
 import faang.school.paymentservice.dto.PaymentStatus;
+import faang.school.paymentservice.dto.AuthorizationDto;
+import faang.school.paymentservice.model.BankOperation;
+import faang.school.paymentservice.service.payment.PaymentService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class PaymentController {
+
+    private final PaymentService paymentService;
 
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
@@ -33,5 +46,27 @@ public class PaymentController {
                 dto.currency(),
                 message)
         );
+    }
+
+    @PostMapping("/authorization")
+    public ResponseEntity<UUID> processAuthorization(@RequestBody @Valid AuthorizationDto authorizationDto) {
+        UUID operationId = paymentService.processAuthorization(authorizationDto);
+        return ResponseEntity.ok().body(operationId);
+    }
+
+    @PatchMapping("/clearing/{operationId}")
+    public void clearingOperation(@PathVariable UUID operationId) {
+        paymentService.clearingOperation(operationId);
+    }
+
+    @PatchMapping("/cancel/{operationId}")
+    public void cancelOperation(@PathVariable UUID operationId) {
+        paymentService.cancelOperation(operationId);
+    }
+
+    @GetMapping("/{operationId}")
+    public ResponseEntity<BankOperation> getBankOperation(@PathVariable UUID operationId) {
+        BankOperation bankOperation = paymentService.getBankOperation(operationId);
+        return ResponseEntity.ok().body(bankOperation);
     }
 }
