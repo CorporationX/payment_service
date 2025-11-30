@@ -30,10 +30,12 @@ import static faang.school.paymentservice.dto.Currency.USD;
 @Slf4j
 public class PaymentController {
     private final OpenExchangeClient openExchangeClient;
-    @Value("${commission}")
-    private String COMMISSION;
-    @Value("${default-currency}")
-    private String DEFAULT_CURRENCY;
+    @Value("${app.commission}")
+    private String commission;
+    @Value("${app.default_currency}")
+    private String defaultCurrency;
+    @Value("${app.divide_scale}")
+    private int divideScale;
 
     @PostMapping("/payment")
     public ResponseEntity<PaymentResponse> sendPayment(@RequestBody @Validated PaymentRequest dto) {
@@ -43,7 +45,7 @@ public class PaymentController {
         int verificationCode = new Random().nextInt(1000, 10000);
         String message = String.format("Dear friend! Thank you for your purchase! " +
                         "Your payment on %s %s was accepted.",
-                formattedSum, DEFAULT_CURRENCY);
+                formattedSum, defaultCurrency);
 
         return ResponseEntity.ok(new PaymentResponse(
                 PaymentStatus.SUCCESS,
@@ -59,14 +61,14 @@ public class PaymentController {
         Currency requestCurrency = dto.currency();
         BigDecimal conversionFactor = BigDecimal.ONE;
         if (requestCurrency != USD) {
-            RatesResponse ratesResponse = openExchangeClient.getLatest(DEFAULT_CURRENCY, requestCurrency.name());
+            RatesResponse ratesResponse = openExchangeClient.getLatest(defaultCurrency, requestCurrency.name());
             if (!ratesResponse.rates().containsKey(requestCurrency.name())) {
                 log.error("Currency {} not supported", requestCurrency.name());
                 throw new HttpMessageNotReadableException("Currency not supported");
             }
             conversionFactor = ratesResponse.rates().get(requestCurrency.name());
         }
-        return dto.amount().divide(conversionFactor, 7, RoundingMode.HALF_UP)
-                .multiply(new BigDecimal(COMMISSION));
+        return dto.amount().divide(conversionFactor, divideScale, RoundingMode.HALF_UP)
+                .multiply(new BigDecimal(commission));
     }
 }
