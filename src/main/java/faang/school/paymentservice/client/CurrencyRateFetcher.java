@@ -61,7 +61,7 @@ public class CurrencyRateFetcher {
             throw new IllegalArgumentException("Currency API returned null base");
         }
 
-        if (!response.getBase().equals(baseCurrency)){
+        if (!response.getBase().equals(baseCurrency)) {
             log.error("Mismatched base currency in response: expected {}, got {}", baseCurrency, response.getBase());
             throw new IllegalArgumentException("Mismatched base currency in response");
         }
