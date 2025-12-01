@@ -64,7 +64,7 @@ public class PaymentController {
             RatesResponse ratesResponse = openExchangeClient.getLatest(defaultCurrency, requestCurrency.name());
             if (!ratesResponse.rates().containsKey(requestCurrency.name())) {
                 log.error("Currency {} not supported", requestCurrency.name());
-                throw new HttpMessageNotReadableException("Currency not supported");
+                throw new IllegalArgumentException("Currency "+ requestCurrency.name() +" not supported");
             }
             conversionFactor = ratesResponse.rates().get(requestCurrency.name());
         }
