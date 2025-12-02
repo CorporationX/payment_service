@@ -27,9 +27,9 @@ public class GlobalExceptionHandler {
                 );
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+    public ErrorResponse handleIllegalArgumentException(IllegalArgumentException e) {
         String message = e.getMessage().contains("Currency") ? "We only accept " + Arrays.toString(Currency.values())
                 : e.getMessage();
 
