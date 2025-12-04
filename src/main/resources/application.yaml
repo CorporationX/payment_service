@@ -36,8 +36,10 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       concurrency: 3
+      enable-auto-commit: false
       properties:
         spring.json.trusted.packages: "*"
+        spring.json.value.default.type: java.util.Map
     topics:
       payment.authorization-request: "payment.authorization-request"
       payment.authorization-response: "payment.authorization-response"
