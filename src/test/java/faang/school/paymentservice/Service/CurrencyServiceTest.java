@@ -107,7 +107,7 @@ public class CurrencyServiceTest {
     @DisplayName("Get all rates when Redis is empty and API returns empty should error")
     void testGetAllRatesWhileRedisIsEmptyAndApiReturnsEmpty() {
         when(valueOps.get(anyString())).thenReturn(Mono.empty());
-        when(currencyRateFetcher.getLatestRates("EUR")).thenReturn(Mono.empty());
+        when(currencyRateFetcher.getLatestRates()).thenReturn(Mono.empty());
 
         StepVerifier.create(service.getAllRates())
                 .expectErrorMatches(throwable ->
@@ -124,7 +124,7 @@ public class CurrencyServiceTest {
         badResponse.setSuccess(false);
 
         when(valueOps.get(anyString())).thenReturn(Mono.empty());
-        when(currencyRateFetcher.getLatestRates("EUR")).thenReturn(Mono.just(badResponse));
+        when(currencyRateFetcher.getLatestRates()).thenReturn(Mono.just(badResponse));
 
         StepVerifier.create(service.getAllRates())
                 .expectErrorMatches(throwable ->

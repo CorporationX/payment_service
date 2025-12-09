@@ -25,7 +25,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     public Mono<Void> updateRates() {
         log.info("Refreshing currency rates from external API");
 
-        return currencyRateFetcher.getLatestRates(baseCurrency)
+        return currencyRateFetcher.getLatestRates()
                 .flatMap(this::saveToCache)
                 .doOnSuccess(success -> log.info("Currency rates successfully refreshed"))
                 .doOnError(error -> log.error("Failed to refresh currency rates", error))
@@ -49,7 +49,7 @@ public class CurrencyServiceImpl implements CurrencyService {
                     Double to = rates.getRates().get(toRate);
                     if (to == null) {
                         log.debug("We dont use rate for that currency: {}", toRate);
-                        sink.error(new IllegalArgumentException("Currency " + toRate + " not found"));
+                        sink.error(new IllegalArgumentException(String.format("Currency %s not found", toRate)));
                     } else {
                         log.debug("Exchange rate from {} to {} = {}", baseCurrency, toRate, to);
                         sink.next(to);
