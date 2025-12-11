@@ -14,19 +14,4 @@ public class PaymentScheduler {
     public void clearingSchedulingPayments() {
         paymentSchedulerService.clearingSchedulingPayments();
     }
-
-    @Scheduled(cron = "${app.scheduled.payments.retry-authorization-error}", zone = "Europe/Moscow")
-    public void retryAuthorizationErrorPayments() {
-        paymentSchedulerService.retryAuthorizationErrorPayments();
-    }
-
-    @Scheduled(cron = "${app.scheduled.payments.retry-clearing-error}", zone = "Europe/Moscow")
-    public void retryClearingErrorPayments() {
-        paymentSchedulerService.retryClearingErrorPayments();
-    }
-
-    @Scheduled(cron = "${app.scheduled.payments.retry-cancel-error}", zone = "Europe/Moscow")
-    public void retryCancelErrorPayments() {
-        paymentSchedulerService.retryCancelErrorPayments();
-    }
 }

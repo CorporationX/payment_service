@@ -1,14 +1,17 @@
 package faang.school.paymentservice.service.payment;
 
 import faang.school.paymentservice.dto.AuthorizationDto;
+import faang.school.paymentservice.dto.BankOperationDto;
 import faang.school.paymentservice.dto.TypeOperation;
-import faang.school.paymentservice.kafka.dto.KafkaAuthorizationRequestDto;
-import faang.school.paymentservice.kafka.dto.KafkaCancelRequestDto;
-import faang.school.paymentservice.kafka.dto.KafkaClearingRequestDto;
+import faang.school.paymentservice.exception.DuplicateRequestException;
+import faang.school.paymentservice.kafka.dto.AuthorizationKafkaRequestDto;
+import faang.school.paymentservice.kafka.dto.CancelKafkaRequestDto;
+import faang.school.paymentservice.kafka.dto.ClearingKafkaRequestDto;
 import faang.school.paymentservice.kafka.producer.KafkaProducerService;
-import faang.school.paymentservice.model.BankOperation;
 import faang.school.paymentservice.model.PaymentStatus;
-import faang.school.paymentservice.repository.BankOperationRepository;
+import faang.school.paymentservice.model.Transfer;
+import faang.school.paymentservice.repository.TransferRepository;
+import faang.school.paymentservice.service.redis.RedisService;
 import faang.school.paymentservice.service.transaction.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +19,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static faang.school.paymentservice.service.payment.PaymentValidator.validateCancel;
 import static faang.school.paymentservice.service.payment.PaymentValidator.validateClearing;
@@ -24,6 +29,11 @@ import static faang.school.paymentservice.service.payment.PaymentValidator.valid
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
+
+    private final TransferRepository transferRepository;
+    private final KafkaProducerService kafkaProducerService;
+    private final TransactionService transactionService;
+    private final RedisService redisService;
 
     @Value("${spring.kafka.topics.payment.authorization-request}")
     private String authorizationRequestTopic;
@@ -34,94 +44,93 @@ public class PaymentService {
     @Value("${spring.kafka.topics.payment.cancel-request}")
     private String cancelRequestTopic;
 
-    private final BankOperationRepository bankOperationRepository;
-    private final KafkaProducerService kafkaProducerService;
+    @Value("${app.clear-scheduled-at}")
+    private Long clearScheduledAt;
 
-    private final TransactionService transactionService;
+    @Value("${app.request-ttl}")
+    private Long requestTTL;
 
     @Transactional
     public UUID processAuthorization(@Valid AuthorizationDto authorizationDto) {
-        BankOperation bankOperation = BankOperation.builder()
+        validateIdempotence(authorizationDto);
+        Transfer transfer = Transfer.builder()
                 .senderAccountId(authorizationDto.senderAccountId())
                 .recipientAccountId(authorizationDto.recipientAccountId())
                 .amount(authorizationDto.amount())
-                .typeOperation(TypeOperation.AUTHORIZATION)
                 .productCategory(authorizationDto.productCategory())
-                .clearScheduledAt(authorizationDto.clearScheduledAt())
+                .clearScheduledAt(LocalDateTime.now().plusSeconds(clearScheduledAt))
                 .status(PaymentStatus.ON_AUTHORIZATION)
                 .build();
 
-        BankOperation savedBankOperation = bankOperationRepository.save(bankOperation);
+        Transfer savedTransfer = transferRepository.save(transfer);
 
-        transactionService.saveTransactionBankOperation(savedBankOperation);
+        transactionService.saveTransfersTransaction(savedTransfer, TypeOperation.AUTHORIZATION);
 
-        KafkaAuthorizationRequestDto paymentToSend = new KafkaAuthorizationRequestDto(
+        AuthorizationKafkaRequestDto paymentToSend = new AuthorizationKafkaRequestDto(
                 authorizationDto.senderAccountId(),
                 authorizationDto.amount(),
-                savedBankOperation.getId());
+                savedTransfer.getId());
 
         kafkaProducerService.sendMessage(authorizationRequestTopic, paymentToSend);
-        return savedBankOperation.getId();
+        return savedTransfer.getId();
     }
 
-    @Transactional
-    public void retryAuthorization(UUID operationId) {
-        BankOperation bankOperation = bankOperationRepository.findByIdOrThrow(operationId);
+    private void validateIdempotence(AuthorizationDto authorizationDto) {
+        String  key = String.valueOf(authorizationDto.hashCode());
 
-        bankOperation.setTypeOperation(TypeOperation.AUTHORIZATION);
-        bankOperation.setStatus(PaymentStatus.ON_AUTHORIZATION);
-        bankOperationRepository.save(bankOperation);
+        if (redisService.exists(key)) {
+            throw new DuplicateRequestException("Duplicate request");
+        }
 
-        transactionService.saveTransactionBankOperation(bankOperation);
-
-        KafkaAuthorizationRequestDto paymentToSend = new KafkaAuthorizationRequestDto(
-                bankOperation.getSenderAccountId(),
-                bankOperation.getAmount(),
-                bankOperation.getId());
-
-        kafkaProducerService.sendMessage(authorizationRequestTopic, paymentToSend);
+        redisService.set(key, authorizationDto, requestTTL, TimeUnit.SECONDS);
     }
 
     @Transactional
     public void clearingOperation(UUID operationId) {
-        BankOperation bankOperation = bankOperationRepository.findByIdOrThrow(operationId);
+        Transfer transfer = transferRepository.findByIdOrThrow(operationId);
 
-        validateClearing(bankOperation);
+        validateClearing(transfer);
 
-        bankOperation.setTypeOperation(TypeOperation.CLEARING);
-        bankOperation.setStatus(PaymentStatus.ON_CLEARING);
-        bankOperationRepository.save(bankOperation);
+        transfer.setStatus(PaymentStatus.ON_CLEARING);
+        transferRepository.save(transfer);
 
-        transactionService.saveTransactionBankOperation(bankOperation);
+        transactionService.saveTransfersTransaction(transfer, TypeOperation.CLEARING);
 
-        KafkaClearingRequestDto paymentToSend = new KafkaClearingRequestDto(
-                bankOperation.getSenderAccountId(),
-                bankOperation.getRecipientAccountId(),
-                bankOperation.getAmount(),
-                bankOperation.getId());
+        ClearingKafkaRequestDto paymentToSend = new ClearingKafkaRequestDto(
+                transfer.getSenderAccountId(),
+                transfer.getRecipientAccountId(),
+                transfer.getAmount(),
+                transfer.getId());
         kafkaProducerService.sendMessage(clearingRequestTopic, paymentToSend);
     }
 
     @Transactional
     public void cancelOperation(UUID operationId) {
-        BankOperation bankOperation = bankOperationRepository.findByIdOrThrow(operationId);
+        Transfer transfer = transferRepository.findByIdOrThrow(operationId);
 
-        validateCancel(bankOperation);
+        validateCancel(transfer);
 
-        bankOperation.setTypeOperation(TypeOperation.CANCELING);
-        bankOperation.setStatus(PaymentStatus.ON_CANCELLING);
-        bankOperationRepository.save(bankOperation);
+        transfer.setStatus(PaymentStatus.ON_CANCELLING);
+        transferRepository.save(transfer);
 
-        transactionService.saveTransactionBankOperation(bankOperation);
+        transactionService.saveTransfersTransaction(transfer, TypeOperation.CANCELING);
 
-        KafkaCancelRequestDto paymentToSend = new KafkaCancelRequestDto(
-                bankOperation.getSenderAccountId(),
-                bankOperation.getAmount(),
-                bankOperation.getId());
+        CancelKafkaRequestDto paymentToSend = new CancelKafkaRequestDto(
+                transfer.getSenderAccountId(),
+                transfer.getAmount(),
+                transfer.getId());
         kafkaProducerService.sendMessage(cancelRequestTopic, paymentToSend);
     }
 
-    public BankOperation getBankOperation(UUID operationId) {
-        return bankOperationRepository.findByIdOrThrow(operationId);
+    public BankOperationDto getBankOperation(UUID operationId) {
+        Transfer transfer = transferRepository.findByIdOrThrow(operationId);
+        return new BankOperationDto(
+                transfer.getSenderAccountId(),
+                transfer.getRecipientAccountId(),
+                transfer.getAmount(),
+                transfer.getProductCategory(),
+                transfer.getClearScheduledAt(),
+                transfer.getStatus()
+        );
     }
 }

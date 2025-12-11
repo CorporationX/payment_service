@@ -1,13 +1,14 @@
 package faang.school.paymentservice.model;
 
-import faang.school.paymentservice.dto.TypeOperation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -20,8 +21,8 @@ import lombok.experimental.FieldNameConstants;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -31,12 +32,15 @@ import java.util.UUID;
 @Builder
 @Entity
 @FieldNameConstants
-@Table(name = "bank_operation")
-public class BankOperation {
+@Table(name = "transfer")
+public class Transfer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @OneToMany(mappedBy = "transfer", fetch = FetchType.LAZY)
+    private List<Transaction> transactions;
 
     @Column(name = "sender_account_id", nullable = false)
     private UUID senderAccountId;
@@ -45,11 +49,7 @@ public class BankOperation {
     private UUID recipientAccountId;
 
     @Column(name = "amount", nullable = false)
-    private BigDecimal amount;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type_operation", nullable = false)
-    private TypeOperation typeOperation;
+    private Long amount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "product_category")

@@ -15,6 +15,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  data:
+    redis:
+      port: 6379
+      host: localhost
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
@@ -59,6 +63,5 @@ app:
   scheduled:
     payments:
       clearing-scheduling: "0/30 * * * * *"
-      retry-authorization-error: "0/30 * * * * *"
-      retry-clearing-error: "0/30 * * * * *"
-      retry-cancel-error: "0/30 * * * * *"
+  clear-scheduled-at: 1800
+  request-ttl: 15

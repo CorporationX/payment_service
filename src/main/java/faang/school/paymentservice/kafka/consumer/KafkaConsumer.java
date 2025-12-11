@@ -1,12 +1,11 @@
 package faang.school.paymentservice.kafka.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import faang.school.paymentservice.kafka.dto.KafkaAuthorizationResponseDto;
-import faang.school.paymentservice.kafka.dto.KafkaCancelResponseDto;
-import faang.school.paymentservice.kafka.dto.KafkaClearingResponseDto;
+import faang.school.paymentservice.kafka.dto.AuthorizationKafkaResponseDto;
+import faang.school.paymentservice.kafka.dto.CancelKafkaResponseDto;
+import faang.school.paymentservice.kafka.dto.ClearingKafkaResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -27,10 +26,10 @@ public class KafkaConsumer {
             groupId = "authorization-response",
             concurrency = "${spring.kafka.consumer.concurrency}",
             containerFactory = "paymentKafkaListenerContainerFactory")
-    public void authorizationResponseListener(@Payload Map<String, Object> consumerRecord, Acknowledgment ack) {
-        KafkaAuthorizationResponseDto kafkaAuthorizationResponseDto = objectMapper.convertValue(consumerRecord, KafkaAuthorizationResponseDto.class);
-        log.info("Get Kafka event authorization response: {}", consumerRecord);
-        kafkaConsumerService.handleAuthorizationResponse(kafkaAuthorizationResponseDto);
+    public void authorizationResponseListener(@Payload Map<String, Object> responseDto, Acknowledgment ack) {
+        AuthorizationKafkaResponseDto authorizationKafkaResponseDto = objectMapper.convertValue(responseDto, AuthorizationKafkaResponseDto.class);
+        log.info("Get Kafka event authorization response: {}", responseDto);
+        kafkaConsumerService.handleAuthorizationResponse(authorizationKafkaResponseDto);
         ack.acknowledge();
     }
 
@@ -39,22 +38,22 @@ public class KafkaConsumer {
             groupId = "clearing-response",
             concurrency = "${spring.kafka.consumer.concurrency}",
             containerFactory = "paymentKafkaListenerContainerFactory")
-    public void clearingResponseListener(@Payload Map<String, Object> consumerRecord, Acknowledgment ack) {
-        KafkaClearingResponseDto kafkaClearingResponseDto = objectMapper.convertValue(consumerRecord, KafkaClearingResponseDto.class);
-        log.info("Get Kafka event clearing response: {}", consumerRecord);
-        kafkaConsumerService.handleClearingResponse(kafkaClearingResponseDto);
+    public void clearingResponseListener(@Payload Map<String, Object> responseDto, Acknowledgment ack) {
+        ClearingKafkaResponseDto clearingKafkaResponseDto = objectMapper.convertValue(responseDto, ClearingKafkaResponseDto.class);
+        log.info("Get Kafka event clearing response: {}", responseDto);
+        kafkaConsumerService.handleClearingResponse(clearingKafkaResponseDto);
         ack.acknowledge();
     }
 
     @KafkaListener(
             topics = "${spring.kafka.topics.payment.cancel-response}",
-            groupId = "clearing-response",
+            groupId = "cancel-response",
             concurrency = "${spring.kafka.consumer.concurrency}",
             containerFactory = "paymentKafkaListenerContainerFactory")
-    public void cancelResponseListener(ConsumerRecord<String, Object> consumerRecord, Acknowledgment ack) {
-        KafkaCancelResponseDto kafkaCancelResponseDto = objectMapper.convertValue(consumerRecord, KafkaCancelResponseDto.class);
-        log.info("Get Kafka event cancel response: {}", consumerRecord);
-        kafkaConsumerService.handleCancelResponse(kafkaCancelResponseDto);
+    public void cancelResponseListener(@Payload Map<String, Object> responseDto, Acknowledgment ack) {
+        CancelKafkaResponseDto cancelKafkaResponseDto = objectMapper.convertValue(responseDto, CancelKafkaResponseDto.class);
+        log.info("Get Kafka event cancel response: {}", responseDto);
+        kafkaConsumerService.handleCancelResponse(cancelKafkaResponseDto);
         ack.acknowledge();
     }
 }

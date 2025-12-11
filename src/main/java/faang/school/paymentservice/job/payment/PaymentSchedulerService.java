@@ -1,7 +1,7 @@
 package faang.school.paymentservice.job.payment;
 
 import faang.school.paymentservice.model.PaymentStatus;
-import faang.school.paymentservice.repository.BankOperationRepository;
+import faang.school.paymentservice.repository.TransferRepository;
 import faang.school.paymentservice.service.payment.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,28 +14,13 @@ import java.util.UUID;
 @Service
 public class PaymentSchedulerService {
 
-    private final BankOperationRepository bankOperationRepository;
+    private final TransferRepository transferRepository;
     private final PaymentService paymentService;
 
     public void clearingSchedulingPayments() {
-        List<UUID> bankOperationIdList = bankOperationRepository.findIdsByStatusAndClearScheduledAt(
+        List<UUID> bankOperationIdList = transferRepository.findIdsByStatusAndClearScheduledAt(
                 PaymentStatus.AUTHORIZATION_SUCCESS,
                 LocalDateTime.now());
         bankOperationIdList.forEach(paymentService::clearingOperation);
-    }
-
-    public void retryAuthorizationErrorPayments() {
-        List<UUID> bankOperationIdList = bankOperationRepository.findIdsByStatus(PaymentStatus.AUTHORIZATION_ERROR);
-        bankOperationIdList.forEach(paymentService::retryAuthorization);
-    }
-
-    public void retryClearingErrorPayments() {
-        List<UUID> bankOperationIdList = bankOperationRepository.findIdsByStatus(PaymentStatus.CLEARING_ERROR);
-        bankOperationIdList.forEach(paymentService::clearingOperation);
-    }
-
-    public void retryCancelErrorPayments() {
-        List<UUID> bankOperationIdList = bankOperationRepository.findIdsByStatus(PaymentStatus.CANCEL_ERROR);
-        bankOperationIdList.forEach(paymentService::retryAuthorization);
     }
 }

@@ -4,8 +4,8 @@ import faang.school.paymentservice.model.PaymentStatus;
 
 import java.util.UUID;
 
-public record KafkaAuthorizationResponseDto(
-        UUID operationId,
+public record CancelKafkaResponseDto(
+        UUID transferId,
         PaymentStatus paymentStatus,
         String description
 ) {

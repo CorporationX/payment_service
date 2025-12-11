@@ -1,6 +1,7 @@
 package faang.school.paymentservice.service.transaction;
 
-import faang.school.paymentservice.model.BankOperation;
+import faang.school.paymentservice.dto.TypeOperation;
+import faang.school.paymentservice.model.Transfer;
 import faang.school.paymentservice.model.Transaction;
 import faang.school.paymentservice.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,13 +13,12 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
 
-    public void saveTransactionBankOperation(BankOperation bankOperation) {
+    public void saveTransfersTransaction(Transfer transfer, TypeOperation typeOperation) {
         Transaction transaction = Transaction.builder()
-                .bankOperation(bankOperation)
-                .requestAccountId(bankOperation.getSenderAccountId())
-                .typeOperation(bankOperation.getTypeOperation())
-                .status(bankOperation.getStatus())
-                .statusDescription(bankOperation.getStatusDescription())
+                .transfer(transfer)
+                .typeOperation(typeOperation)
+                .status(transfer.getStatus())
+                .statusDescription(transfer.getStatusDescription())
                 .build();
         transactionRepository.save(transaction);
     }

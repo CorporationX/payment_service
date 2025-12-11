@@ -1,11 +1,13 @@
 package faang.school.paymentservice.kafka.consumer;
 
-import faang.school.paymentservice.kafka.dto.KafkaAuthorizationResponseDto;
-import faang.school.paymentservice.kafka.dto.KafkaCancelResponseDto;
-import faang.school.paymentservice.kafka.dto.KafkaClearingResponseDto;
-import faang.school.paymentservice.model.BankOperation;
+import faang.school.paymentservice.dto.TypeOperation;
+import faang.school.paymentservice.kafka.dto.AuthorizationKafkaResponseDto;
+import faang.school.paymentservice.kafka.dto.CancelKafkaResponseDto;
+import faang.school.paymentservice.kafka.dto.ClearingKafkaResponseDto;
+import faang.school.paymentservice.model.Transfer;
 import faang.school.paymentservice.model.PaymentStatus;
-import faang.school.paymentservice.repository.BankOperationRepository;
+import faang.school.paymentservice.repository.TransferRepository;
+import faang.school.paymentservice.service.transaction.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,27 +18,29 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class KafkaConsumerService {
 
-    private final BankOperationRepository bankOperationRepository;
+    private final TransferRepository transferRepository;
+    private final TransactionService transactionService;
 
     @Transactional
-    public void handleAuthorizationResponse(KafkaAuthorizationResponseDto responseDto) {
-        handleResponse(responseDto.operationId(), responseDto.paymentStatus(), responseDto.description());
+    public void handleAuthorizationResponse(AuthorizationKafkaResponseDto responseDto) {
+        handleResponse(responseDto.transferId(), responseDto.paymentStatus(), responseDto.description(), TypeOperation.AUTHORIZATION);
     }
 
     @Transactional
-    public void handleClearingResponse(KafkaClearingResponseDto responseDto) {
-        handleResponse(responseDto.operationId(), responseDto.paymentStatus(), responseDto.description());
+    public void handleClearingResponse(ClearingKafkaResponseDto responseDto) {
+        handleResponse(responseDto.transferId(), responseDto.paymentStatus(), responseDto.description(), TypeOperation.CLEARING);
     }
 
     @Transactional
-    public void handleCancelResponse(KafkaCancelResponseDto responseDto) {
-        handleResponse(responseDto.operationId(), responseDto.paymentStatus(), responseDto.description());
+    public void handleCancelResponse(CancelKafkaResponseDto responseDto) {
+        handleResponse(responseDto.transferId(), responseDto.paymentStatus(), responseDto.description(), TypeOperation.CANCELING);
     }
 
-    private void handleResponse(UUID operationId, PaymentStatus paymentStatus, String description) {
-        BankOperation bankOperation = bankOperationRepository.findByIdOrThrow(operationId);
-        bankOperation.setStatus(paymentStatus);
-        bankOperation.setStatusDescription(description);
-        bankOperationRepository.save(bankOperation);
+    private void handleResponse(UUID operationId, PaymentStatus paymentStatus, String description, TypeOperation typeOperation) {
+        Transfer transfer = transferRepository.findByIdOrThrow(operationId);
+        transfer.setStatus(paymentStatus);
+        transfer.setStatusDescription(description);
+        Transfer savedTransfer = transferRepository.save(transfer);
+        transactionService.saveTransfersTransaction(savedTransfer, typeOperation);
     }
 }

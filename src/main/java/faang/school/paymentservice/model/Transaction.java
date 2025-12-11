@@ -40,11 +40,8 @@ public class Transaction {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "project_id")
-    private BankOperation bankOperation;
-
-    @Column(name = "request_account_id", nullable = false)
-    private UUID requestAccountId;
+    @JoinColumn(name = "transfer_id")
+    private Transfer transfer;
 
     @Column(name = "type_operation", nullable = false)
     @Enumerated(EnumType.STRING)
