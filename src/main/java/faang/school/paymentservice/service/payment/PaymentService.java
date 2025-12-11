@@ -86,40 +86,54 @@ public class PaymentService {
     }
 
     @Transactional
-    public void clearingOperation(UUID operationId) {
-        Transfer transfer = transferRepository.findByIdOrThrow(operationId);
+    public void clearingOperation(UUID transferId) {
+        Transfer transfer = transferRepository.findByIdOrThrow(transferId);
 
-        validateClearing(transfer);
+        if (transfer.getStatus() == PaymentStatus.ON_AUTHORIZATION) {
+            transfer.setStatus(PaymentStatus.CLEARING_WAITING);
+            Transfer savedTransfer = transferRepository.save(transfer);
 
-        transfer.setStatus(PaymentStatus.ON_CLEARING);
-        transferRepository.save(transfer);
+            transactionService.saveTransfersTransaction(savedTransfer, TypeOperation.CLEARING);
+        } else {
+            validateClearing(transfer);
 
-        transactionService.saveTransfersTransaction(transfer, TypeOperation.CLEARING);
+            transfer.setStatus(PaymentStatus.ON_CLEARING);
+            Transfer savedTransfer = transferRepository.save(transfer);
 
-        ClearingKafkaRequestDto paymentToSend = new ClearingKafkaRequestDto(
-                transfer.getSenderAccountId(),
-                transfer.getRecipientAccountId(),
-                transfer.getAmount(),
-                transfer.getId());
-        kafkaProducerService.sendMessage(clearingRequestTopic, paymentToSend);
+            transactionService.saveTransfersTransaction(savedTransfer, TypeOperation.CLEARING);
+
+            ClearingKafkaRequestDto paymentToSend = new ClearingKafkaRequestDto(
+                    transfer.getSenderAccountId(),
+                    transfer.getRecipientAccountId(),
+                    transfer.getAmount(),
+                    transfer.getId());
+            kafkaProducerService.sendMessage(clearingRequestTopic, paymentToSend);
+        }
     }
 
     @Transactional
-    public void cancelOperation(UUID operationId) {
-        Transfer transfer = transferRepository.findByIdOrThrow(operationId);
+    public void cancelOperation(UUID transferId) {
+        Transfer transfer = transferRepository.findByIdOrThrow(transferId);
 
-        validateCancel(transfer);
+        if (transfer.getStatus() == PaymentStatus.ON_AUTHORIZATION) {
+            transfer.setStatus(PaymentStatus.CANCEL_WAITING);
+            Transfer savedTransfer = transferRepository.save(transfer);
 
-        transfer.setStatus(PaymentStatus.ON_CANCELLING);
-        transferRepository.save(transfer);
+            transactionService.saveTransfersTransaction(savedTransfer, TypeOperation.CANCELING);
+        } else {
+            validateCancel(transfer);
 
-        transactionService.saveTransfersTransaction(transfer, TypeOperation.CANCELING);
+            transfer.setStatus(PaymentStatus.ON_CANCELLING);
+            Transfer savedTransfer = transferRepository.save(transfer);
 
-        CancelKafkaRequestDto paymentToSend = new CancelKafkaRequestDto(
-                transfer.getSenderAccountId(),
-                transfer.getAmount(),
-                transfer.getId());
-        kafkaProducerService.sendMessage(cancelRequestTopic, paymentToSend);
+            transactionService.saveTransfersTransaction(savedTransfer, TypeOperation.CANCELING);
+
+            CancelKafkaRequestDto paymentToSend = new CancelKafkaRequestDto(
+                    transfer.getSenderAccountId(),
+                    transfer.getAmount(),
+                    transfer.getId());
+            kafkaProducerService.sendMessage(cancelRequestTopic, paymentToSend);
+        }
     }
 
     public BankOperationDto getBankOperation(UUID operationId) {

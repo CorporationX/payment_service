@@ -7,6 +7,7 @@ import faang.school.paymentservice.kafka.dto.ClearingKafkaResponseDto;
 import faang.school.paymentservice.model.Transfer;
 import faang.school.paymentservice.model.PaymentStatus;
 import faang.school.paymentservice.repository.TransferRepository;
+import faang.school.paymentservice.service.payment.PaymentService;
 import faang.school.paymentservice.service.transaction.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,17 @@ public class KafkaConsumerService {
 
     private final TransferRepository transferRepository;
     private final TransactionService transactionService;
+    private final PaymentService paymentService;
 
     @Transactional
     public void handleAuthorizationResponse(AuthorizationKafkaResponseDto responseDto) {
-        handleResponse(responseDto.transferId(), responseDto.paymentStatus(), responseDto.description(), TypeOperation.AUTHORIZATION);
+        Transfer transfer = transferRepository.findByIdOrThrow(responseDto.transferId());
+        PaymentStatus transferStatus = transfer.getStatus();
+        transfer.setStatus(responseDto.paymentStatus());
+        transfer.setStatusDescription(responseDto.description());
+        Transfer savedTransfer = transferRepository.save(transfer);
+        transactionService.saveTransfersTransaction(savedTransfer, TypeOperation.AUTHORIZATION);
+        checkForWaitingOperations(responseDto.paymentStatus(), transferStatus, responseDto.transferId());
     }
 
     @Transactional
@@ -42,5 +50,16 @@ public class KafkaConsumerService {
         transfer.setStatusDescription(description);
         Transfer savedTransfer = transferRepository.save(transfer);
         transactionService.saveTransfersTransaction(savedTransfer, typeOperation);
+    }
+
+    private void checkForWaitingOperations(PaymentStatus responseStatus, PaymentStatus existTransferStatus, UUID transferId) {
+        if (responseStatus == PaymentStatus.AUTHORIZATION_SUCCESS) {
+            if (existTransferStatus == PaymentStatus.CLEARING_WAITING) {
+                paymentService.clearingOperation(transferId);
+            }
+            if (existTransferStatus == PaymentStatus.CANCEL_WAITING) {
+                paymentService.cancelOperation(transferId);
+            }
+        }
     }
 }
