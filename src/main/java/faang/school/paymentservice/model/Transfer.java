@@ -39,7 +39,7 @@ public class Transfer {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToMany(mappedBy = "transfer", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "transfer", fetch = FetchType.EAGER)
     private List<Transaction> transactions;
 
     @Column(name = "sender_account_id", nullable = false)

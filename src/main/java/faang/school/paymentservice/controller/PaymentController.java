@@ -1,6 +1,6 @@
 package faang.school.paymentservice.controller;
 
-import faang.school.paymentservice.dto.BankOperationDto;
+import faang.school.paymentservice.dto.TransferDto;
 import faang.school.paymentservice.dto.PaymentRequest;
 import java.text.DecimalFormat;
 import java.util.Random;
@@ -64,9 +64,9 @@ public class PaymentController {
         paymentService.cancelOperation(operationId);
     }
 
-    @GetMapping("/{operationId}")
-    public ResponseEntity<BankOperationDto> getBankOperation(@PathVariable UUID operationId) {
-        BankOperationDto bankOperationDto = paymentService.getBankOperation(operationId);
-        return ResponseEntity.ok().body(bankOperationDto);
+    @GetMapping("/{operationId}/{senderAccountId}")
+    public ResponseEntity<TransferDto> getBankOperation(@PathVariable UUID operationId, @PathVariable UUID senderAccountId) {
+        TransferDto transferDto = paymentService.getTransfer(operationId, senderAccountId);
+        return ResponseEntity.ok().body(transferDto);
     }
 }

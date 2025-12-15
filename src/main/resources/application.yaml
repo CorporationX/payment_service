@@ -8,6 +8,7 @@ spring:
     username: user
     password: password
   jpa:
+    open-in-view: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
@@ -31,9 +32,9 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
         spring.json.add.type.headers: false
-        acks: all
+        acks: 1
         retries: 1
-        enable.idempotence: true
+        enable.idempotence: false
         request.timeout.ms: 30000
         max.block.ms: 60000
     consumer:
@@ -44,6 +45,9 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
         spring.json.value.default.type: java.util.Map
+      authorization-group-id: "authorization-response"
+      clearing-group-id: "clearing-response"
+      cancel-group-id: "cancel-response"
     topics:
       payment.authorization-request: "payment.authorization-request"
       payment.authorization-response: "payment.authorization-response"

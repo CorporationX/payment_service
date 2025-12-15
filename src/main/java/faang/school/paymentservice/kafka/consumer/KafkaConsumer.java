@@ -23,7 +23,7 @@ public class KafkaConsumer {
 
     @KafkaListener(
             topics = "${spring.kafka.topics.payment.authorization-response}",
-            groupId = "authorization-response",
+            groupId = "${spring.kafka.consumer.authorization-group-id}",
             concurrency = "${spring.kafka.consumer.concurrency}",
             containerFactory = "paymentKafkaListenerContainerFactory")
     public void authorizationResponseListener(@Payload Map<String, Object> responseDto, Acknowledgment ack) {
@@ -35,7 +35,7 @@ public class KafkaConsumer {
 
     @KafkaListener(
             topics = "${spring.kafka.topics.payment.clearing-response}",
-            groupId = "clearing-response",
+            groupId = "${spring.kafka.consumer.clearing-group-id}",
             concurrency = "${spring.kafka.consumer.concurrency}",
             containerFactory = "paymentKafkaListenerContainerFactory")
     public void clearingResponseListener(@Payload Map<String, Object> responseDto, Acknowledgment ack) {
@@ -47,7 +47,7 @@ public class KafkaConsumer {
 
     @KafkaListener(
             topics = "${spring.kafka.topics.payment.cancel-response}",
-            groupId = "cancel-response",
+            groupId = "${spring.kafka.consumer.cancel-group-id}",
             concurrency = "${spring.kafka.consumer.concurrency}",
             containerFactory = "paymentKafkaListenerContainerFactory")
     public void cancelResponseListener(@Payload Map<String, Object> responseDto, Acknowledgment ack) {

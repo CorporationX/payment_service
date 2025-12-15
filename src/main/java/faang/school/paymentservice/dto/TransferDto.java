@@ -6,7 +6,7 @@ import faang.school.paymentservice.model.ProductCategory;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record BankOperationDto(
+public record TransferDto(
         UUID senderAccountId,
         UUID recipientAccountId,
         Long amount,

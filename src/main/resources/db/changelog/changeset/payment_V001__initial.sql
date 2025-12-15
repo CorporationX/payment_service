@@ -22,10 +22,8 @@ CREATE TABLE transaction (
     status               varchar(255)   NOT NULL,
     status_description   text,
     created_at           timestamp      NOT NULL DEFAULT now(),
-    updated_at           timestamp
+    updated_at           timestamp,
+    CONSTRAINT fk_transaction_transfer
+            FOREIGN KEY (transfer_id)
+            REFERENCES transfer (id)
 );
-
-ALTER TABLE transaction
-    ADD CONSTRAINT fk_transaction_transfer
-        FOREIGN KEY (transfer_id)
-        REFERENCES transfer (id);
