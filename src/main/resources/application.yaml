@@ -1,6 +1,71 @@
+spring:
+  application:
+    name: User Service
+    version: 1.0.0
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: user
+    password: password
+  jpa:
+    open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.add.type.headers: false
+        acks: 1
+        retries: 1
+        enable.idempotence: false
+        request.timeout.ms: 30000
+        max.block.ms: 60000
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      concurrency: 3
+      enable-auto-commit: false
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: java.util.Map
+      authorization-group-id: "authorization-response"
+      clearing-group-id: "clearing-response"
+      cancel-group-id: "cancel-response"
+    topics:
+      payment.authorization-request: "payment.authorization-request"
+      payment.authorization-response: "payment.authorization-response"
+      payment.clearing-request: "payment.clearing-request"
+      payment.clearing-response: "payment.clearing-response"
+      payment.cancel-request: "payment.cancel-request"
+      payment.cancel-response: "payment.cancel-response"
+
 server:
   port: 9080
 
 logging:
   level:
     root: info
+
+app:
+  scheduled:
+    payments:
+      clearing-scheduling: "0/30 * * * * *"
+  clear-scheduled-at: 1800
+  request-ttl: 15

@@ -17,8 +17,17 @@ dependencies {
      * Spring boot starters
      */
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    implementation("org.springframework.kafka:spring-kafka:3.3.10")
+
+    /**
+     * Database
+     */
+    implementation("org.liquibase:liquibase-core")
+    runtimeOnly("org.postgresql:postgresql")
 
     /**
      * Utils & Logging
